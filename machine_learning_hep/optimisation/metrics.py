@@ -15,7 +15,7 @@
 """
 Metrics for (ML) optimisation
 """
-from sklearn.metrics import make_scorer, roc_auc_score, accuracy_score
+from sklearn.metrics import make_scorer, roc_auc_score, accuracy_score, mean_squared_error
 
 
 def get_scorers(score_names):
@@ -33,5 +33,8 @@ def get_scorers(score_names):
             scorers["AUC"] = make_scorer(roc_auc_score, needs_threshold=True)
         elif sn == "Accuracy":
             scorers["Accuracy"] = make_scorer(accuracy_score)
+
+        elif sn == "MSE":
+            scorers["MSE"] = make_scorer(mean_squared_error)
 
     return scorers
