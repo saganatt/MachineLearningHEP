@@ -32,7 +32,7 @@ import pandas as pd
 import uproot
 
 from .bitwise import tag_bit_df
-from .io import dump_yaml_from_dict
+from .io_ml_utils import dump_yaml_from_dict
 from .logger import get_logger
 from .utilities import (count_df_length_pkl, dfquery, mask_df, merge_method,
                         mergerootfiles, openfile, read_df, seldf_singlevar,

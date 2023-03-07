@@ -44,7 +44,7 @@ from machine_learning_hep.logger import get_logger
 import machine_learning_hep.optimization as optz
 from machine_learning_hep.correlations import vardistplot_probscan, efficiency_cutscan
 from machine_learning_hep.utilities_files import checkdirs, checkmakedirlist
-from machine_learning_hep.io import parse_yaml, dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import parse_yaml, dump_yaml_from_dict
 
 
 # pylint: disable=too-many-instance-attributes, too-many-statements, unbalanced-tuple-unpacking, fixme

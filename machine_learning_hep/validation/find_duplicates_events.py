@@ -20,7 +20,7 @@ from lz4 import frame # pylint: disable=unused-import
 import yaml
 
 from machine_learning_hep.utilities import openfile
-from machine_learning_hep.io import dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import dump_yaml_from_dict
 from machine_learning_hep.do_variations import modify_dictionary
 
 

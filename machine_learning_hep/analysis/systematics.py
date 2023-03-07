@@ -35,7 +35,7 @@ from ROOT import TGraphErrors
 from machine_learning_hep.utilities_plot import load_root_style
 from machine_learning_hep.fitting.helpers import MLFitter
 from machine_learning_hep.multiprocesser import MultiProcesser
-from machine_learning_hep.io import parse_yaml, dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import parse_yaml, dump_yaml_from_dict
 from machine_learning_hep.logger import get_logger
 
 

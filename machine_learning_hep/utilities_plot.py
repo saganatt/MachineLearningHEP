@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 from ROOT import TH1F, TH2F, TH2, TFile, TH1, TH3F, TGraphAsymmErrors
 from ROOT import TPad, TCanvas, TLegend, kBlack, kGreen, kRed, kBlue, kWhite
 from ROOT import gStyle, gROOT, TMatrixD
-from machine_learning_hep.io import parse_yaml, dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import parse_yaml, dump_yaml_from_dict
 from machine_learning_hep.logger import get_logger
 
 def prepare_fig(plot_count):

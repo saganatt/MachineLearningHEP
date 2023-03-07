@@ -18,7 +18,7 @@ import os
 
 # HF specific imports
 from machine_learning_hep.workflow.workflow_base import WorkflowBase
-from machine_learning_hep.io import dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import dump_yaml_from_dict
 
 class Analyzer(WorkflowBase):
     def __init__(self, datap, case, typean, period):
