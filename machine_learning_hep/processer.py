@@ -33,7 +33,7 @@ from machine_learning_hep.utilities import dfquery, selectdfquery, merge_method,
 from machine_learning_hep.utilities import list_folders, createlist, appendmainfoldertolist
 from machine_learning_hep.utilities import create_folder_struc, seldf_singlevar, openfile
 from machine_learning_hep.utilities import mergerootfiles, count_df_length_pkl
-from machine_learning_hep.io import dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import dump_yaml_from_dict
 from machine_learning_hep.logger import get_logger
 pd.options.mode.chained_assignment = None
 

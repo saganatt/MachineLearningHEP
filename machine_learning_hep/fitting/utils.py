@@ -27,7 +27,7 @@ import inspect
 # pylint: disable=import-error, no-name-in-module, unused-import
 from ROOT import TFile
 
-from machine_learning_hep.io import parse_yaml, dump_yaml_from_dict, checkdir
+from machine_learning_hep.io_ml_utils import parse_yaml, dump_yaml_from_dict, checkdir
 from machine_learning_hep.logger import get_logger
 
 

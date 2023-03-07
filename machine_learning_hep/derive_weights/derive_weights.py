@@ -28,7 +28,7 @@ from root_numpy import fill_hist # pylint: disable=import-error
 from ROOT import TFile, TH1F, TH2F # pylint: disable=import-error, no-name-in-module
 
 from machine_learning_hep.utilities import openfile
-from machine_learning_hep.io import parse_yaml
+from machine_learning_hep.io_ml_utils import parse_yaml
 from machine_learning_hep.do_variations import modify_dictionary
 
 

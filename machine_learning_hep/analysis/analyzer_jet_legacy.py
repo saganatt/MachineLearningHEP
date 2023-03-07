@@ -35,7 +35,7 @@ from ROOT import RooUnfoldBayes
 # HF specific imports
 from machine_learning_hep.fitting.helpers import MLFitter
 from machine_learning_hep.logger import get_logger
-from machine_learning_hep.io import dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import dump_yaml_from_dict
 from machine_learning_hep.utilities import folding, get_bins, make_latex_table, parallelizer
 from machine_learning_hep.utilities_plot import plot_histograms
 from machine_learning_hep.analysis.analyzer import Analyzer

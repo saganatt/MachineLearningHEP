@@ -18,7 +18,7 @@ main script for doing data processing, machine learning and analysis
 import os
 import tempfile
 from machine_learning_hep.utilities import merge_method, mergerootfiles
-from machine_learning_hep.io import parse_yaml, dump_yaml_from_dict
+from machine_learning_hep.io_ml_utils import parse_yaml, dump_yaml_from_dict
 from machine_learning_hep.logger import get_logger
 
 class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-statements, consider-using-f-string, too-many-branches
