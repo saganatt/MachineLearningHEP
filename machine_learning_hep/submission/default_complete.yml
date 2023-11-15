@@ -24,18 +24,18 @@ mergingperiods: # pkl_skimmed_merge_for_ml_all
     activate: false
 
 ml_study: # mlout, mlplot
-  activate: false
-  dotraining: false
-  dotesting: false
-  doplotdistr: false
+  activate: true
+  dotraining: true
+  dotesting: true
+  doplotdistr: true
   doroc: false
-  doroctraintest: false
-  doimportance: false
-  doimportanceshap: false
-  docorrelation: false
-  dolearningcurve: false
+  doroctraintest: true
+  doimportance: true
+  doimportanceshap: true
+  docorrelation: true
+  dolearningcurve: true
   doapplytodatamc: false
-  doscancuts: false
+  doscancuts: true
   doefficiency: false
   dosignifopt: false
   doboundary: false
