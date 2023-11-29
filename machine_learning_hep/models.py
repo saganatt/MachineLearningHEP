@@ -151,22 +151,33 @@ def test(ml_type, names_, trainedmodels_, test_set_, mylistvariables_, myvariabl
     logger = get_logger()
 
     x_test_ = test_set_[mylistvariables_]
-    y_test_ = test_set_[myvariablesy_].values.reshape(len(x_test_),)
-    test_set_[myvariablesy_] = pd.Series(y_test_, index=test_set_.index)
+    y_test_ = test_set_.filter(regex=myvariablesy_)
+    #logger.info(f"test set y:\n{y_test_}")
+    #num_cols = len(y_test_.columns)
+    #y_test_.values.reshape(len(x_test_), num_cols)
+    logger.info(f"len x test: {len(x_test_)} y test:\n{y_test_}")
+    test_set_[y_test_.columns] = y_test_
+    logger.info(f"Final test set y:\n{test_set_}")
     for name, model in zip(names_, trainedmodels_):
         y_test_prediction = []
         y_test_prob = []
         y_test_prediction = model.predict(x_test_)
-        y_test_prediction = y_test_prediction.reshape(len(y_test_prediction),)
-        test_set_['y_test_prediction'+name] = pd.Series(y_test_prediction, index=test_set_.index)
+        logger.info(f"y predicted:\n{y_test_prediction}")
+        #y_test_prediction = y_test_prediction.reshape(len(y_test_prediction), len(y_test_prediction[0]))
+        #logger.info(f"y predicted reshaped:\n{y_test_prediction}")
+        for ind, column in enumerate(y_test_.columns):
+            test_set_[f"y_test_prediction{name}_{column}"] = pd.Series(y_test_prediction[:, ind], index=test_set_.index)
 
+        print(f"y test with pred:\n{test_set_}")
         y_test_prob = model.predict_proba(x_test_)
+        logger.info(f"y test proba:\n{y_test_prob}")
         if ml_type == "BinaryClassification":
             test_set_['y_test_prob'+name] = pd.Series(y_test_prob[:, 1], index=test_set_.index)
         elif ml_type == "MultiClassification" and labels_ is not None:
             for pred, lab in enumerate(labels_):
                 test_set_['y_test_prob'+name+lab] = pd.Series(y_test_prob[:, pred],
                                                               index=test_set_.index)
+            print(f"Final test set:\n{test_set_}")
         else:
             logger.fatal("Incorrect settings for chosen mltype")
     return test_set_
