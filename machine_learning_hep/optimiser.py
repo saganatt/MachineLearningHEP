@@ -25,22 +25,21 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
+from sklearn.preprocessing import label_binarize
 from ROOT import TFile, TCanvas, TH1F, TF1, gROOT  # pylint: disable=import-error,no-name-in-module
-from machine_learning_hep.utilities import seldf_singlevar, split_df_sigbkg, createstringselection
+from machine_learning_hep.utilities import seldf_singlevar, split_df_classes, createstringselection
 from machine_learning_hep.utilities import openfile, selectdfquery, mask_df
+from machine_learning_hep.utilities import checkdirlist, checkmakedirlist
 from machine_learning_hep.correlations import vardistplot, scatterplot, correlationmatrix
+from machine_learning_hep.correlations import vardistplot_probscan, efficiency_cutscan
 from machine_learning_hep.models import getclf_scikit, getclf_xgboost, getclf_keras
 from machine_learning_hep.models import fit, savemodels, readmodels, test, apply, decisionboundaries
 # from machine_learning_hep.root import write_tree
-from machine_learning_hep.mlperformance import cross_validation_mse, plot_cross_validation_mse
-from machine_learning_hep.mlperformance import plot_learning_curves, precision_recall
-from machine_learning_hep.mlperformance import roc_train_test, plot_overtraining
-from machine_learning_hep.optimisation.grid_search import do_gridsearch, perform_plot_gridsearch
 from machine_learning_hep.models import importanceplotall, shap_study
+import machine_learning_hep.mlperformance as mlhep_plotting
+from machine_learning_hep.optimisation.grid_search import do_gridsearch, perform_plot_gridsearch
 from machine_learning_hep.logger import get_logger
 from machine_learning_hep.optimization import calc_bkg, calc_signif, calc_eff, calc_sigeff_steps
-from machine_learning_hep.correlations import vardistplot_probscan, efficiency_cutscan
-from machine_learning_hep.utilities import checkdirlist, checkmakedirlist
 from machine_learning_hep.io import parse_yaml, dump_yaml_from_dict
 
 
@@ -104,7 +103,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         #if self.v_selected:
         #    self.v_selected = self.v_selected[index]
         self.v_bound = data_param["variables"]["var_boundaries"]
-        self.v_sig = data_param["variables"]["var_signal"]
+        self.v_class = data_param["variables"]["var_class"]
         self.v_invmass = data_param["variables"]["var_inv_mass"]
         self.v_cuts = data_param["variables"].get("var_cuts", [])
         self.v_corrx = data_param["variables"]["var_correlation"][0]
@@ -119,8 +118,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.p_typean = typean
         self.p_nbkg = data_param["ml"]["nbkg"]
         self.p_nsig = data_param["ml"]["nsig"]
-        self.p_tagsig = data_param["ml"]["sampletagforsignal"]
-        self.p_tagbkg = data_param["ml"]["sampletagforbkg"]
+        self.p_tags = data_param["ml"]["sampletags"]
         self.p_binmin = binmin
         self.p_binmax = binmax
         self.p_npca = None
@@ -140,27 +138,26 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.p_triggersel_mc = data_param["ml"]["triggersel"]["mc"]
         self.p_triggersel_data = data_param["ml"]["triggersel"]["data"]
 
+        self.p_multiclass_labels = data_param["ml"]["multiclass_labels"]
+
         #dataframes
         self.df_mc = None
         self.df_mcgen = None
         self.df_data = None
         self.arraydf = None
-        self.df_sig = None
-        self.df_bkg = None
+        self.dfs_input = None
         self.df_ml = None
         self.df_mltest = None
         self.df_mltrain = None
-        self.df_sigtrain = None
-        self.df_sigtest = None
-        self.df_bkgtrain = None
-        self.df_bktest = None
+        self.dfs_train = None
+        self.dfs_test = None
         self.df_xtrain = None
         self.df_ytrain = None
         self.df_xtest = None
         self.df_ytest = None
         #selections
-        self.s_selbkgml = data_param["ml"]["sel_bkgml"]
-        self.s_selsigml = data_param["ml"]["sel_sigml"]
+        self.s_selbkg = data_param["ml"]["sel_bkg"] # used only to calculate significance
+        self.s_selml = data_param["ml"]["sel_ml"]
         self.p_equalise_sig_bkg = data_param["ml"].get("equalise_sig_bkg", False)
         #model param
         self.db_model = model_config
@@ -246,8 +243,11 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
 
 
     def preparesample(self):
-
         self.logger.info("Prepare Sample")
+
+        # tag == 0 corresponds to df_data in self.arraydf
+        sig_labs = [lab for lab, tag in zip(self.p_multiclass_labels, self.p_tags) if tag != 0]
+        bkg_labs = [lab for lab, tag in zip(self.p_multiclass_labels, self.p_tags) if tag == 0]
 
         filename_train = \
                 os.path.join(self.dirmlout, f"df_train_{self.p_binmin}_{self.p_binmax}.pkl")
@@ -261,31 +261,45 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
             self.df_mltest = pickle.load(openfile(filename_test, "rb"))
 
         else:
-
             self.prepare_data_mc_mcgen()
 
-            self.df_sig, self.df_bkg = self.arraydf[self.p_tagsig], self.arraydf[self.p_tagbkg]
-            self.df_sig = seldf_singlevar(self.df_sig, self.v_bin, self.p_binmin, self.p_binmax)
-            self.df_bkg = seldf_singlevar(self.df_bkg, self.v_bin, self.p_binmin, self.p_binmax)
-            self.df_sig = self.df_sig.query(self.s_selsigml)
-            self.df_bkg = self.df_bkg.query(self.s_selbkgml)
-            self.df_bkg["ismcsignal"] = 0
-            self.df_bkg["ismcprompt"] = 0
-            self.df_bkg["ismcfd"] = 0
-            self.df_bkg["ismcbkg"] = 0
+            self.dfs_input = {}
+            for ind, label in enumerate(self.p_multiclass_labels):
+                self.dfs_input[label] = self.arraydf[self.p_tags[ind]]
+                self.dfs_input[label] = seldf_singlevar(self.dfs_input[label],
+                                                        self.v_bin, self.p_binmin, self.p_binmax)
+                self.dfs_input[label] = self.dfs_input[label].query(self.s_selml[ind])
+
+            v_to_zero_in_data = ["ismcsignal", "ismcprompt", "ismcfd", "ismcbkg"]
+            for label in bkg_labs:
+                for var_to_zero in v_to_zero_in_data:
+                    self.dfs_input[label][var_to_zero] = 0
+
+            sigs_count = sum(len(self.dfs_input[label]) for label in sig_labs)
+            bkgs_count = sum(len(self.dfs_input[label]) for label in bkg_labs)
 
             if self.p_equalise_sig_bkg:
-                self.p_nsig = min(len(self.df_sig), len(self.df_bkg), self.p_nsig)
-                self.p_nbkg = min(len(self.df_sig), len(self.df_bkg), self.p_nbkg)
+                self.p_nsig = min(sigs_count, bkgs_count, self.p_nsig)
+                self.p_nbkg = min(sigs_count, bkgs_count, self.p_nbkg)
 
             self.df_ml = pd.DataFrame()
-            self.df_sig = shuffle(self.df_sig, random_state=self.rnd_shuffle)
-            self.df_bkg = shuffle(self.df_bkg, random_state=self.rnd_shuffle)
-            self.df_sig = self.df_sig[:self.p_nsig]
-            self.df_bkg = self.df_bkg[:self.p_nbkg]
-            self.df_sig[self.v_sig] = 1
-            self.df_bkg[self.v_sig] = 0
-            self.df_ml = pd.concat([self.df_sig, self.df_bkg])
+            for label in self.p_multiclass_labels:
+                self.dfs_input[label] = shuffle(self.dfs_input[label],
+                                                random_state=self.rnd_shuffle)
+            for label in sig_labs:
+                self.dfs_input[label] = self.dfs_input[label][:self.p_nsig]
+            for label in bkg_labs:
+                self.dfs_input[label] = self.dfs_input[label][:self.p_nbkg]
+            for ind, label in enumerate(self.p_multiclass_labels):
+                self.dfs_input[label][self.v_class] = ind
+            self.df_ml = pd.concat([self.dfs_input[label] for label in self.p_multiclass_labels])
+
+            self.logger.info(f"DF ml with class numbers:\n{self.df_ml}")
+            df_y = label_binarize(self.df_ml[self.v_class], classes=[*range(len(self.p_multiclass_labels))])
+            for ind, label in enumerate(self.p_multiclass_labels):
+                self.df_ml[f"{self.v_class}_{label}"] = df_y[:, ind]
+            self.logger.info(f"DF ml binarized:\n{self.df_ml}")
+
             self.df_mltrain, self.df_mltest = train_test_split(self.df_ml, \
                                                test_size=self.test_frac, random_state=self.rnd_splt)
             self.df_mltrain = self.df_mltrain.reset_index(drop=True)
@@ -296,32 +310,39 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
             pickle.dump(self.df_mltest, openfile(filename_test, "wb"), protocol=4)
 
         # Now continue with extracting signal and background stats and report
-        self.df_sigtrain, self.df_bkgtrain = split_df_sigbkg(self.df_mltrain, self.v_sig)
-        self.df_sigtest, self.df_bkgtest = split_df_sigbkg(self.df_mltest, self.v_sig)
+        self.dfs_train = split_df_classes(self.df_mltrain, self.v_class, self.p_multiclass_labels)
+        self.dfs_test = split_df_classes(self.df_mltest, self.v_class, self.p_multiclass_labels)
         self.logger.info("Total number of candidates: train %d and test %d", len(self.df_mltrain),
                          len(self.df_mltest))
-        self.logger.info("Number of signal candidates: train %d and test %d",
-                         len(self.df_sigtrain), len(self.df_sigtest))
-        self.logger.info("Number of bkg candidates: %d and test %d", len(self.df_bkgtrain),
-                         len(self.df_bkgtest))
+        for label in self.p_multiclass_labels:
+            self.logger.info("Number of %s candidates: train %d and test %d",
+                             label, len(self.dfs_train[label]), len(self.dfs_test[label]))
 
         self.logger.info("Aim for number of signal events: %d", self.p_nsig)
         self.logger.info("Aim for number of background events: %d", self.p_nbkg)
 
-        if self.p_nsig > (len(self.df_sigtrain) + len(self.df_sigtest)):
+        sigs_count_train = sum(len(self.dfs_train[label]) for label in sig_labs)
+        bkgs_count_train = sum(len(self.dfs_train[label]) for label in bkg_labs)
+        sigs_count_test = sum(len(self.dfs_test[label]) for label in sig_labs)
+        bkgs_count_test = sum(len(self.dfs_test[label]) for label in bkg_labs)
+
+        if self.p_nsig > (sigs_count_train + sigs_count_test):
             self.logger.warning("There are not enough signal events")
-        if self.p_nbkg > (len(self.df_bkgtrain) + len(self.df_bkgtest)):
+        if self.p_nbkg > (bkgs_count_train + bkgs_count_test):
             self.logger.warning("There are not enough background events")
 
         if self.p_mask_values:
             self.logger.info("Maksing values for training and testing")
             mask_df(self.df_mltrain, self.p_mask_values)
             mask_df(self.df_mltest, self.p_mask_values)
+
         # Final preparation of signal and background samples for training and testing
         self.df_xtrain = self.df_mltrain[self.v_train]
-        self.df_ytrain = self.df_mltrain[self.v_sig]
+        self.df_ytrain = self.df_mltrain.filter(regex=f"{self.v_class}_")
         self.df_xtest = self.df_mltest[self.v_train]
-        self.df_ytest = self.df_mltest[self.v_sig]
+        self.df_ytest = self.df_mltest.filter(regex=f"{self.v_class}_")
+        self.logger.info(f"df ytrain binarized:\n{self.df_ytrain}")
+        self.logger.info(f"df ytest binarized:\n{self.df_ytest}")
 
         self.step_done("preparemlsamples")
 
@@ -349,61 +370,23 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         def make_plot_name(output, label, n_var, binmin, binmax):
             return f'{output}/CorrMatrix_{label}_nVar{n_var}_{binmin:.1f}_{binmax:.1f}.png'
 
-        if self.v_selected:
-            vardistplot(self.df_sigtrain, self.df_bkgtrain,
-                        self.v_selected, self.dirmlplot,
-                        self.p_binmin, self.p_binmax, self.p_plot_options)
-        else:
-            vardistplot(self.df_sigtrain, self.df_bkgtrain,
-                    self.v_all, self.dirmlplot,
+        var_set = {"selected_vars": self.v_selected, "features": self.v_train} \
+                if self.v_selected else {"all_vars": self.v_all, "features": self.v_train}
+
+        vardistplot(self.dfs_train,
+                    sorted(var_set)[0], self.dirmlplot,
                     self.p_binmin, self.p_binmax, self.p_plot_options)
 
-        vardistplot(self.df_sigtrain, self.df_bkgtrain,
-                    self.v_train, self.dirmlplot,
-                    self.p_binmin, self.p_binmax, self.p_plot_options)
-
-        scatterplot(self.df_sigtrain, self.df_bkgtrain,
+        scatterplot(self.dfs_train,
                     self.v_corrx, self.v_corry,
                     self.dirmlplot, self.p_binmin, self.p_binmax)
 
-
-        if self.v_selected:
-            output = make_plot_name(self.dirmlplot, "Signal_selected_vars", len(self.v_selected),
-                                    self.p_binmin, self.p_binmax)
-            correlationmatrix(self.df_sigtrain, self.v_selected, "Signal", output,
-                              self.p_binmin, self.p_binmax, self.p_plot_options)
-
-            output = make_plot_name(self.dirmlplot, "Background_selected_vars",
-                                    len(self.v_selected), self.p_binmin, self.p_binmax)
-            correlationmatrix(self.df_bkgtrain, self.v_selected, "Background", output,
-                              self.p_binmin, self.p_binmax, self.p_plot_options)
-        else:
-            output = make_plot_name(self.dirmlplot, "Signal_all_vars", len(self.v_all),
-                              self.p_binmin, self.p_binmax)
-            correlationmatrix(self.df_sigtrain, self.v_all, "Signal", output,
-                              self.p_binmin, self.p_binmax, self.p_plot_options)
-
-            output = make_plot_name(self.dirmlplot, "Background_all_vars", len(self.v_all),
-                                    self.p_binmin, self.p_binmax)
-            correlationmatrix(self.df_bkgtrain, self.v_all, "Background", output,
-                              self.p_binmin, self.p_binmax, self.p_plot_options)
-
-        output = make_plot_name(self.dirmlplot, "Signal_features", len(self.v_train),
-                                self.p_binmin, self.p_binmax)
-        correlationmatrix(self.df_sigtrain, self.v_train, "Signal", output,
-                          self.p_binmin, self.p_binmax, self.p_plot_options)
-
-        output = make_plot_name(self.dirmlplot, "Background_features", len(self.v_train),
-                                self.p_binmin, self.p_binmax)
-        correlationmatrix(self.df_bkgtrain, self.v_train, "Background", output,
-                          self.p_binmin, self.p_binmax, self.p_plot_options)
-
-        # For each plot there was an IO returned. That is not needed and was only important for
-        # browser interface version of this package which became completely deprecated
-
-        #return imageIO_vardist_all, imageIO_vardist_train, imageIO_scatterplot, \
-        #          imageIO_corr_sig_all, imageIO_corr_bkg_all, imageIO_corr_sig_train, \
-        #          imageIO_corr_bkg_train
+        for label in self.p_multiclass_labels:
+            for var_label in var_set, var_labels:
+                output = make_plot_name(self.dirmlplot, f"{label}_{var_label}",
+                                        len(var_set[var_label]), self.p_binmin, self.p_binmax)
+                correlationmatrix(self.dfs_train[label], var_set[var_label], label, output,
+                                  self.p_binmin, self.p_binmax, self.p_plot_options)
 
     def loadmodels(self):
         classifiers_scikit, names_scikit, _, _ = getclf_scikit(self.db_model)
@@ -434,15 +417,15 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.logger.info("Time elapsed = %.3f", time.time() - t0)
 
     def do_test(self):
-
         self.do_train()
         if self.step_done("test"):
             self.df_mltest_applied = pickle.load(openfile(self.f_mltest_applied, "rb"))
             return
 
         self.logger.info("Testing")
+        labels = self.p_multiclass_labels if self.p_mltype == "MultiClassification" else None
         self.df_mltest_applied = test(self.p_mltype, self.p_classname, self.p_trainedmod,
-                                      self.df_mltest, self.v_train, self.v_sig)
+                                      self.df_mltest, self.v_train, f"{self.v_class}_", labels)
         pickle.dump(self.df_mltest_applied, openfile(self.f_mltest_applied, "wb"), protocol=4)
         # df_ml_test_to_root = self.dirmlout+"/testsample_%s_mldecision.root" % (self.s_suffix)
         # write_tree(df_ml_test_to_root, self.n_treetest, self.df_mltest_applied)
@@ -457,11 +440,11 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.do_train()
 
         self.logger.info("Application")
-
+        labels = self.p_multiclass_labels if self.p_mltype == "MultiClassification" else None
         df_data = apply(self.p_mltype, self.p_classname, self.p_trainedmod,
-                        self.df_data, self.v_train)
+                        self.df_data, self.v_train, labels)
         df_mc = apply(self.p_mltype, self.p_classname, self.p_trainedmod,
-                      self.df_mc, self.v_train)
+                      self.df_mc, self.v_train, labels)
         pickle.dump(df_data, openfile(self.f_reco_applieddata, "wb"), protocol=4)
         pickle.dump(df_mc, openfile(self.f_reco_appliedmc, "wb"), protocol=4)
 
@@ -469,18 +452,20 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         if self.step_done("cross_validation"):
             return
         self.logger.info("Do cross validation")
-        df_scores = cross_validation_mse(self.p_classname, self.p_class,
-                                         self.df_xtrain, self.df_ytrain,
-                                         self.p_nkfolds, self.p_ncorescross)
-        plot_cross_validation_mse(self.p_classname, df_scores, self.s_suffix, self.dirmlplot)
+        df_scores = mlhep_plotting.cross_validation_mse(self.p_classname, self.p_class,
+                                                        self.df_xtrain, self.df_ytrain,
+                                                        self.p_nkfolds, self.p_ncorescross)
+        mlhep_plotting.plot_cross_validation_mse(self.p_classname, df_scores,
+                                                 self.s_suffix, self.dirmlplot)
 
     def do_learningcurve(self):
         if self.step_done("leaningcurve"):
             return
         self.logger.info("Make learning curve")
         npoints = 10
-        plot_learning_curves(self.p_classname, self.p_class, self.s_suffix,
-                             self.dirmlplot, self.df_xtrain, self.df_ytrain, npoints)
+        mlhep_plotting.plot_learning_curves(self.p_classname, self.p_class, self.s_suffix,
+                                            self.dirmlplot, self.df_xtrain, self.df_ytrain,
+                                            npoints)
 
     def do_roc(self):
         if self.step_done("roc_simple"):
@@ -489,8 +474,15 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.do_train()
 
         self.logger.info("Make ROC for train")
-        precision_recall(self.p_classname, self.p_class, self.s_suffix,
-                         self.df_xtrain, self.df_ytrain, self.p_nkfolds, self.dirmlplot)
+        mlhep_plotting.plot_precision_recall(self.p_classname, self.p_class, self.s_suffix,
+                                             self.df_xtrain, self.df_ytrain, self.p_nkfolds,
+                                             self.dirmlplot, self.p_multiclass_labels)
+        roc_tpr = mlhep_plotting.plot_roc(self.p_classname, self.p_class, self.s_suffix,
+                                          self.df_xtrain, self.df_ytrain, self.p_nkfolds,
+                                          self.dirmlplot, self.p_multiclass_labels)
+        mlhep_plotting.plot_two_class_efficiences(self.p_classname, self.s_suffix,
+                                                  roc_tpr, self.dirmlplot,
+                                                  self.p_multiclass_labels)
 
     def do_roc_train_test(self):
         if self.step_done("roc_train_test"):
@@ -499,9 +491,11 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.do_train()
 
         self.logger.info("Make ROC for train and test")
-        roc_train_test(self.p_classname, self.p_class, self.df_xtrain, self.df_ytrain,
-                       self.df_xtest, self.df_ytest, self.s_suffix, self.dirmlplot,
-                       self.p_binmin, self.p_binmax)
+        mlhep_plotting.roc_train_test(self.p_classname, self.p_class,
+                                      self.df_xtrain, self.df_ytrain,
+                                      self.df_xtest, self.df_ytest,
+                                      self.s_suffix, self.dirmlplot,
+                                      self.p_binmin, self.p_binmax)
 
     def do_plot_model_pred(self):
         if self.step_done("plot_model_pred"):
@@ -510,8 +504,10 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.do_train()
 
         self.logger.info("Plot model prediction distribution")
-        plot_overtraining(self.p_classname, self.p_class, self.s_suffix, self.dirmlplot,
-                          self.df_xtrain, self.df_ytrain, self.df_xtest, self.df_ytest)
+        mlhep_plotting.plot_overtraining(self.p_classname, self.p_class, self.s_suffix,
+                                         self.dirmlplot, self.df_xtrain, self.df_ytrain,
+                                         self.df_xtest, self.df_ytest,
+                                         self.p_multiclass_labels)
 
     def do_importance(self):
         if self.step_done("importance"):
@@ -697,7 +693,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         signal_yield = self.p_raahp * signal_yield
         self.logger.debug("Expected signal yield x RAA hp: %.3e", signal_yield)
 
-        df_data_sideband = self.df_data.query(self.s_selbkgml)
+        df_data_sideband = self.df_data.query(self.s_selbkg)
         df_data_sideband = shuffle(df_data_sideband, random_state=self.rnd_shuffle)
         df_data_sideband = df_data_sideband.tail(round(len(df_data_sideband) * self.p_bkgfracopt))
         hmass = TH1F('hmass', '', self.p_num_bins, self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
