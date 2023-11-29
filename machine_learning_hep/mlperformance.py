@@ -295,26 +295,20 @@ def plot_learning_curves(names_, classifiers_, suffix_, folder, x_data, y_data, 
 
 
 def plot_overtraining(names, classifiers, suffix, folder, x_train, y_train, x_val, y_val,
-                      multiclass_labels, bins=50):
-    if multiclass_labels is None:
-        multiclass_labels = ['S', 'B']
+                      variabley, multiclass_labels, bins=50):
     for name, clf in zip(names, classifiers):
+        predict_probs_train = clf.predict_proba(x_train)
+        predict_probs_test = clf.predict_proba(x_val)
         for cls_hyp, label_hyp in enumerate(multiclass_labels):
             fig = plt.figure(figsize=(10, 8))
-            decisions = []
-            for x, y in ((x_train, y_train), (x_val, y_val)):
-                for cls in range(len(multiclass_labels)):
-                    dec = clf.predict_proba(x[y == cls])[:, cls_hyp]
-                    decisions += [dec]
-
-            for label, dec, color in zip(multiclass_labels, decisions[:len(multiclass_labels)],
-                                         HIST_COLORS):
-                plt.hist(dec, color=color, alpha=0.5, range=[0, 1], bins=bins,
+            for label, color in zip(multiclass_labels, HIST_COLORS):
+                plt.hist(predict_probs_train[y_train[f"{variabley}_{label}"] == 1, cls_hyp],
+                         color=color, alpha=0.5, range=[0, 1], bins=bins,
                          histtype='stepfilled', density=True, label=f'{label}, train')
-            for label, dec, color in zip(multiclass_labels, decisions[len(multiclass_labels):],
-                                         HIST_COLORS):
-                hist, bins = np.histogram(dec, bins=bins, range=[0, 1], density=True)
-                scale = len(dec) / sum(hist)
+            for label, color in zip(multiclass_labels, HIST_COLORS):
+                predicted_probs = predict_probs_test[y_val[f"{variabley}_{label}"] == 1, cls_hyp]
+                hist, bins = np.histogram(predicted_probs, bins=bins, range=[0, 1], density=True)
+                scale = len(predicted_probs) / sum(hist)
                 err = np.sqrt(hist * scale) / scale
                 center = (bins[:-1] + bins[1:]) / 2
                 plt.errorbar(center, hist, yerr=err, fmt='o', c=color, label=f'{label}, test')

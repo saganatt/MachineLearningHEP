@@ -423,9 +423,9 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
             return
 
         self.logger.info("Testing")
-        labels = self.p_multiclass_labels if self.p_mltype == "MultiClassification" else None
         self.df_mltest_applied = test(self.p_mltype, self.p_classname, self.p_trainedmod,
-                                      self.df_mltest, self.v_train, f"{self.v_class}_", labels)
+                                      self.df_mltest, self.v_train, self.v_class,
+                                      self.p_multiclass_labels)
         pickle.dump(self.df_mltest_applied, openfile(self.f_mltest_applied, "wb"), protocol=4)
         # df_ml_test_to_root = self.dirmlout+"/testsample_%s_mldecision.root" % (self.s_suffix)
         # write_tree(df_ml_test_to_root, self.n_treetest, self.df_mltest_applied)
@@ -506,7 +506,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.logger.info("Plot model prediction distribution")
         mlhep_plotting.plot_overtraining(self.p_classname, self.p_class, self.s_suffix,
                                          self.dirmlplot, self.df_xtrain, self.df_ytrain,
-                                         self.df_xtest, self.df_ytest,
+                                         self.df_xtest, self.df_ytest, self.v_class,
                                          self.p_multiclass_labels)
 
     def do_importance(self):
