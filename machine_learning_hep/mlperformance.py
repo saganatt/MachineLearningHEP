@@ -15,6 +15,7 @@
 """
 Methods to: model performance evaluation
 """
+import itertools
 from io import BytesIO
 import pickle
 import pandas as pd
@@ -27,6 +28,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_curve, auc, confusion_matrix, precision_recall_curve
 from sklearn.metrics import mean_squared_error
 
+HIST_COLORS = ['r', 'b', 'g']
 
 def cross_validation_mse(names_, classifiers_, x_train, y_train, cv_, ncores):
     df_scores = pd.DataFrame()
@@ -178,23 +180,28 @@ def confusion(names_, classifiers_, suffix_, x_train, y_train, cvgen, folder):
     return img_confmatrix_dg0, img_confmatrix
 
 
-def precision_recall(names_, classifiers_, suffix_, x_train, y_train, cvgen, folder):
-
+def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train,
+                          cvgen, folder, multiclass_labels):
     if len(names_) == 1:
         figure1 = plt.figure(figsize=(20, 15))  # pylint: disable=unused-variable
     else:
         figure1 = plt.figure(figsize=(25, 15))  # pylint: disable=unused-variable
         plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.4, hspace=0.2)
 
-    i = 1
-    for name, clf in zip(names_, classifiers_):
-        if len(names_) > 1:
-            plt.subplot(2, (len(names_)+1)/2, i)
+    if multiclass_labels is None:
+        multiclass_labels = ['S', 'B']
+
+    for ind, (name, clf) in enumerate(zip(names_, classifiers_)):
         y_proba = cross_val_predict(clf, x_train, y_train, cv=cvgen, method="predict_proba")
-        y_scores = y_proba[:, 1]
-        precisions, recalls, thresholds = precision_recall_curve(y_train, y_scores)
-        plt.plot(thresholds, precisions[:-1], "b--", label="Precision=TP/(TP+FP)", linewidth=5.0)
-        plt.plot(thresholds, recalls[:-1], "g-", label="Recall=TP/(TP+FN)", linewidth=5.0)
+        if len(names_) > 1:
+            plt.subplot(2, (len(names_)+1)/2, ind)
+        for cls_hyp, (label_hyp, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
+            y_scores = y_proba[:, cls_hyp]
+            precisions, recalls, thresholds = precision_recall_curve(y_train, y_scores)
+            plt.plot(thresholds, precisions[:-1], f"{color}--",
+                     label=f"Precision {label_hyp} = TP/(TP+FP)", linewidth=5.0)
+            plt.plot(thresholds, recalls[:-1], f"{color}-", alpha=0.5,
+                     label=f"Recall {label_hyp} = TP/(TP+FN)", linewidth=5.0)
         plt.xlabel('Probability', fontsize=20)
         plt.ylabel('Precision or Recall', fontsize=20)
         plt.title('Precision, Recall '+name, fontsize=20)
@@ -202,43 +209,58 @@ def precision_recall(names_, classifiers_, suffix_, x_train, y_train, cvgen, fol
         plt.ylim([0, 1])
         plt.xticks(fontsize=18)
         plt.yticks(fontsize=18)
-        i += 1
     plotname = folder+'/precision_recall%s.png' % (suffix_)
     plt.savefig(plotname)
-    img_precision_recall = BytesIO()
-    plt.savefig(img_precision_recall, format='png')
-    img_precision_recall.seek(0)
 
-    figure2 = plt.figure(figsize=(20, 15))  # pylint: disable=unused-variable
-    i = 1
-    aucs = []
 
+def plot_roc(names_, classifiers_, suffix_, x_train, y_train, cvgen, folder, multiclass_labels):
+    figure = plt.figure(figsize=(20, 15))  # pylint: disable=unused-variable
+    roc_tpr = {}
     for name, clf in zip(names_, classifiers_):
+        roc_tpr[name] = {}
         y_proba = cross_val_predict(clf, x_train, y_train, cv=cvgen, method="predict_proba")
-        y_scores = y_proba[:, 1]
-        fpr, tpr, _ = roc_curve(y_train, y_scores)
-        roc_auc = auc(fpr, tpr)
-        aucs.append(roc_auc)
-        plt.xlabel('False Positive Rate or (1 - Specifity)', fontsize=20)
-        plt.ylabel('True Positive Rate or (Sensitivity)', fontsize=20)
-        plt.title('Receiver Operating Characteristic', fontsize=20)
-        plt.plot(fpr, tpr, "b-", label='ROC %s (AUC = %0.2f)' %
-                 (name, roc_auc), linewidth=5.0)
-        plt.legend(loc="lower center", prop={'size': 30})
-        plt.xticks(fontsize=18)
-        plt.yticks(fontsize=18)
-        i += 1
+        for cls_hyp, (label_hyp, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
+            y_scores = y_proba[:, cls_hyp]
+            fpr, tpr, _ = roc_curve(y_train, y_scores)
+            roc_auc = auc(fpr, tpr)
+            plt.plot(fpr, tpr, f"{color}-", label='ROC %s %s (AUC = %0.2f)' %
+                     (name, label_hyp, roc_auc), linewidth=5.0)
+            roc_tpr[name][label_hyp] = tpr
+    plt.xlabel('False Positive Rate or (1 - Specifity)', fontsize=20)
+    plt.ylabel('True Positive Rate or Sensitivity', fontsize=20)
+    plt.title('Receiver Operating Characteristic', fontsize=20)
+    plt.legend(loc="lower center", prop={'size': 30})
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
     plotname = folder+'/ROCcurve%s.png' % (suffix_)
     plt.savefig(plotname)
-    img_roc = BytesIO()
-    plt.savefig(img_roc, format='png')
-    img_roc.seek(0)
+    return roc_tpr
 
-    return img_precision_recall, img_roc
+
+def plot_two_class_efficiences(names_, suffix_, roc_tpr, folder, multiclass_labels):
+    figure = plt.figure(figsize=(20, 15)) #pylint: disable=unused-variable
+    for name in names_:
+        label_pairs = itertools.combinations(multiclass_labels, repeat=2)
+        for (label_hyp, label_hyp2), color in zip(label_pairs, HIST_COLORS):
+            tpr_auc = auc(roc_tpr[name][label_hyp], roc_tpr[name][label_hyp2])
+            plt.plot(roc_tpr[name][label_hyp], roc_tpr[name][label_hyp2],
+                     f"{color}-", label='%s %s vs %s (AUC = %0.2f)' %
+                     (name, label_hyp, label_hyp2, tpr_auc), linewidth=5.0)
+            tpr_auc_inv = auc(roc_tpr[name][label_hyp2], roc_tpr[name][label_hyp])
+            plt.plot(roc_tpr[name][label_hyp2], roc_tpr[name][label_hyp],
+                     f"{color}-", alpha=0.5, label='%s %s vs %s (AUC = %0.2f)' %
+                     (name, label_hyp2, label_hyp, tpr_auc_inv), linewidth=5.0)
+    plt.xlabel('First class efficiency', fontsize=20)
+    plt.ylabel('Second class efficiency', fontsize=20)
+    plt.title('Receiver Operating Characteristic', fontsize=20)
+    plt.legend(loc="lower center", prop={'size': 30})
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
+    plotname = folder+'/Effcurve%s.png' % (suffix_)
+    plt.savefig(plotname)
 
 
 def plot_learning_curves(names_, classifiers_, suffix_, folder, x_data, y_data, npoints):
-
     figure1 = plt.figure(figsize=(20, 15))
     i = 1
     x_train, x_val, y_train, y_val = train_test_split(x_data, y_data, test_size=0.2)
@@ -270,42 +292,40 @@ def plot_learning_curves(names_, classifiers_, suffix_, folder, x_data, y_data, 
         i += 1
     plotname = folder+'/learning_curve%s.png' % (suffix_)
     plt.savefig(plotname)
-    img_learn = BytesIO()
-    plt.savefig(img_learn, format='png')
-    img_learn.seek(0)
-    return img_learn
+
 
 def plot_overtraining(names, classifiers, suffix, folder, x_train, y_train, x_val, y_val,
-                      bins=50):
+                      multiclass_labels, bins=50):
+    if multiclass_labels is None:
+        multiclass_labels = ['S', 'B']
     for name, clf in zip(names, classifiers):
-        fig = plt.figure(figsize=(10, 8))
-        decisions = []
-        for x, y in ((x_train, y_train), (x_val, y_val)):
-            d1 = clf.predict_proba(x[y > 0.5])[:, 1]
-            d2 = clf.predict_proba(x[y < 0.5])[:, 1]
-            decisions += [d1, d2]
+        for cls_hyp, label_hyp in enumerate(multiclass_labels):
+            fig = plt.figure(figsize=(10, 8))
+            decisions = []
+            for x, y in ((x_train, y_train), (x_val, y_val)):
+                for cls in range(len(multiclass_labels)):
+                    dec = clf.predict_proba(x[y == cls])[:, cls_hyp]
+                    decisions += [dec]
 
-        plt.hist(decisions[0], color='r', alpha=0.5, range=[0, 1], bins=bins,
-                 histtype='stepfilled', density=True, label='S, train')
-        plt.hist(decisions[1], color='b', alpha=0.5, range=[0, 1], bins=bins,
-                 histtype='stepfilled', density=True, label='B, train')
-        hist, bins = np.histogram(decisions[2], bins=bins, range=[0, 1], density=True)
-        scale = len(decisions[2]) / sum(hist)
-        err = np.sqrt(hist * scale) / scale
-        center = (bins[:-1] + bins[1:]) / 2
-        plt.errorbar(center, hist, yerr=err, fmt='o', c='r', label='S, test')
-        hist, bins = np.histogram(decisions[3], bins=bins, range=[0, 1], density=True)
-        scale = len(decisions[3]) / sum(hist)
-        err = np.sqrt(hist * scale) / scale
-        plt.errorbar(center, hist, yerr=err, fmt='o', c='b', label='B, test')
-        plt.xlabel("Model output", fontsize=15)
-        plt.ylabel("Arbitrary units", fontsize=15)
-        plt.legend(loc="best", frameon=False, fontsize=15)
-        plt.yscale("log")
+            for label, dec, color in zip(multiclass_labels, decisions[:len(multiclass_labels)],
+                                         HIST_COLORS):
+                plt.hist(dec, color=color, alpha=0.5, range=[0, 1], bins=bins,
+                         histtype='stepfilled', density=True, label=f'{label}, train')
+            for label, dec, color in zip(multiclass_labels, decisions[len(multiclass_labels):],
+                                         HIST_COLORS):
+                hist, bins = np.histogram(dec, bins=bins, range=[0, 1], density=True)
+                scale = len(dec) / sum(hist)
+                err = np.sqrt(hist * scale) / scale
+                center = (bins[:-1] + bins[1:]) / 2
+                plt.errorbar(center, hist, yerr=err, fmt='o', c=color, label=f'{label}, test')
+            plt.xlabel(f"ML score for {label_hyp}", fontsize=15)
+            plt.ylabel("Arbitrary units", fontsize=15)
+            plt.legend(loc="best", frameon=False, fontsize=15)
+            plt.yscale("log")
 
-        plot_name = f'{folder}/ModelOutDistr_{name}_{suffix}.png'
-        fig.savefig(plot_name)
-        plot_name = plot_name.replace('png', 'pickle')
+            plot_name = f'{folder}/ModelOutDistr_{label_hyp}_{name}_{suffix}.png'
+            fig.savefig(plot_name)
+
 
 def roc_train_test(names, classifiers, x_train, y_train, x_test, y_test, suffix, folder,
                    binmin, binmax):
