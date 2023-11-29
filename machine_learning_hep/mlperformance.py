@@ -180,24 +180,24 @@ def confusion(names_, classifiers_, suffix_, x_train, y_train, cvgen, folder):
     return img_confmatrix_dg0, img_confmatrix
 
 
-def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train,
-                          cvgen, folder, multiclass_labels):
+def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train, y_train_onehot,
+                          nkfolds, folder, multiclass_labels):
     if len(names_) == 1:
         figure1 = plt.figure(figsize=(20, 15))  # pylint: disable=unused-variable
     else:
         figure1 = plt.figure(figsize=(25, 15))  # pylint: disable=unused-variable
         plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.4, hspace=0.2)
 
-    if multiclass_labels is None:
-        multiclass_labels = ['S', 'B']
-
     for ind, (name, clf) in enumerate(zip(names_, classifiers_)):
-        y_proba = cross_val_predict(clf, x_train, y_train, cv=cvgen, method="predict_proba")
+        y_proba = cross_val_predict(clf, x_train, y_train, cv=nkfolds, method="predict_proba")
         if len(names_) > 1:
             plt.subplot(2, (len(names_)+1)/2, ind)
         for cls_hyp, (label_hyp, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
             y_scores = y_proba[:, cls_hyp]
-            precisions, recalls, thresholds = precision_recall_curve(y_train, y_scores)
+            print(f"y proba:\n{y_proba}\nscores for class {label_hyp}:\n{y_scores}")
+            print(f"y onehot:\n{y_train_onehot}\nfor class:\n{y_train_onehot.iloc[:, cls_hyp]}")
+            precisions, recalls, thresholds = precision_recall_curve(y_train_onehot.iloc[:, cls_hyp], y_scores)
+            print(f"precisions:\n{precisions}\nrecalls\n{recalls}")
             plt.plot(thresholds, precisions[:-1], f"{color}--",
                      label=f"Precision {label_hyp} = TP/(TP+FP)", linewidth=5.0)
             plt.plot(thresholds, recalls[:-1], f"{color}-", alpha=0.5,
@@ -213,15 +213,16 @@ def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train,
     plt.savefig(plotname)
 
 
-def plot_roc(names_, classifiers_, suffix_, x_train, y_train, cvgen, folder, multiclass_labels):
+def plot_roc(names_, classifiers_, suffix_, x_train, y_train, y_train_onehot, nkfolds, folder,
+             multiclass_labels):
     figure = plt.figure(figsize=(20, 15))  # pylint: disable=unused-variable
     roc_tpr = {}
     for name, clf in zip(names_, classifiers_):
         roc_tpr[name] = {}
-        y_proba = cross_val_predict(clf, x_train, y_train, cv=cvgen, method="predict_proba")
+        y_proba = cross_val_predict(clf, x_train, y_train, cv=nkfolds, method="predict_proba")
         for cls_hyp, (label_hyp, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
             y_scores = y_proba[:, cls_hyp]
-            fpr, tpr, _ = roc_curve(y_train, y_scores)
+            fpr, tpr, _ = roc_curve(y_train_onehot.iloc[:, cls_hyp], y_scores)
             roc_auc = auc(fpr, tpr)
             plt.plot(fpr, tpr, f"{color}-", label='ROC %s %s (AUC = %0.2f)' %
                      (name, label_hyp, roc_auc), linewidth=5.0)
@@ -295,18 +296,17 @@ def plot_learning_curves(names_, classifiers_, suffix_, folder, x_data, y_data, 
 
 
 def plot_overtraining(names, classifiers, suffix, folder, x_train, y_train, x_val, y_val,
-                      variabley, multiclass_labels, bins=50):
+                      multiclass_labels, bins=50):
     for name, clf in zip(names, classifiers):
         predict_probs_train = clf.predict_proba(x_train)
         predict_probs_test = clf.predict_proba(x_val)
         for cls_hyp, label_hyp in enumerate(multiclass_labels):
             fig = plt.figure(figsize=(10, 8))
-            for label, color in zip(multiclass_labels, HIST_COLORS):
-                plt.hist(predict_probs_train[y_train[f"{variabley}_{label}"] == 1, cls_hyp],
+            for cls, (label, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
+                plt.hist(predict_probs_train[y_train.iloc[:, cls] == 1, cls_hyp],
                          color=color, alpha=0.5, range=[0, 1], bins=bins,
                          histtype='stepfilled', density=True, label=f'{label}, train')
-            for label, color in zip(multiclass_labels, HIST_COLORS):
-                predicted_probs = predict_probs_test[y_val[f"{variabley}_{label}"] == 1, cls_hyp]
+                predicted_probs = predict_probs_test[y_val.iloc[:, cls] == 1, cls_hyp]
                 hist, bins = np.histogram(predicted_probs, bins=bins, range=[0, 1], density=True)
                 scale = len(predicted_probs) / sum(hist)
                 err = np.sqrt(hist * scale) / scale

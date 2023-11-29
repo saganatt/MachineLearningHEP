@@ -294,11 +294,9 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                 self.dfs_input[label][self.v_class] = ind
             self.df_ml = pd.concat([self.dfs_input[label] for label in self.p_multiclass_labels])
 
-            self.logger.info(f"DF ml with class numbers:\n{self.df_ml}")
             df_y = label_binarize(self.df_ml[self.v_class], classes=[*range(len(self.p_multiclass_labels))])
             for ind, label in enumerate(self.p_multiclass_labels):
                 self.df_ml[f"{self.v_class}_{label}"] = df_y[:, ind]
-            self.logger.info(f"DF ml binarized:\n{self.df_ml}")
 
             self.df_mltrain, self.df_mltest = train_test_split(self.df_ml, \
                                                test_size=self.test_frac, random_state=self.rnd_splt)
@@ -332,7 +330,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
             self.logger.warning("There are not enough background events")
 
         if self.p_mask_values:
-            self.logger.info("Maksing values for training and testing")
+            self.logger.info("Masking values for training and testing")
             mask_df(self.df_mltrain, self.p_mask_values)
             mask_df(self.df_mltest, self.p_mask_values)
 
@@ -341,8 +339,6 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.df_ytrain = self.df_mltrain.filter(regex=f"{self.v_class}_")
         self.df_xtest = self.df_mltest[self.v_train]
         self.df_ytest = self.df_mltest.filter(regex=f"{self.v_class}_")
-        self.logger.info(f"df ytrain binarized:\n{self.df_ytrain}")
-        self.logger.info(f"df ytest binarized:\n{self.df_ytest}")
 
         self.step_done("preparemlsamples")
 
@@ -423,8 +419,9 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
             return
 
         self.logger.info("Testing")
+        variablesy = [f"{self.v_class}_{label}" for label in self.p_multiclass_labels]
         self.df_mltest_applied = test(self.p_mltype, self.p_classname, self.p_trainedmod,
-                                      self.df_mltest, self.v_train, self.v_class,
+                                      self.df_mltest, self.v_train, variablesy,
                                       self.p_multiclass_labels)
         pickle.dump(self.df_mltest_applied, openfile(self.f_mltest_applied, "wb"), protocol=4)
         # df_ml_test_to_root = self.dirmlout+"/testsample_%s_mldecision.root" % (self.s_suffix)
@@ -475,11 +472,13 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
 
         self.logger.info("Make ROC for train")
         mlhep_plotting.plot_precision_recall(self.p_classname, self.p_class, self.s_suffix,
-                                             self.df_xtrain, self.df_ytrain, self.p_nkfolds,
-                                             self.dirmlplot, self.p_multiclass_labels)
+                                             self.df_xtrain, self.df_mltrain[self.v_class],
+                                             self.df_ytrain, self.p_nkfolds, self.dirmlplot,
+                                             self.p_multiclass_labels)
         roc_tpr = mlhep_plotting.plot_roc(self.p_classname, self.p_class, self.s_suffix,
-                                          self.df_xtrain, self.df_ytrain, self.p_nkfolds,
-                                          self.dirmlplot, self.p_multiclass_labels)
+                                          self.df_xtrain, self.df_mltrain[self.v_class],
+                                          self.df_ytrain, self.p_nkfolds, self.dirmlplot,
+                                          self.p_multiclass_labels)
         mlhep_plotting.plot_two_class_efficiences(self.p_classname, self.s_suffix,
                                                   roc_tpr, self.dirmlplot,
                                                   self.p_multiclass_labels)
@@ -506,8 +505,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.logger.info("Plot model prediction distribution")
         mlhep_plotting.plot_overtraining(self.p_classname, self.p_class, self.s_suffix,
                                          self.dirmlplot, self.df_xtrain, self.df_ytrain,
-                                         self.df_xtest, self.df_ytest, self.v_class,
-                                         self.p_multiclass_labels)
+                                         self.df_xtest, self.df_ytest, self.p_multiclass_labels)
 
     def do_importance(self):
         if self.step_done("importance"):

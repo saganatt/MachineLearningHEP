@@ -28,7 +28,7 @@ ml_study: # mlout, mlplot
   dotraining: true
   dotesting: true
   doplotdistr: true
-  doroc: false
+  doroc: true
   doroctraintest: false
   doimportance: false
   doimportanceshap: false
