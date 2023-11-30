@@ -25,6 +25,7 @@ import matplotlib as mpl
 import seaborn as sn
 from sklearn.model_selection import cross_val_score, cross_val_predict, train_test_split
 from sklearn.model_selection import StratifiedKFold
+from sklearn.multiclass import OneVsOneClassifier
 from sklearn.metrics import roc_curve, auc, confusion_matrix, precision_recall_curve
 from sklearn.metrics import mean_squared_error
 
@@ -213,20 +214,16 @@ def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train, y_tra
     plt.savefig(plotname)
 
 
-def plot_roc(names_, classifiers_, suffix_, x_train, y_train, y_train_onehot, nkfolds, folder,
+def plot_roc(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folder,
              multiclass_labels):
     figure = plt.figure(figsize=(20, 15))  # pylint: disable=unused-variable
-    roc_tpr = {}
     for name, clf in zip(names_, classifiers_):
-        roc_tpr[name] = {}
         y_proba = cross_val_predict(clf, x_train, y_train, cv=nkfolds, method="predict_proba")
         for cls_hyp, (label_hyp, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
-            y_scores = y_proba[:, cls_hyp]
-            fpr, tpr, _ = roc_curve(y_train_onehot.iloc[:, cls_hyp], y_scores)
+            fpr, tpr, _ = roc_curve(y_train == cls_hyp, y_proba[:, cls_hyp])
             roc_auc = auc(fpr, tpr)
             plt.plot(fpr, tpr, f"{color}-", label='ROC %s %s (AUC = %0.2f)' %
                      (name, label_hyp, roc_auc), linewidth=5.0)
-            roc_tpr[name][label_hyp] = tpr
     plt.xlabel('False Positive Rate or (1 - Specifity)', fontsize=20)
     plt.ylabel('True Positive Rate or Sensitivity', fontsize=20)
     plt.title('Receiver Operating Characteristic', fontsize=20)
@@ -235,30 +232,36 @@ def plot_roc(names_, classifiers_, suffix_, x_train, y_train, y_train_onehot, nk
     plt.yticks(fontsize=18)
     plotname = folder+'/ROCcurve%s.png' % (suffix_)
     plt.savefig(plotname)
-    return roc_tpr
 
-
-def plot_two_class_efficiences(names_, suffix_, roc_tpr, folder, multiclass_labels):
-    figure = plt.figure(figsize=(20, 15)) #pylint: disable=unused-variable
-    for name in names_:
-        label_pairs = itertools.combinations(multiclass_labels, repeat=2)
-        for (label_hyp, label_hyp2), color in zip(label_pairs, HIST_COLORS):
-            tpr_auc = auc(roc_tpr[name][label_hyp], roc_tpr[name][label_hyp2])
-            plt.plot(roc_tpr[name][label_hyp], roc_tpr[name][label_hyp2],
-                     f"{color}-", label='%s %s vs %s (AUC = %0.2f)' %
-                     (name, label_hyp, label_hyp2, tpr_auc), linewidth=5.0)
-            tpr_auc_inv = auc(roc_tpr[name][label_hyp2], roc_tpr[name][label_hyp])
-            plt.plot(roc_tpr[name][label_hyp2], roc_tpr[name][label_hyp],
-                     f"{color}-", alpha=0.5, label='%s %s vs %s (AUC = %0.2f)' %
-                     (name, label_hyp2, label_hyp, tpr_auc_inv), linewidth=5.0)
-    plt.xlabel('First class efficiency', fontsize=20)
-    plt.ylabel('Second class efficiency', fontsize=20)
-    plt.title('Receiver Operating Characteristic', fontsize=20)
-    plt.legend(loc="lower center", prop={'size': 30})
-    plt.xticks(fontsize=18)
-    plt.yticks(fontsize=18)
-    plotname = folder+'/Effcurve%s.png' % (suffix_)
-    plt.savefig(plotname)
+# FIXME: https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html#sphx-glr-auto-examples-model-selection-plot-roc-py
+# Fabio has one vs one ROC --> OneVsOneClassifier?
+def plot_two_class_efficiences(names_, classifiers_, suffix_, x, y, nkfolds, folder,
+                               multiclass_labels):
+    for name, clf in zip(names_, classifiers_):
+        #y_scores = OneVsOneClassifier(clf).fit(x, y).predict_proba()
+        y_scores = cross_val_predict(clf, x, y, cv=nkfolds, method="predict_proba")
+        print(f"y scores:\n{y_scores}")
+        figure = plt.figure(figsize=(20, 15)) #pylint: disable=unused-variable
+        label_pairs = itertools.combinations(multiclass_labels, 2)
+        for label_pair, color in zip(label_pairs, HIST_COLORS):
+            ind_lab1 = multiclass_labels.index(label_pair[0])
+            ind_lab2 = multiclass_labels.index(label_pair[1])
+            mask_or = np.logical_or(y == ind_lab1, y == ind_lab2)
+            for ind, (ind_lab, alpha) in enumerate(zip((ind_lab1, ind_lab2), (1.0, 0.5))):
+                mask = y == ind_lab
+                print(f"y scores[mask_or]:\n{y_scores[mask_or]}\ny scores for lab {label_pair[ind]} {ind_lab}\n{y_scores[mask_or, ind_lab]}")
+                fpr, tpr, _ = roc_curve(mask[mask_or], y_scores[mask_or, ind_lab])
+                roc_auc = auc(fpr, tpr)
+                plt.plot(fpr, tpr, f"{color}-", alpha=alpha, label=f"ROC {name} "\
+                         f"{label_pair[ind]} vs {label_pair[1-ind]} (AUC = {roc_auc:.2f})",
+                         linewidth=5.0)
+        plt.xlabel('First class efficiency', fontsize=20)
+        plt.ylabel('Second class efficiency', fontsize=20)
+        plt.title('Receiver Operating Characteristic', fontsize=20)
+        plt.legend(loc="lower center", prop={'size': 30})
+        plt.xticks(fontsize=18)
+        plt.yticks(fontsize=18)
+        plt.savefig(f"{folder}/Effcurve{name}{suffix_}.png")
 
 
 def plot_learning_curves(names_, classifiers_, suffix_, folder, x_data, y_data, npoints):

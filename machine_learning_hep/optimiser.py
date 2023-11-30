@@ -477,10 +477,11 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                                              self.p_multiclass_labels)
         roc_tpr = mlhep_plotting.plot_roc(self.p_classname, self.p_class, self.s_suffix,
                                           self.df_xtrain, self.df_mltrain[self.v_class],
-                                          self.df_ytrain, self.p_nkfolds, self.dirmlplot,
+                                          self.p_nkfolds, self.dirmlplot,
                                           self.p_multiclass_labels)
-        mlhep_plotting.plot_two_class_efficiences(self.p_classname, self.s_suffix,
-                                                  roc_tpr, self.dirmlplot,
+        mlhep_plotting.plot_two_class_efficiences(self.p_classname, self.p_class, self.s_suffix,
+                                                  self.df_xtrain, self.df_mltrain[self.v_class],
+                                                  self.p_nkfolds, self.dirmlplot,
                                                   self.p_multiclass_labels)
 
     def do_roc_train_test(self):
