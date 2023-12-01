@@ -294,7 +294,8 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                 self.dfs_input[label][self.v_class] = ind
             self.df_ml = pd.concat([self.dfs_input[label] for label in self.p_multiclass_labels])
 
-            df_y = label_binarize(self.df_ml[self.v_class], classes=[*range(len(self.p_multiclass_labels))])
+            df_y = label_binarize(self.df_ml[self.v_class],
+                                  classes=[*range(len(self.p_multiclass_labels))])
             for ind, label in enumerate(self.p_multiclass_labels):
                 self.df_ml[f"{self.v_class}_{label}"] = df_y[:, ind]
 
@@ -473,16 +474,15 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.logger.info("Make ROC for train")
         mlhep_plotting.plot_precision_recall(self.p_classname, self.p_class, self.s_suffix,
                                              self.df_xtrain, self.df_mltrain[self.v_class],
-                                             self.df_ytrain, self.p_nkfolds, self.dirmlplot,
+                                             self.p_nkfolds, self.dirmlplot,
                                              self.p_multiclass_labels)
-        roc_tpr = mlhep_plotting.plot_roc(self.p_classname, self.p_class, self.s_suffix,
-                                          self.df_xtrain, self.df_mltrain[self.v_class],
-                                          self.p_nkfolds, self.dirmlplot,
-                                          self.p_multiclass_labels)
+        mlhep_plotting.plot_roc(self.p_classname, self.p_class, self.s_suffix,
+                                self.df_xtrain, self.df_mltrain[self.v_class],
+                                self.p_nkfolds, self.dirmlplot,
+                                self.p_multiclass_labels)
         mlhep_plotting.plot_two_class_efficiences(self.p_classname, self.p_class, self.s_suffix,
                                                   self.df_xtrain, self.df_mltrain[self.v_class],
-                                                  self.p_nkfolds, self.dirmlplot,
-                                                  self.p_multiclass_labels)
+                                                  self.dirmlplot, self.p_multiclass_labels)
 
     def do_roc_train_test(self):
         if self.step_done("roc_train_test"):
@@ -491,10 +491,10 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.do_train()
 
         self.logger.info("Make ROC for train and test")
-        mlhep_plotting.roc_train_test(self.p_classname, self.p_class,
+        mlhep_plotting.roc_train_test(self.p_classname, self.p_class, self.s_suffix,
                                       self.df_xtrain, self.df_ytrain,
                                       self.df_xtest, self.df_ytest,
-                                      self.s_suffix, self.dirmlplot,
+                                      self.dirmlplot, self.p_multiclass_labels,
                                       self.p_binmin, self.p_binmax)
 
     def do_plot_model_pred(self):
@@ -505,8 +505,10 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
 
         self.logger.info("Plot model prediction distribution")
         mlhep_plotting.plot_overtraining(self.p_classname, self.p_class, self.s_suffix,
-                                         self.dirmlplot, self.df_xtrain, self.df_ytrain,
-                                         self.df_xtest, self.df_ytest, self.p_multiclass_labels)
+                                         self.df_xtrain, self.df_mltrain[self.v_class],
+                                         self.df_xtest, self.df_mltest[self.v_class],
+                                         self.df_ytrain, self.df_ytest,
+                                         self.dirmlplot, self.p_multiclass_labels)
 
     def do_importance(self):
         if self.step_done("importance"):

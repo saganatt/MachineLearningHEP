@@ -21,12 +21,10 @@ import pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import seaborn as sn
 from sklearn.model_selection import cross_val_score, cross_val_predict, train_test_split
 from sklearn.model_selection import StratifiedKFold
-from sklearn.multiclass import OneVsOneClassifier
-from sklearn.metrics import roc_curve, auc, confusion_matrix, precision_recall_curve
+from sklearn.metrics import roc_curve, roc_auc_score, auc, confusion_matrix, precision_recall_curve
 from sklearn.metrics import mean_squared_error
 
 HIST_COLORS = ['r', 'b', 'g']
@@ -181,7 +179,7 @@ def confusion(names_, classifiers_, suffix_, x_train, y_train, cvgen, folder):
     return img_confmatrix_dg0, img_confmatrix
 
 
-def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train, y_train_onehot,
+def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train,
                           nkfolds, folder, multiclass_labels):
     if len(names_) == 1:
         figure1 = plt.figure(figsize=(20, 15))  # pylint: disable=unused-variable
@@ -196,8 +194,7 @@ def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train, y_tra
         for cls_hyp, (label_hyp, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
             y_scores = y_proba[:, cls_hyp]
             print(f"y proba:\n{y_proba}\nscores for class {label_hyp}:\n{y_scores}")
-            print(f"y onehot:\n{y_train_onehot}\nfor class:\n{y_train_onehot.iloc[:, cls_hyp]}")
-            precisions, recalls, thresholds = precision_recall_curve(y_train_onehot.iloc[:, cls_hyp], y_scores)
+            precisions, recalls, thresholds = precision_recall_curve(y_train == cls_hyp, y_scores)
             print(f"precisions:\n{precisions}\nrecalls\n{recalls}")
             plt.plot(thresholds, precisions[:-1], f"{color}--",
                      label=f"Precision {label_hyp} = TP/(TP+FP)", linewidth=5.0)
@@ -210,8 +207,7 @@ def plot_precision_recall(names_, classifiers_, suffix_, x_train, y_train, y_tra
         plt.ylim([0, 1])
         plt.xticks(fontsize=18)
         plt.yticks(fontsize=18)
-    plotname = folder+'/precision_recall%s.png' % (suffix_)
-    plt.savefig(plotname)
+    plt.savefig(f"{folder}/precision_recall{suffix_}.png")
 
 
 def plot_roc(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folder,
@@ -222,25 +218,25 @@ def plot_roc(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folder,
         for cls_hyp, (label_hyp, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
             fpr, tpr, _ = roc_curve(y_train == cls_hyp, y_proba[:, cls_hyp])
             roc_auc = auc(fpr, tpr)
-            plt.plot(fpr, tpr, f"{color}-", label='ROC %s %s (AUC = %0.2f)' %
-                     (name, label_hyp, roc_auc), linewidth=5.0)
+            plt.plot(fpr, tpr, f"{color}-", label=f"ROC {name} {label_hyp} vs rest, "\
+                     f"AUC = {roc_auc:.2f}", linewidth=5.0)
     plt.xlabel('False Positive Rate or (1 - Specifity)', fontsize=20)
     plt.ylabel('True Positive Rate or Sensitivity', fontsize=20)
     plt.title('Receiver Operating Characteristic', fontsize=20)
     plt.legend(loc="lower center", prop={'size': 30})
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
-    plotname = folder+'/ROCcurve%s.png' % (suffix_)
-    plt.savefig(plotname)
+    plt.savefig(f"{folder}/ROCcurve{suffix_}.png")
 
-# FIXME: https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html#sphx-glr-auto-examples-model-selection-plot-roc-py
-# Fabio has one vs one ROC --> OneVsOneClassifier?
-def plot_two_class_efficiences(names_, classifiers_, suffix_, x, y, nkfolds, folder,
+
+def plot_two_class_efficiences(names_, classifiers_, suffix_, x, y, folder,
                                multiclass_labels):
     for name, clf in zip(names_, classifiers_):
-        #y_scores = OneVsOneClassifier(clf).fit(x, y).predict_proba()
-        y_scores = cross_val_predict(clf, x, y, cv=nkfolds, method="predict_proba")
-        print(f"y scores:\n{y_scores}")
+        # Not using cross_val as we do not compare different classifiers
+        y_scores = clf.predict_proba(x)
+        #scores_sum = y_scores.sum(axis=1)
+        #non_ones = scores_sum[scores_sum != 1.0]
+        #print(f"sum of scores:\n{scores_sum}\nnot one:\n{non_ones}")
         figure = plt.figure(figsize=(20, 15)) #pylint: disable=unused-variable
         label_pairs = itertools.combinations(multiclass_labels, 2)
         for label_pair, color in zip(label_pairs, HIST_COLORS):
@@ -249,10 +245,11 @@ def plot_two_class_efficiences(names_, classifiers_, suffix_, x, y, nkfolds, fol
             mask_or = np.logical_or(y == ind_lab1, y == ind_lab2)
             for ind, (ind_lab, alpha) in enumerate(zip((ind_lab1, ind_lab2), (1.0, 0.5))):
                 mask = y == ind_lab
-                print(f"y scores[mask_or]:\n{y_scores[mask_or]}\ny scores for lab {label_pair[ind]} {ind_lab}\n{y_scores[mask_or, ind_lab]}")
                 fpr, tpr, _ = roc_curve(mask[mask_or], y_scores[mask_or, ind_lab])
                 roc_auc = auc(fpr, tpr)
-                plt.plot(fpr, tpr, f"{color}-", alpha=alpha, label=f"ROC {name} "\
+                #roc_auc_2 = roc_auc_score(y, y_scores, multi_class="ovo")
+                #print(f"ROC by fpr, tpr: {roc_auc} roc from fun: {roc_auc_2}")
+                plt.plot(fpr, tpr, f"{color}-", alpha=alpha, label=f"ROC "\
                          f"{label_pair[ind]} vs {label_pair[1-ind]} (AUC = {roc_auc:.2f})",
                          linewidth=5.0)
         plt.xlabel('First class efficiency', fontsize=20)
@@ -294,11 +291,10 @@ def plot_learning_curves(names_, classifiers_, suffix_, folder, x_data, y_data, 
             figure1.subplots_adjust(hspace=.5)
         plt.legend(loc="best", prop={'size': 30})
         i += 1
-    plotname = folder+'/learning_curve%s.png' % (suffix_)
-    plt.savefig(plotname)
+    plt.savefig(f"{folder}/learning_curve{suffix_}.png")
 
 
-def plot_overtraining(names, classifiers, suffix, folder, x_train, y_train, x_val, y_val,
+def plot_overtraining(names, classifiers, suffix, x_train, y_train, x_val, y_val, y_train_onehot, y_val_onehot, folder,
                       multiclass_labels, bins=50):
     for name, clf in zip(names, classifiers):
         predict_probs_train = clf.predict_proba(x_train)
@@ -306,10 +302,13 @@ def plot_overtraining(names, classifiers, suffix, folder, x_train, y_train, x_va
         for cls_hyp, label_hyp in enumerate(multiclass_labels):
             fig = plt.figure(figsize=(10, 8))
             for cls, (label, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
-                plt.hist(predict_probs_train[y_train.iloc[:, cls] == 1, cls_hyp],
+                cond1 = y_train == cls
+                cond_one_hot = y_train_onehot.iloc[:, cls]
+                print(f"Train disagreement: {cond1[np.logical_xor(cond1, cond_one_hot)]}")
+                plt.hist(predict_probs_train[y_train == cls, cls_hyp],
                          color=color, alpha=0.5, range=[0, 1], bins=bins,
                          histtype='stepfilled', density=True, label=f'{label}, train')
-                predicted_probs = predict_probs_test[y_val.iloc[:, cls] == 1, cls_hyp]
+                predicted_probs = predict_probs_test[y_val == cls, cls_hyp]
                 hist, bins = np.histogram(predicted_probs, bins=bins, range=[0, 1], density=True)
                 scale = len(predicted_probs) / sum(hist)
                 err = np.sqrt(hist * scale) / scale
@@ -319,27 +318,24 @@ def plot_overtraining(names, classifiers, suffix, folder, x_train, y_train, x_va
             plt.ylabel("Arbitrary units", fontsize=15)
             plt.legend(loc="best", frameon=False, fontsize=15)
             plt.yscale("log")
-
-            plot_name = f'{folder}/ModelOutDistr_{label_hyp}_{name}_{suffix}.png'
-            fig.savefig(plot_name)
+            fig.savefig(f"{folder}/ModelOutDistr_{label_hyp}_{name}_{suffix}.png")
 
 
-def roc_train_test(names, classifiers, x_train, y_train, x_test, y_test, suffix, folder,
-                   binmin, binmax):
+def roc_train_test(names_, classifiers_, suffix_, x_train, y_train, x_test, y_test,
+                   folder, multiclass_labels, binmin, binmax):
     fig = plt.figure(figsize=(20, 15))
-
-    for name, clf in zip(names, classifiers):
-        y_train_pred = clf.predict_proba(x_train)[:, 1]
-        y_test_pred = clf.predict_proba(x_test)[:, 1]
-        fpr_train, tpr_train, _ = roc_curve(y_train, y_train_pred)
-        fpr_test, tpr_test, _ = roc_curve(y_test, y_test_pred)
-        roc_auc_train = auc(fpr_train, tpr_train)
-        roc_auc_test = auc(fpr_test, tpr_test)
-        name_plot = name.replace("_", "\\_")
-        train_line = plt.plot(fpr_train, tpr_train, lw=3, alpha=0.4,
-                              label=f'ROC {name_plot} - Train set (AUC = {roc_auc_train:.4f})')
-        plt.plot(fpr_test, tpr_test, lw=3, ls="-.", alpha=0.8, c=train_line[0].get_color(),
-                 label=f'ROC {name} - Test set (AUC = {roc_auc_test:.4f})')
+    for name, clf in zip(names_, classifiers_):
+        for (x, y), set_name in zip(((x_train, y_train), (x_test, y_test)), ("train", "test")):
+            y_pred = clf.predict_proba(x)
+            print(f"y pred:\n{y_pred}\ny:\n{y}")
+            for cls_hyp, (label_hyp, color, ls, alpha) in \
+                    enumerate(zip(multiclass_labels, HIST_COLORS, ("-", "-."), (0.4, 0.8))):
+                print(f"y for {cls_hyp}:\n{y.iloc[:, cls_hyp]}\ny pred for {cls_hyp}:\n{y_pred[:, cls_hyp]}")
+                fpr, tpr, _ = roc_curve(y.iloc[:, cls_hyp], y_pred[:, cls_hyp])
+                roc_auc = auc(fpr, tpr)
+                plt.plot(fpr, tpr, f"{color}{ls}", lw=3, alpha=alpha,
+                         label=f"ROC {name} {label_hyp} vs rest, {set_name} set, "\
+                               f"AUC = {roc_auc:.4f}")
 
     plt.text(0.7, 0.5,
              f" ${binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {binmax}$",
@@ -351,10 +347,9 @@ def roc_train_test(names, classifiers, x_train, y_train, x_test, y_test, suffix,
     plt.ylabel('True Positive Rate', fontsize=30)
     plt.legend(loc='lower right', prop={'size': 25})
     plt.tick_params(labelsize=20)
-    plot_name = f'{folder}/ROCtraintest{suffix}.png'
-    mpl.rcParams.update({"text.usetex": True})
+    plot_name = f'{folder}/ROCtraintest{suffix_}.png'
     fig.savefig(plot_name)
-    mpl.rcParams.update({"text.usetex": False})
+    # FIXME: Why are some plots saved in pickle?
     plot_name = plot_name.replace('png', 'pickle')
     with open(plot_name, 'wb') as out:
         pickle.dump(fig, out)

@@ -29,11 +29,11 @@ ml_study: # mlout, mlplot
   dotesting: true
   doplotdistr: true
   doroc: true
-  doroctraintest: false
+  doroctraintest: true
   doimportance: false
   doimportanceshap: false
   docorrelation: false
-  dolearningcurve: false
+  dolearningcurve: true
   doapplytodatamc: false
   doscancuts: false # TODO: Adjust to multiclass, same problem as docorrelation
   doefficiency: false
