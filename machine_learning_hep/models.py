@@ -151,7 +151,7 @@ def test(ml_type, names_, trainedmodels_, test_set_, mylistvariables_, myvariabl
     logger = get_logger()
 
     x_test_ = test_set_[mylistvariables_]
-    y_test_ = test_set_[myvariablesy]
+    y_test_ = test_set_[myvariablesy_]
     #logger.info(f"test set y:\n{y_test_}")
     #num_cols = len(y_test_.columns)
     #y_test_.values.reshape(len(x_test_), num_cols)
