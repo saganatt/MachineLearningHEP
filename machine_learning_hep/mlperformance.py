@@ -302,13 +302,10 @@ def plot_overtraining(names, classifiers, suffix, x_train, y_train, x_val, y_val
         for cls_hyp, label_hyp in enumerate(multiclass_labels):
             fig = plt.figure(figsize=(10, 8))
             for cls, (label, color) in enumerate(zip(multiclass_labels, HIST_COLORS)):
-                cond1 = y_train == cls
-                cond_one_hot = y_train_onehot.iloc[:, cls]
-                print(f"Train disagreement: {cond1[np.logical_xor(cond1, cond_one_hot)]}")
-                plt.hist(predict_probs_train[y_train == cls, cls_hyp],
+                plt.hist(predict_probs_train[y_train_onehot.iloc[:, cls] == 1, cls_hyp],
                          color=color, alpha=0.5, range=[0, 1], bins=bins,
                          histtype='stepfilled', density=True, label=f'{label}, train')
-                predicted_probs = predict_probs_test[y_val == cls, cls_hyp]
+                predicted_probs = predict_probs_test[y_val_onehot.iloc[:, cls] == 1, cls_hyp]
                 hist, bins = np.histogram(predicted_probs, bins=bins, range=[0, 1], density=True)
                 scale = len(predicted_probs) / sum(hist)
                 err = np.sqrt(hist * scale) / scale
