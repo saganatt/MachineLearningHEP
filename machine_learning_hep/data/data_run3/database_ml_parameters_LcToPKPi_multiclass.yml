@@ -18,7 +18,6 @@ LcpKpi:
   doml: true
   mass: 2.286
   sel_reco_unp: "fPt>0"
-  sel_reco_singletrac_unp : null
   sel_gen_unp: "fPt>0"
   sel_cen_unp: null
   sel_good_evt_unp: "fIsEventReject == 0"
@@ -71,6 +70,9 @@ LcpKpi:
                    [fImpactParameter0, fImpactParameter1, fImpactParameter2, fPtProng0, fPtProng1, fPtProng2, fCpa],
                    [fImpactParameter0, fImpactParameter1, fImpactParameter2, fPtProng0, fPtProng1, fPtProng2, fCpa],
                    [fImpactParameter0, fImpactParameter1, fImpactParameter2, fPtProng0, fPtProng1, fPtProng2, fCpa]]
+    var_selected: [fPosX, fPosY, fPosZ, fY, fEta, fPt, fCpa, fCpaXY, fM, fChi2PCA, fDecayLength, fDecayLengthXY,
+                   fNSigTpcPi0, fNSigTpcPr0, fNSigTpcKa1, fNSigTpcPi2, fNSigTpcPr2,
+                   fNSigTofPi0, fNSigTofPr0, fNSigTofKa1, fNSigTofPi2, fNSigTofPr2]
     var_boundaries: [fDecayLength, fPt]
     var_correlation:
       - [fDecayLength, fChi2PCA, fCpa]
@@ -224,7 +226,8 @@ LcpKpi:
     equalise_sig_bkg: True
     sampletags: [0, 1, 1]
     sel_bkg: fM < 2.22 or fM > 2.35 # for plotting significance; should agree with bkg selection in sel_ml
-    sel_ml: [fM < 2.22 or fM > 2.35, ismcprompt == 1, ismcfd == 1] # best to have non-prompt (the smallest class) last, so the plots won't complain about the middle class missing
+    # best to have non-prompt (the smallest class) last, so the plots won't complain about the middle class missing
+    sel_ml: [fM < 2.22 or fM > 2.35, ismcsignal == 1 and ismcprompt == 1, ismcsignal == 1 and ismcfd == 1]
     multiclass_labels: [bkg, prompt, non-prompt]
     nkfolds: 5
     rnd_shuffle: 12
@@ -290,8 +293,8 @@ LcpKpi:
 
     Run3analysis:
       proc_type: Dhadrons
-      useperiod: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-      plotbin: [1]
+      useperiod: [1, 0]
+      plotbin: [1, 0]
       usesinglebineff: 0
       sel_binmin2: [1,2,4,6,8,12] #list of nbins
       sel_binmax2: [2,4,6,8,12,24] #list of nbins
@@ -299,12 +302,12 @@ LcpKpi:
       triggerbit: ''
       use_cuts: False
       cuts:
-        - "fCPA > 0.95"
-        - "fCPA > 0.95"
-        - "fCPA > 0.95"
-        - "fCPA > 0.95"
-        - "fCPA > 0.95"
-        - "fCPA > 0.95"
+        - "fDecayLength > 0.02 and fCpa > 0.9"
+        - "fDecayLength > 0.02 and fCpa > 0.9"
+        - "fDecayLength > 0.02 and fCpa > 0.9"
+        - "fDecayLength > 0.02 and fCpa > 0.9"
+        - "fDecayLength > 0.02 and fCpa > 0.9"
+        - "fDecayLength > 0.02 and fCpa > 0.9"
 
 
       # To initialize the individual fits in pT bins
@@ -322,7 +325,7 @@ LcpKpi:
         weighttrig: false
 
       data:
-        runselection: [null, null] #FIXME
+        runselection: [null] #FIXME
         prefix_dir_res: /data2/mkabus/MLHEP/results-multi-binarized-oh-overtraining-2/
         results: [LHC22pp/Results/prod_LHC22o/resultsdata] #list of periods
         resultsallp: LHC22pp/Results/resultsdatatot
@@ -344,10 +347,9 @@ LcpKpi:
       rebin: [4,4,4,4,4,4]
       fix_mean: [false,false,false,false,false,false]
       fix_sigma: [false,false,false,false,false,false]
-      masssecpeak: 0.
       # Fix mean and/or sigma
       FixedMean: False
-      SetFixGaussianSigma: [true,true,true,true,true,true]
+      SetFixGaussianSigma: [false,false,false,false,false,false]
       # Use value set for "masspeak" for initializing total fit, otherwise what is derived from MC fit is used
       SetInitialGaussianMean: true
       # Use values set for "sigmaarray" for initializing total fit (per pT bin),
