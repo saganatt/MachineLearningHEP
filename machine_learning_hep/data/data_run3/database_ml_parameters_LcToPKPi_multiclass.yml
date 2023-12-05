@@ -229,12 +229,13 @@ LcpKpi:
     nkfolds: 5
     rnd_shuffle: 12
     rnd_splt: 12
+    rnd_all: 12 # Set to None for pure randomness
     test_frac: 0.2
     binmin: [1,2,4,6,8,12] # must be equal to sel_skim_binmin (sel_skim_binmin bins)
     binmax: [2,4,6,8,12,24] # must be equal to sel_skim_binmax (sel_skim_binmin bins)
     mltype: MultiClassification
     ncorescrossval: 10
-    prefix_dir_ml: /data2/mkabus/MLHEP/results-multi-binarized/
+    prefix_dir_ml: /data2/mkabus/MLHEP/results-multi-binarized-oh-overtraining-2/
     mlplot: mlplot # to be removed
     mlout: mlout # to be removed
 
@@ -258,11 +259,11 @@ LcpKpi:
 
   mlapplication:
     data:
-      prefix_dir_app: /data2/mkabus/MLHEP/results-multi-binarized/
+      prefix_dir_app: /data2/mkabus/MLHEP/results-multi-binarized-oh-overtraining-2/
       pkl_skimmed_dec: [LHC22pp/MLapplication/prod_LHC22o/skpkldecdata] #list of periods
       pkl_skimmed_decmerged: [LHC22pp/MLapplication/prod_LHC22o/skpkldecdatamerged] #list of periods
     mc:
-      prefix_dir_app: /data2/mkabus/MLHEP/results-multi-binarized/
+      prefix_dir_app: /data2/mkabus/MLHEP/results-multi-binarized-oh-overtraining-2/
       pkl_skimmed_dec: [LHC22pp_mc/MLapplication/prod_LHC22b1b/skpkldecmc,
                         LHC22pp_mc/MLapplication/prod_LHC22b1a/skpkldecmc] #list of periods
       pkl_skimmed_decmerged: [LHC22pp_mc/MLapplication/prod_LHC22b1b/skpkldecmcmerged,
@@ -322,12 +323,12 @@ LcpKpi:
 
       data:
         runselection: [null, null] #FIXME
-        prefix_dir_res: /data2/mkabus/MLHEP/results-multi-binarized/
+        prefix_dir_res: /data2/mkabus/MLHEP/results-multi-binarized-oh-overtraining-2/
         results: [LHC22pp/Results/prod_LHC22o/resultsdata] #list of periods
         resultsallp: LHC22pp/Results/resultsdatatot
       mc:
         runselection: [null, null] #FIXME
-        prefix_dir_res: /data2/mkabus/MLHEP/results-multi-binarized/
+        prefix_dir_res: /data2/mkabus/MLHEP/results-multi-binarized-oh-overtraining-2/
         results: [LHC22pp_mc/Results/prod_LHC22b1b/resultsmc,
                   LHC22pp_mc/Results/prod_LHC22b1a/resultsmc] #list of periods
         resultsallp: LHC22pp_mc/Results/prod_LHC22b1b_LHC22b1a/resultsmctot
