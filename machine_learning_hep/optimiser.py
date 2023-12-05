@@ -379,10 +379,10 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                     self.dirmlplot, self.p_binmin, self.p_binmax)
 
         for label in self.p_multiclass_labels:
-            for var_label in var_set, var_labels:
-                output = make_plot_name(self.dirmlplot, f"{label}_{var_label}",
-                                        len(var_set[var_label]), self.p_binmin, self.p_binmax)
-                correlationmatrix(self.dfs_train[label], var_set[var_label], label, output,
+            for var_label, variables in var_set.items():
+                output = make_plot_name(self.dirmlplot, f"{label}_{var_label}", len(variables),
+                                        self.p_binmin, self.p_binmax)
+                correlationmatrix(self.dfs_train[label], variables, label, output,
                                   self.p_binmin, self.p_binmax, self.p_plot_options)
 
     def loadmodels(self):
