@@ -29,6 +29,8 @@ from machine_learning_hep.utilities_plot import plot_histograms
 from machine_learning_hep.fitting.utils import save_fit, load_fit
 from machine_learning_hep.fitting.fitters import FitAliHF, FitROOTGauss, FitSystAliHF
 
+FILE_FORMATS = ["eps", "png"]
+
 class MLFitParsFactory: # pylint: disable=too-many-instance-attributes
     """
     Managing MLHEP specific fit parameters and is used to collect and retrieve all information
@@ -898,11 +900,13 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
             fit.draw(canvas, sigma_signal=n_sigma_signal, x_axis_label=x_axis_label,
                      y_axis_label=y_axis_label, title=title)
             if self.pars_factory.apply_weights is False:
-                canvas.SaveAs(make_file_path(save_dir, "fittedplot", "eps", None,
-                                             suffix_write))
+                for ff in FILE_FORMATS:
+                    canvas.SaveAs(make_file_path(save_dir, "fittedplot", ff, None,
+                                                 suffix_write))
             else:
-                canvas.SaveAs(make_file_path(save_dir, "fittedplotweights", "eps", None,
-                                             suffix_write))
+                for ff in FILE_FORMATS:
+                    canvas.SaveAs(make_file_path(save_dir, "fittedplotweights", ff, None,
+                                                 suffix_write))
             canvas.Close()
             fit.draw(canvas_data[ibin2].cd(ibin1+1), sigma_signal=n_sigma_signal,
                      x_axis_label=x_axis_label, y_axis_label=y_axis_label, title=title)
@@ -944,7 +948,8 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
                             self.pars_factory.fit_range_low[ibin1], \
                             self.pars_factory.fit_range_up[ibin1])
                 h_residual_trend.Draw()
-                c_res.SaveAs(make_file_path(save_dir, "residual", "eps", None, suffix_write))
+                for ff in FILE_FORMATS:
+                    c_res.SaveAs(make_file_path(save_dir, "residual", ff, None, suffix_write))
                 c_res.Close()
 
 
@@ -966,8 +971,9 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
             pre_fit_mc.draw(canvas, x_axis_label=x_axis_label, y_axis_label=y_axis_label,
                             title=title)
 
-            canvas.SaveAs(make_file_path(save_dir, "fittedplot_integrated_mc", "eps", None,
-                                         suffix_write))
+            for ff in FILE_FORMATS:
+                canvas.SaveAs(make_file_path(save_dir, "fittedplot_integrated_mc", ff, None,
+                                             suffix_write))
             canvas.Close()
             pre_fit_mc.draw(canvas_init_mc.cd(ibin1+1), x_axis_label=x_axis_label,
                             y_axis_label=y_axis_label, title=title)
@@ -992,8 +998,9 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
             canvas = TCanvas("fit_canvas_data_init", suffix_write, 700, 700)
             pre_fit_data.draw(canvas, sigma_signal=n_sigma_signal, x_axis_label=x_axis_label,
                               y_axis_label=y_axis_label, title=title)
-            canvas.SaveAs(make_file_path(save_dir, "fittedplot_integrated", "eps", None,
-                                         suffix_write))
+            for ff in FILE_FORMATS:
+                canvas.SaveAs(make_file_path(save_dir, "fittedplot_integrated", ff, None,
+                                             suffix_write))
             canvas.Close()
             pre_fit_data.draw(canvas_init_data.cd(ibin1+1), sigma_signal=n_sigma_signal,
                               x_axis_label=x_axis_label, y_axis_label=y_axis_label,
@@ -1007,13 +1014,15 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
                 sigmas_init_data_histos.SetBinError(ibin1 + 1, kernel.GetSigmaUncertainty())
 
 
-        canvas_init_mc.SaveAs(make_file_path(save_dir, "canvas_InitMC", "eps"))
+        for ff in FILE_FORMATS:
+            canvas_init_mc.SaveAs(make_file_path(save_dir, "canvas_InitMC", ff))
+            canvas_init_data.SaveAs(make_file_path(save_dir, "canvas_InitData", ff))
         canvas_init_mc.Close()
-        canvas_init_data.SaveAs(make_file_path(save_dir, "canvas_InitData", "eps"))
         canvas_init_data.Close()
         for ibin2 in bins2:
             suffix2 = f"ibin2_{ibin2}"
-            canvas_data[ibin2].SaveAs(make_file_path(save_dir, "canvas_FinalData", "eps", None,
+            for ff in FILE_FORMATS:
+                canvas_data[ibin2].SaveAs(make_file_path(save_dir, "canvas_FinalData", ff, None,
                                                      suffix2))
             if root_dir:
                 root_dir.cd()
@@ -1036,43 +1045,44 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
         else:
             leg_strings = [""]
 
-        save_name = make_file_path(save_dir, "Yields", "eps", None, [self.case, self.ana_type])
-        # Yields summary plot
-        plot_histograms([yieldshistos[ibin2] for ibin2 in bins2], True, True, leg_strings,
-                        "uncorrected yields", "#it{p}_{T} (GeV/#it{c})",
-                        f"Uncorrected yields {latex_hadron_name} {self.ana_type}", "mult. / int.",
-                        save_name)
-        save_name = make_file_path(save_dir, "Background", "eps", None, [self.case, self.ana_type])
-        # Background summary plot
-        plot_histograms([backgroundhistos[ibin2] for ibin2 in bins2], True, True, leg_strings,
-                        "background", "#it{p}_{T} (GeV/#it{c})",
-                        f"Background {latex_hadron_name} {self.ana_type}", "mult. / int.",
-                        save_name)
-        save_name = make_file_path(save_dir, "Means", "eps", None, [self.case, self.ana_type])
-        # Means summary plot
-        plot_histograms([means_histos[ibin2] for ibin2 in bins2], False, True, leg_strings, "Means",
-                        "#it{p}_{T} (GeV/#it{c})",
-                        "#mu_{fit} " + f"{latex_hadron_name} {self.ana_type}", "mult. / int.",
-                        save_name)
-        save_name = make_file_path(save_dir, "Sigmas", "eps", None, [self.case, self.ana_type])
-        #Sigmas summary plot
-        plot_histograms([sigmas_histos[ibin2] for ibin2 in bins2], False, True, leg_strings,
-                        "Sigmas", "#it{p}_{T} (GeV/#it{c})",
-                        "#sigma_{fit} " + f"{latex_hadron_name} {self.ana_type}", "mult. / int.",
-                        save_name)
+        for ff in FILE_FORMATS:
+            save_name = make_file_path(save_dir, "Yields", ff, None, [self.case, self.ana_type])
+            # Yields summary plot
+            plot_histograms([yieldshistos[ibin2] for ibin2 in bins2], True, True, leg_strings,
+                            "uncorrected yields", "#it{p}_{T} (GeV/#it{c})",
+                            f"Uncorrected yields {latex_hadron_name} {self.ana_type}", "mult. / int.",
+                            save_name)
+            save_name = make_file_path(save_dir, "Background", ff, None, [self.case, self.ana_type])
+            # Background summary plot
+            plot_histograms([backgroundhistos[ibin2] for ibin2 in bins2], True, True, leg_strings,
+                            "background", "#it{p}_{T} (GeV/#it{c})",
+                            f"Background {latex_hadron_name} {self.ana_type}", "mult. / int.",
+                            save_name)
+            save_name = make_file_path(save_dir, "Means", ff, None, [self.case, self.ana_type])
+            # Means summary plot
+            plot_histograms([means_histos[ibin2] for ibin2 in bins2], False, True, leg_strings, "Means",
+                            "#it{p}_{T} (GeV/#it{c})",
+                            "#mu_{fit} " + f"{latex_hadron_name} {self.ana_type}", "mult. / int.",
+                            save_name)
+            save_name = make_file_path(save_dir, "Sigmas", ff, None, [self.case, self.ana_type])
+            #Sigmas summary plot
+            plot_histograms([sigmas_histos[ibin2] for ibin2 in bins2], False, True, leg_strings,
+                            "Sigmas", "#it{p}_{T} (GeV/#it{c})",
+                            "#sigma_{fit} " + f"{latex_hadron_name} {self.ana_type}", "mult. / int.",
+                            save_name)
 
-        # Plot the initialized means and sigma for MC and data
-        save_name = make_file_path(save_dir, "Means_mult_int", "eps", None,
-                                   [self.case, self.ana_type])
-        plot_histograms([means_init_mc_histos, means_init_data_histos], False, False,
-                        ["MC", "data"], "Means of int. mult.", "#it{p}_{T} (GeV/#it{c})",
-                        "#mu_{fit} " + f"{latex_hadron_name} {self.ana_type}", "", save_name)
+            # Plot the initialized means and sigma for MC and data
+            save_name = make_file_path(save_dir, "Means_mult_int", ff, None,
+                                       [self.case, self.ana_type])
+            plot_histograms([means_init_mc_histos, means_init_data_histos], False, False,
+                            ["MC", "data"], "Means of int. mult.", "#it{p}_{T} (GeV/#it{c})",
+                            "#mu_{fit} " + f"{latex_hadron_name} {self.ana_type}", "", save_name)
 
-        save_name = make_file_path(save_dir, "Sigmas_mult_int", "eps", None,
-                                   [self.case, self.ana_type])
-        plot_histograms([sigmas_init_mc_histos, sigmas_init_data_histos], False, False,
-                        ["MC", "data"], "Sigmas of int. mult.", "#it{p}_{T} (GeV/#it{c})",
-                        "#sigma_{fit} " + f"{latex_hadron_name} {self.ana_type}", "", save_name)
+            save_name = make_file_path(save_dir, "Sigmas_mult_int", ff, None,
+                                       [self.case, self.ana_type])
+            plot_histograms([sigmas_init_mc_histos, sigmas_init_data_histos], False, False,
+                            ["MC", "data"], "Sigmas of int. mult.", "#it{p}_{T} (GeV/#it{c})",
+                            "#sigma_{fit} " + f"{latex_hadron_name} {self.ana_type}", "", save_name)
 
 
     def draw_syst(self, save_dir, results_dir, root_dir=None): # pylint: disable=too-many-branches, too-many-statements, too-many-locals
@@ -1120,11 +1130,13 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
             fit.draw(canvas, title=title)
 
             if self.pars_factory.apply_weights is False:
-                canvas.SaveAs(make_file_path(save_dir, "multi_trial", "eps", None,
-                                             suffix_write))
+                for ff in FILE_FORMATS:
+                    canvas.SaveAs(make_file_path(save_dir, "multi_trial", ff, None,
+                                                 suffix_write))
             else:
-                canvas.SaveAs(make_file_path(save_dir, "multi_trial_weights", "eps", None,
-                                             suffix_write))
+                for ff in FILE_FORMATS:
+                    canvas.SaveAs(make_file_path(save_dir, "multi_trial_weights", ff, None,
+                                                 suffix_write))
 
             if root_dir:
                 root_dir.cd()
