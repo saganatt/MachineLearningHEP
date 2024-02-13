@@ -287,12 +287,12 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                     self.p_nclasses[ind] = min(min_class_count, self.p_nclasses[ind])
                     self.logger.info("Max possible number of equalized samples for %s: %d",
                                      label, self.p_nclasses[ind])
+                self.p_nclasses[self.p_class_labels.index("bkg")] = \
+                        self.p_nclasses[self.p_class_labels.index("bkg")] * self.p_multbkg
 
             for ind, (label, nclass) in enumerate(zip(self.p_class_labels, self.p_nclasses)):
                 self.dfs_input[label] = shuffle(self.dfs_input[label],
                                                 random_state=self.rnd_shuffle)
-                if label == "bkg" and self.p_equalise_sig_bkg:
-                    nclass = nclass*self.p_multbkg
                 self.dfs_input[label] = self.dfs_input[label][:nclass]
                 self.dfs_input[label][self.v_class] = ind
             self.df_ml = pd.concat([self.dfs_input[label] for label in self.p_class_labels])
