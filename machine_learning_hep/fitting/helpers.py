@@ -851,7 +851,7 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
 
         nx = 4
         ny = 2
-        canvy = 533
+        canvy = 2132
         if n_bins1 > 12:
             nx = 5
             ny = 4
@@ -863,7 +863,7 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
 
         canvas_init_mc = TCanvas("canvas_init_mc", "MC", 1000, canvy)
         canvas_init_data = TCanvas("canvas_init_data", "Data", 1000, canvy)
-        canvas_data = {ibin2: TCanvas("canvas_data%d" % (ibin2), "Data", 1000, canvy) \
+        canvas_data = {ibin2: TCanvas("canvas_data%d" % (ibin2), "Data", 4000, canvy) \
                        for ibin2 in bins2}
         canvas_init_mc.Divide(nx, ny)
         canvas_init_data.Divide(nx, ny)
@@ -879,7 +879,8 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
                 title = f"{self.pars_factory.bins1_edges_low[ibin1]:.1f} < #it{{p}}_{{T}} < " \
                         f"{self.pars_factory.bins1_edges_up[ibin1]:.1f}" \
                         f"(prob0 <= {self.pars_factory.prob_cut_fin[ibin1][0]:.2f} &" \
-                        f"prob1 >= {self.pars_factory.prob_cut_fin[ibin1][1]:.2f})"
+                        f"prob1 >= {self.pars_factory.prob_cut_fin[ibin1][1]:.2f} &" \
+                        f"prob2 >= {self.pars_factory.prob_cut_fin[ibin1][2]:.2f})"
             else:
                 title = f"{self.pars_factory.bins1_edges_low[ibin1]:.1f} < #it{{p}}_{{T}} < " \
                         f"{self.pars_factory.bins1_edges_up[ibin1]:.1f}" \
