@@ -39,6 +39,7 @@ from machine_learning_hep.analysis.analyzer import Analyzer
 from machine_learning_hep.hf_pt_spectrum import hf_pt_spectrum
 # pylint: disable=too-few-public-methods, too-many-instance-attributes, too-many-statements, fixme
 
+FILE_FORMATS = ["eps", "png"]
 
 class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
     species = "analyzer"
@@ -240,8 +241,9 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         h_sel_pr.SetMinimum(0.001)
         h_sel_pr.SetMaximum(1.0)
         gPad.SetLogy()
-        cEff.SaveAs("%s/Eff%s%s.eps" % (self.d_resultsallpmc,
-                                        self.case, self.typean))
+        for ff in FILE_FORMATS:
+            cEff.SaveAs("%s/Eff%s%s.%s" % (self.d_resultsallpmc,
+                                           self.case, self.typean, ff))
 
         cEffFD = TCanvas('cEffFD', 'The Fit Canvas')
         cEffFD.SetCanvasSize(1900, 1500)
@@ -268,8 +270,9 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         h_sel_fd.SetMaximum(1.)
         gPad.SetLogy()
         legeffFD.Draw()
-        cEffFD.SaveAs("%s/EffFD%s%s.eps" % (self.d_resultsallpmc,
-                                            self.case, self.typean))
+        for ff in FILE_FORMATS:
+            cEffFD.SaveAs("%s/EffFD%s%s.%s" % (self.d_resultsallpmc,
+                                               self.case, self.typean, ff))
 
     # def plotter(self):
     # To be added from dhadron_mult
