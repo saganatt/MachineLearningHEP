@@ -912,46 +912,46 @@ class MLFitter: # pylint: disable=too-many-instance-attributes
             fit.draw(canvas_data[ibin2].cd(ibin1+1), sigma_signal=n_sigma_signal,
                      x_axis_label=x_axis_label, y_axis_label=y_axis_label, title=title)
 
-            if fit.success:
-                fill_wrapper(yieldshistos[ibin2], ibin1 + 1,
-                             kernel.GetRawYield(), kernel.GetRawYieldError())
-                fill_wrapper(means_histos[ibin2], ibin1 + 1,
-                             kernel.GetMean(), kernel.GetMeanUncertainty())
-                fill_wrapper(sigmas_histos[ibin2], ibin1 + 1,
-                             kernel.GetSigma(), kernel.GetSigmaUncertainty())
-                fill_wrapper(refls_histos[ibin2], ibin1 + 1,
-                             kernel.GetReflOverSig(), kernel.GetReflOverSigUncertainty())
+            #if fit.success:
+            fill_wrapper(yieldshistos[ibin2], ibin1 + 1,
+                         kernel.GetRawYield(), kernel.GetRawYieldError())
+            fill_wrapper(means_histos[ibin2], ibin1 + 1,
+                         kernel.GetMean(), kernel.GetMeanUncertainty())
+            fill_wrapper(sigmas_histos[ibin2], ibin1 + 1,
+                         kernel.GetSigma(), kernel.GetSigmaUncertainty())
+            fill_wrapper(refls_histos[ibin2], ibin1 + 1,
+                         kernel.GetReflOverSig(), kernel.GetReflOverSigUncertainty())
 
-                bkg = c_double()
-                bkg_err = c_double()
-                kernel.Background(n_sigma_signal, bkg, bkg_err)
-                fill_wrapper(backgroundhistos[ibin2], ibin1 + 1, bkg, bkg_err)
+            bkg = c_double()
+            bkg_err = c_double()
+            kernel.Background(n_sigma_signal, bkg, bkg_err)
+            fill_wrapper(backgroundhistos[ibin2], ibin1 + 1, bkg, bkg_err)
 
-                signif = c_double()
-                signif_err = c_double()
-                kernel.Significance(n_sigma_signal, signif, signif_err)
-                fill_wrapper(signifs_histos[ibin2], ibin1 + 1, signif, signif_err)
+            signif = c_double()
+            signif_err = c_double()
+            kernel.Significance(n_sigma_signal, signif, signif_err)
+            fill_wrapper(signifs_histos[ibin2], ibin1 + 1, signif, signif_err)
 
-                # Residual plot
-                c_res = TCanvas('cRes', 'The Fit Canvas', 800, 800)
-                c_res.cd()
-                h_pulls = histo.Clone(f"{histo.GetName()}_pull")
-                h_residual_trend = histo.Clone(f"{histo.GetName()}_residual_trend")
-                h_pulls_trend = histo.Clone(f"{histo.GetName()}_pulls_trend")
-                if self.pars_factory.include_reflections:
-                    _ = kernel.GetOverBackgroundPlusReflResidualsAndPulls( \
-                            h_pulls, h_residual_trend, h_pulls_trend, \
-                            self.pars_factory.fit_range_low[ibin1], \
-                            self.pars_factory.fit_range_up[ibin1])
-                else:
-                    _ = kernel.GetOverBackgroundResidualsAndPulls( \
-                            h_pulls, h_residual_trend, h_pulls_trend, \
-                            self.pars_factory.fit_range_low[ibin1], \
-                            self.pars_factory.fit_range_up[ibin1])
-                h_residual_trend.Draw()
-                for ff in FILE_FORMATS:
-                    c_res.SaveAs(make_file_path(save_dir, "residual", ff, None, suffix_write))
-                c_res.Close()
+            # Residual plot
+            c_res = TCanvas('cRes', 'The Fit Canvas', 800, 800)
+            c_res.cd()
+            h_pulls = histo.Clone(f"{histo.GetName()}_pull")
+            h_residual_trend = histo.Clone(f"{histo.GetName()}_residual_trend")
+            h_pulls_trend = histo.Clone(f"{histo.GetName()}_pulls_trend")
+            if self.pars_factory.include_reflections:
+                _ = kernel.GetOverBackgroundPlusReflResidualsAndPulls( \
+                        h_pulls, h_residual_trend, h_pulls_trend, \
+                        self.pars_factory.fit_range_low[ibin1], \
+                        self.pars_factory.fit_range_up[ibin1])
+            else:
+                _ = kernel.GetOverBackgroundResidualsAndPulls( \
+                        h_pulls, h_residual_trend, h_pulls_trend, \
+                        self.pars_factory.fit_range_low[ibin1], \
+                        self.pars_factory.fit_range_up[ibin1])
+            h_residual_trend.Draw()
+            for ff in FILE_FORMATS:
+                c_res.SaveAs(make_file_path(save_dir, "residual", ff, None, suffix_write))
+            c_res.Close()
 
 
             # Summary plots to be done only once per pT bin
