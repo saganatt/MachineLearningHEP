@@ -350,7 +350,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
       mc: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.0, 0.95], [0.2, 0.0, 0.95], [0.2, 0.0, 0.95], [0.2, 0.0, 0.95], [0.5, 0.0, 0.95], [0.5, 0.0, 0.95]] #list of nbins
+    probcutoptimal: [[0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.5, 0.0, %fd%], [0.5, 0.0, %fd%]] #list of nbins
 
   analysis:
     anahptspectrum: "LctopKpi" # D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
@@ -391,12 +391,12 @@ LcpKpi:
 
       data:
         runselection: [null] #FIXME
-        prefix_dir_res: /data2/mkabus/MLHEP/results-multiclass-fd_95-bkg_rv/
+        prefix_dir_res: /data2/mkabus/MLHEP/results-multiclass-fd_99-bkg_rv/
         results: [LHC22pp/Results/prod_LHC22o/resultsdata] #list of periods
         resultsallp: LHC22pp/Results/resultsdatatot
       mc:
         runselection: [null, null] #FIXME
-        prefix_dir_res: /data2/mkabus/MLHEP/results-multiclass-fd_95-bkg_rv/
+        prefix_dir_res: /data2/mkabus/MLHEP/results-multiclass-fd_99-bkg_rv/
         results: [LHC22pp_mc/Results/prod_LHC22b1b/resultsmc,
                   LHC22pp_mc/Results/prod_LHC22b1a/resultsmc] #list of periods
         resultsallp: LHC22pp_mc/Results/prod_LHC22/resultsmctot
