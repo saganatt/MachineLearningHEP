@@ -211,6 +211,10 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         gROOT.SetBatch(tmp_is_root_batch)
 
     def efficiency(self):
+        # Enable ROOT batch mode and reset in the end
+        tmp_is_root_batch = gROOT.IsBatch()
+        gROOT.SetBatch(True)
+
         self.loadstyle()
         print(self.n_fileff)
         lfileeff = TFile.Open(self.n_fileff)
@@ -273,6 +277,8 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         for ff in FILE_FORMATS:
             cEffFD.SaveAs("%s/EffFD%s%s.%s" % (self.d_resultsallpmc,
                                                self.case, self.typean, ff))
+        # Reset to former mode
+        gROOT.SetBatch(tmp_is_root_batch)
 
     # def plotter(self):
     # To be added from dhadron_mult
