@@ -291,7 +291,7 @@ LcpKpi:
       mc: null
 
     nclasses: [20000, 20000, 20000]
-    equalise_sig_bkg: False
+    equalise_sig_bkg: True
     mult_bkg: [30,2,2,3,3,5]
     sampletags: [0, 1, 1]
     sel_bkg: fM < 2.22 or fM > 2.35 # for plotting significance; should agree with bkg selection in sel_ml
@@ -307,7 +307,7 @@ LcpKpi:
     binmax: [2,4,6,8,12,24] # must be equal to sel_skim_binmax (sel_skim_binmin bins)
     mltype: MultiClassification
     ncorescrossval: 10
-    prefix_dir_ml: /data2/mkabus/MLHEP/results-multiclass-dataformat/
+    prefix_dir_ml: /data2/MLhep/
     mlplot: mlplot # to be removed
     mlout: mlout # to be removed
 
@@ -331,11 +331,11 @@ LcpKpi:
 
   mlapplication:
     data:
-      prefix_dir_app: /data2/mkabus/MLHEP/results-multiclass-dataformat/
+      prefix_dir_app: /data2/MLhep/
       pkl_skimmed_dec: [LHC22pp/MLapplication/prod_LHC22o/skpkldecdata] #list of periods
       pkl_skimmed_decmerged: [LHC22pp/MLapplication/prod_LHC22o/skpkldecdatamerged] #list of periods
     mc:
-      prefix_dir_app: /data2/mkabus/MLHEP/results-multiclass-dataformat/
+      prefix_dir_app: /data2/MLhep/
       pkl_skimmed_dec: [LHC22pp_mc/MLapplication/prod_LHC22b1b/skpkldecmc,
                         LHC22pp_mc/MLapplication/prod_LHC22b1a/skpkldecmc,] #list of periods
       pkl_skimmed_decmerged: [LHC22pp_mc/MLapplication/prod_LHC22b1b/skpkldecmcmerged,
@@ -350,7 +350,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
       mc: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.5, 0.0, %fd%], [0.5, 0.0, %fd%]] #list of nbins
+    probcutoptimal: [[0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.5, 0.2, 0.0], [0.5, 0.2, 0.0]] #list of nbins
 
   analysis:
     anahptspectrum: "LctopKpi" # D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
@@ -391,12 +391,12 @@ LcpKpi:
 
       data:
         runselection: [null] #FIXME
-        prefix_dir_res: /data2/mkabus/MLHEP/results-multiclass-fd_99-bkg_rv/
+        prefix_dir_res: /data2/MLhep/
         results: [LHC22pp/Results/prod_LHC22o/resultsdata] #list of periods
         resultsallp: LHC22pp/Results/resultsdatatot
       mc:
         runselection: [null, null] #FIXME
-        prefix_dir_res: /data2/mkabus/MLHEP/results-multiclass-fd_99-bkg_rv/
+        prefix_dir_res: /data2/MLhep/
         results: [LHC22pp_mc/Results/prod_LHC22b1b/resultsmc,
                   LHC22pp_mc/Results/prod_LHC22b1a/resultsmc] #list of periods
         resultsallp: LHC22pp_mc/Results/prod_LHC22/resultsmctot
