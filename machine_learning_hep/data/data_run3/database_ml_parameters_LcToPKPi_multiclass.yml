@@ -350,7 +350,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
       mc: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.5, 0.0, %fd%], [0.5, 0.0, %fd%]] #list of nbins
+    probcutoptimal: [[0.2, 0.0, 0.9], [0.2, 0.0, 0.9], [0.2, 0.0, 0.9], [0.2, 0.0, 0.9], [0.5, 0.0, 0.9], [0.5, 0.0, 0.9]] #list of nbins
 
   analysis:
     anahptspectrum: "LctopKpi" # D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
