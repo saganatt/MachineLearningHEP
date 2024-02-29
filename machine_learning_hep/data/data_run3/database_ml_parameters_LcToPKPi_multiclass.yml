@@ -350,7 +350,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
       mc: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.5, 0.0, %fd%], [0.5, 0.0, %fd%]] #list of nbins
+    probcutoptimal: [[0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.5, 0.0, %fd%]] #list of nbins
 
   analysis:
     anahptspectrum: "LctopKpi" # D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
@@ -375,13 +375,11 @@ LcpKpi:
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
-        - "fDecayLength > 0.02"
-        - "fDecayLength > 0.02"
 
 
       sel_an_binmin: [2,4,6,8]
       sel_an_binmax: [4,6,8,12]
-      binning_matching: [1,2,3,4]
+      binning_matching: [0,1,2,3]
       presel_gen_eff: "abs(fY) < 0.8"
       evtsel: null
       triggersel:
