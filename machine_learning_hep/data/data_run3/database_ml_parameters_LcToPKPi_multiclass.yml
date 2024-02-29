@@ -227,13 +227,13 @@ LcpKpi:
             - 20.
   files_names:
     namefile_unmerged_tree: AO2D.root
-    namefile_reco: AnalysisResultsReco.pkl.lz4
-    namefile_evt: AnalysisResultsEvt.pkl.lz4
+    namefile_reco: AnalysisResultsReco.pkl
+    namefile_evt: AnalysisResultsEvt.pkl
     namefile_evtvalroot: AnalysisResultsROOTEvtVal.root
-    namefile_evtorig: AnalysisResultsEvtOrig.pkl.lz4
-    namefile_gen: AnalysisResultsGen.pkl.lz4
-    namefile_reco_applieddata: AnalysisResultsRecoAppliedData.pkl.lz4
-    namefile_reco_appliedmc: AnalysisResultsRecoAppliedMC.pkl.lz4
+    namefile_evtorig: AnalysisResultsEvtOrig.pkl
+    namefile_gen: AnalysisResultsGen.pkl
+    namefile_reco_applieddata: AnalysisResultsRecoAppliedData.pkl
+    namefile_reco_appliedmc: AnalysisResultsRecoAppliedMC.pkl
     namefile_mcweights: mcweights.root
     treeoriginreco: 'O2hfcandlclite'
     treeorigingen: 'O2hfcandlcfullp'
@@ -350,7 +350,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
       mc: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.0, 0.9], [0.2, 0.0, 0.9], [0.2, 0.0, 0.9], [0.2, 0.0, 0.9], [0.5, 0.0, 0.9], [0.5, 0.0, 0.9]] #list of nbins
+    probcutoptimal: [[0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.2, 0.0, %fd%], [0.5, 0.0, %fd%], [0.5, 0.0, %fd%]] #list of nbins
 
   analysis:
     anahptspectrum: "LctopKpi" # D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
@@ -365,8 +365,8 @@ LcpKpi:
       useperiod: [1,1]
       plotbin: [1]
       usesinglebineff: 0
-      sel_binmin2: [1,2,4,6,8,12] #list of nbins
-      sel_binmax2: [2,4,6,8,12,24] #list of nbins
+      sel_binmin2: [2,4,6,8] #list of nbins
+      sel_binmax2: [4,6,8,12] #list of nbins
       var_binning2: null
       triggerbit: ''
       use_cuts: False
@@ -379,9 +379,9 @@ LcpKpi:
         - "fDecayLength > 0.02"
 
 
-      sel_an_binmin: [1,2,4,6,8,12]
-      sel_an_binmax: [2,4,6,8,12,24]
-      binning_matching: [0,1,2,3,4,5]
+      sel_an_binmin: [2,4,6,8]
+      sel_an_binmax: [4,6,8,12]
+      binning_matching: [1,2,3,4]
       presel_gen_eff: "abs(fY) < 0.8"
       evtsel: null
       triggersel:
@@ -409,8 +409,8 @@ LcpKpi:
       sgnfunc: [kGaus,kGaus,kGaus,kGaus,kGaus,kGaus]
       bkgfunc: [Pol2,Pol2,Pol2,Pol2,Pol2,Pol2]
       masspeak: 2.286
-      massmin: [2.18, 2.18, 2.16, 2.14, 2.13, 2.10]
-      massmax: [2.38, 2.40, 2.42, 2.436, 2.446, 2.47]
+      massmin: [2.18, 2.16, 2.14, 2.13]
+      massmax: [2.40, 2.42, 2.436, 2.446]
       rebin: [5,5,6,7,8,14]
       fix_mean: [false,false,false,false,false,false]
       fix_sigma: [false,false,false,false,false,false]
