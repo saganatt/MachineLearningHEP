@@ -270,6 +270,7 @@ LcpKpi:
       period: [LHC22o] #list of periods
       select_period: [1]
       prefix_dir: /data2/mkabus/MLHEP/results-multiclass-application/
+      unmerged_tree_dir: [real/train_158254/alice/cern.ch/user/a/alihyperloop/jobs/0029] #list of periods
       pkl: [LHC22pp/period_LHC22o/pkldata] #list of periods
       pkl_skimmed: [LHC22pp/period_LHC22o/pklskdata] #list of periods
       pkl_skimmed_merge_for_ml: [LHC22pp/period_LHC22o/pklskmldata] #list of periods
