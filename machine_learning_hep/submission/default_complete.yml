@@ -4,36 +4,36 @@ download:
     activate: false
 conversion: # pkl
   mc:
-    activate: false
+    activate: true
   data:
-    activate: false
+    activate: true
 skimming: # pkl_skimmed (pklsk), pkl_evtcounter_all
   mc:
-    activate: false
+    activate: true
   data:
-    activate: false
+    activate: true
 merging: # pkl_skimmed_merge_for_ml (pklskml)
   mc:
-    activate: false
+    activate: true
   data:
-    activate: false
+    activate: true
 mergingperiods: # pkl_skimmed_merge_for_ml_all
   mc:
-    activate: false
+    activate: true
   data:
-    activate: false
+    activate: true
 
 ml_study: # mlout, mlplot
-  activate: true
-  dotraining: true
-  dotesting: true
-  doplotdistr: true
-  doroc: true
-  doroctraintest: true
-  doimportance: true
-  doimportanceshap: true
-  docorrelation: true
-  dolearningcurve: true
+  activate: false
+  dotraining: false
+  dotesting: false
+  doplotdistr: false
+  doroc: false
+  doroctraintest: false
+  doimportance: false
+  doimportanceshap: false
+  docorrelation: false
+  dolearningcurve: false
   doapplytodatamc: false
   doscancuts: false
   doefficiency: false
