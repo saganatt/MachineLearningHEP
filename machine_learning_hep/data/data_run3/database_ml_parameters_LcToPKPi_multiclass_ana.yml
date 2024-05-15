@@ -359,7 +359,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
       mc: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.5, 0.2, 0.0], [0.5, 0.2, 0.0]] #list of nbins
+    probcutoptimal: [[%bkg1%, 0.15, 0.0], [%bkg1%, 0.15, 0.0], [%bkg1%, 0.15, 0.0], [%bkg1%, 0.15, 0.0], [%bkg2%, 0.2, 0.0], [%bkg2%, 0.2, 0.0]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "Nb" # fc, Nb
@@ -399,12 +399,12 @@ LcpKpi:
 
       data:
         runselection: [null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-pass6/
+        prefix_dir_res: /data8/majak/MLHEP/results-pass6-bkg_/
         results: [LHC22pp/Results/prod_LHC22o/resultsdata] #list of periods
         resultsallp: LHC22pp/Results/resultsdatatot
       mc:
         runselection: [null, null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-pass6/
+        prefix_dir_res: /data8/majak/MLHEP/results-pass6-bkg_/
         results: [LHC22pp_mc/Results/prod_LHC24d3/resultsmc] #list of periods
         resultsallp: LHC22pp_mc/Results/prod_LHC24d3/resultsmctot
 
