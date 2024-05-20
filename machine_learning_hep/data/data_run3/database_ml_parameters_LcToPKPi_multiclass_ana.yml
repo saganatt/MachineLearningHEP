@@ -357,8 +357,8 @@ LcpKpi:
                      xgboost_classifierLcpKpi_dfselection_fPt_8.0_12.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_12.0_24.0.sav]
     probcutpresel:
-      data: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
-      mc: [[0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.3, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
+      data: [[0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
+      mc: [[0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
     probcutoptimal: [[%bkg1%, 0.15, 0.0], [%bkg1%, 0.15, 0.0], [%bkg1%, 0.15, 0.0], [%bkg1%, 0.15, 0.0], [%bkg2%, 0.2, 0.0], [%bkg2%, 0.2, 0.0]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
