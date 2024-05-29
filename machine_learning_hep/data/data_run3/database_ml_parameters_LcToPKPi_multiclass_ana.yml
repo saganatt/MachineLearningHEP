@@ -418,7 +418,7 @@ LcpKpi:
       masspeak: 2.286
       massmin: [2.18, 2.18, 2.16, 2.14, 2.13, 2.10]
       massmax: [2.40, 2.40, 2.42, 2.436, 2.446, 2.47]
-      rebin: [5,7,6,7,8,14]
+      rebin: [5,7,6,7,9,14]
       fix_mean: [false,false,false,false,false,false]
       fix_sigma: [false,false,false,false,false,false]
       # Fix mean and/or sigma
