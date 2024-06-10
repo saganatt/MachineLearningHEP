@@ -1,13 +1,16 @@
 #!/bin/bash
 
 MLHEP_DIR="/data8/majak/MLHEP"
-OUTPUT_DIR="${MLHEP_DIR}/pass6-input-fdd-rebin"
+OUTPUT_DIR="${MLHEP_DIR}/pass6-input-fd_precise_0524_13cuts_005bkg"
 
-for fd in $(seq 0 5 90; seq 92 2 98) ; do
-  RESDIR="results-fd_${fd}-bkg_0524-rebin"
+RESDIR_PATTERN="${MLHEP_DIR}/results-fd_precise_0524_13cuts_005bkg_"
 
-  cp "${MLHEP_DIR}/${RESDIR}/LHC22pp_mc/Results/prod_LHC24d3/resultsmctot/efficienciesLcpKpiRun3analysis.root" \
-     "${OUTPUT_DIR}/efficienciesLcpKpiRun3analysis-fd_${fd}.root"
-  cp "${MLHEP_DIR}/${RESDIR}/LHC22pp/Results/resultsdatatot/Yields_LcpKpi_Run3analysis.root" \
-     "${OUTPUT_DIR}/yieldsLcpKpiRun3analysis-fd_${fd}.root"
+for dir in ${RESDIR_PATTERN}* ; do
+  suffix=${dir##${RESDIR_PATTERN}}
+  echo $suffix
+
+  cp "${dir}/LHC22pp_mc/Results/prod_LHC24d3/resultsmctot/efficienciesLcpKpiRun3analysis.root" \
+     "${OUTPUT_DIR}/efficienciesLcpKpiRun3analysis-fd_${suffix}.root"
+  cp "${dir}/LHC22pp/Results/resultsdatatot/Yields_LcpKpi_Run3analysis.root" \
+     "${OUTPUT_DIR}/yieldsLcpKpiRun3analysis-fd_${suffix}.root"
 done
