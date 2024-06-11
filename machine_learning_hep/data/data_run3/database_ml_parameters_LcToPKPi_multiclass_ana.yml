@@ -359,7 +359,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
       mc: [[0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.0, %fd12%], [0.1, 0.0, %fd24%], [0.2, 0.0, %fd46%], [0.2, 0.0, %fd68%], [0.5, 0.0, %fd812%], [0.5, 0.0, 0.0]] #list of nbins
+    probcutoptimal: [[0.2, 0.0, %fd12%], [0.05, 0.0, %fd24%], [0.2, 0.0, %fd46%], [0.2, 0.0, %fd68%], [0.5, 0.0, %fd812%], [0.5, 0.0, 0.0]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "Nb" # fc, Nb
@@ -418,7 +418,7 @@ LcpKpi:
       masspeak: 2.286
       massmin: [2.18, 2.18, 2.16, 2.14, 2.13, 2.10]
       massmax: [2.40, 2.40, 2.42, 2.436, 2.446, 2.47]
-      rebin: [5,7,6,7,9,14]
+      rebin: [5,8,6,7,9,14]
       fix_mean: [false,false,false,false,false,false]
       fix_sigma: [false,false,false,false,false,false]
       # Fix mean and/or sigma
