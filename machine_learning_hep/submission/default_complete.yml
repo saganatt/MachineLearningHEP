@@ -4,12 +4,12 @@ download:
     activate: false
 conversion: # pkl
   mc:
-    activate: false
+    activate: true
   data:
     activate: false
 skimming: # pkl_skimmed (pklsk), pkl_evtcounter_all
   mc:
-    activate: false
+    activate: true
   data:
     activate: false
 merging: # pkl_skimmed_merge_for_ml (pklskml)
@@ -24,16 +24,16 @@ mergingperiods: # pkl_skimmed_merge_for_ml_all
     activate: false
 
 ml_study: # mlout, mlplot
-  activate: true
-  dotraining: true
-  dotesting: true
-  doplotdistr: true
-  doroc: true
-  doroctraintest: true
-  doimportance: true
-  doimportanceshap: true
-  docorrelation: true
-  dolearningcurve: true
+  activate: false
+  dotraining: false
+  dotesting: false
+  doplotdistr: false
+  doroc: false
+  doroctraintest: false
+  doimportance: false
+  doimportanceshap: false
+  docorrelation: false
+  dolearningcurve: false
   doapplytodatamc: false
   doscancuts: false
   doefficiency: false
@@ -45,11 +45,11 @@ ml_study: # mlout, mlplot
 
 mlapplication:
   data:
-    doapply: false # pkl_skimmed_dec (pklskdec)
+    doapply: true # pkl_skimmed_dec (pklskdec)
     domergeapply: false # pkl_skimmed_decmerged (pklskdecmerged)
     docontinueafterstop: false # set to true to resume interrupted processing (existing corrupted output will be overwritten)
   mc:
-    doapply: false # pkl_skimmed_dec (pklskdec)
+    doapply: true # pkl_skimmed_dec (pklskdec)
     domergeapply: false # pkl_skimmed_decmerged (pklskdecmerged)
     docontinueafterstop: false # set to true to resume interrupted processing (existing corrupted output will be overwritten)
 
@@ -59,10 +59,10 @@ analysis:
   # Do only merged (false)
   doperperiod: false
   data:
-    histomass: false # processer: process_histomass
+    histomass: true # processer: process_histomass
     dojetsystematics: false # analyzer: jetsystematics
   mc:
-    histomass: false # processer: process_histomass
+    histomass: true # processer: process_histomass
     efficiency: false # processer: process_efficiency
     efficiency_resp: false # analyzer: efficiency
     response: false # processer: process_response
