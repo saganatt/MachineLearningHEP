@@ -289,11 +289,11 @@ LcpKpi:
       select_period: [1]
       prefix_dir: /data8/majak/MLHEP-data/10062024/
       unmerged_tree_dir: [LHC24d3b/alice/cern.ch/user/a/alihyperloop/jobs/0041] #list of periods
-      pkl: [LHC22pp_mc_tuner/prod_LHC24d3b/pklmc] #list of periods
-      pkl_skimmed: [LHC22pp_mc_tuner/prod_LHC24d3b/pklskmc] #list of periods
-      pkl_skimmed_merge_for_ml: [LHC22pp_mc_tuner/prod_LHC24d3b/pklskmlmc] #list of periods
-      pkl_skimmed_merge_for_ml_all: LHC22pp_mc_tuner/prod_LHC22/mltotmc
-      pkl_evtcounter_all: LHC22pp_mc_tuner/prod_LHC22/evttotmc
+      pkl: [LHC22pp_mc_tuner_apply/prod_LHC24d3b/pklmc] #list of periods
+      pkl_skimmed: [LHC22pp_mc_tuner_apply/prod_LHC24d3b/pklskmc] #list of periods
+      pkl_skimmed_merge_for_ml: [LHC22pp_mc_tuner_apply/prod_LHC24d3b/pklskmlmc] #list of periods
+      pkl_skimmed_merge_for_ml_all: LHC22pp_mc_tuner_apply/prod_LHC22/mltotmc
+      pkl_evtcounter_all: LHC22pp_mc_tuner_apply/prod_LHC22/evttotmc
       mcreweights: [../Analyses]
   ml:
     evtsel: null
