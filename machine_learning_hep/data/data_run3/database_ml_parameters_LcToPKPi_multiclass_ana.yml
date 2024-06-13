@@ -261,10 +261,10 @@ LcpKpi:
 
   multi:
     data:
-      nprocessesparallel: 20
+      nprocessesparallel: 10
       maxfiles : [-1] #list of periods
       chunksizeunp : [100] #list of periods
-      chunksizeskim: [100] #list of periods
+      chunksizeskim: [10] #list of periods
       fracmerge : [0.05] #list of periods
       seedmerge: [12] #list of periods
       period: [LHC22o] #list of periods
