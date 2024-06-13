@@ -288,12 +288,12 @@ LcpKpi:
       period: [LHC24d3b] #list of periods
       select_period: [1]
       prefix_dir: /data8/majak/MLHEP-data/10062024/
-      unmerged_tree_dir: [LHC24d3b/alice/cern.ch/user/a/alihyperloop/jobs/0041] #list of periods
-      pkl: [LHC22pp_mc_tuner_apply/prod_LHC24d3b/pklmc] #list of periods
-      pkl_skimmed: [LHC22pp_mc_tuner_apply/prod_LHC24d3b/pklskmc] #list of periods
-      pkl_skimmed_merge_for_ml: [LHC22pp_mc_tuner_apply/prod_LHC24d3b/pklskmlmc] #list of periods
-      pkl_skimmed_merge_for_ml_all: LHC22pp_mc_tuner_apply/prod_LHC22/mltotmc
-      pkl_evtcounter_all: LHC22pp_mc_tuner_apply/prod_LHC22/evttotmc
+      unmerged_tree_dir: [LHC24d3b/alice/cern.ch/user/a/alihyperloop/outputs] #list of periods
+      pkl: [LHC22pp_mc_tuner/prod_LHC24d3b/pklmc] #list of periods
+      pkl_skimmed: [LHC22pp_mc_tuner/prod_LHC24d3b/pklskmc] #list of periods
+      pkl_skimmed_merge_for_ml: [LHC22pp_mc_tuner/prod_LHC24d3b/pklskmlmc] #list of periods
+      pkl_skimmed_merge_for_ml_all: LHC22pp_mc_tuner/prod_LHC24d3b/mltotmc
+      pkl_evtcounter_all: LHC22pp_mc_tuner/prod_LHC24d3b/evttotmc
       mcreweights: [../Analyses]
   ml:
     evtsel: null
@@ -301,9 +301,9 @@ LcpKpi:
       data: null
       mc: null
 
-    nclasses: [20000, 20000, 20000]
-    equalise_sig_bkg: False
-    mult_bkg: [10,1,2,3,3,5]
+    nclasses: [200000, 200000, 200000]
+    equalise_sig_bkg: True
+    mult_bkg: [1,1,1,1,1,1]
     sampletags: [0, 1, 1]
     sel_bkg: fM < 2.22 or fM > 2.35 # for plotting significance; should agree with bkg selection in sel_ml
     # best to have non-prompt (the smallest class) last, so the plots won't complain about the middle class missing
@@ -399,12 +399,12 @@ LcpKpi:
 
       data:
         runselection: [null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-fd_precise_0624_/
+        prefix_dir_res: /data8/majak/MLHEP/results-bkg-0624/
         results: [LHC22pp/Results/prod_LHC22o/resultsdata] #list of periods
         resultsallp: LHC22pp/Results/resultsdatatot
       mc:
         runselection: [null, null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-fd_precise_0624_/
+        prefix_dir_res: /data8/majak/MLHEP/results-bkg-0624/
         results: [LHC22pp_mc/Results/prod_LHC24d3b/resultsmc] #list of periods
         resultsallp: LHC22pp_mc/Results/prod_LHC24d3b/resultsmctot
 
@@ -418,7 +418,7 @@ LcpKpi:
       masspeak: 2.286
       massmin: [2.18, 2.18, 2.16, 2.14, 2.13, 2.10]
       massmax: [2.40, 2.40, 2.42, 2.436, 2.446, 2.47]
-      rebin: [5,8,6,7,9,14]
+      rebin: [5,5,6,7,8,14]
       fix_mean: [false,false,false,false,false,false]
       fix_sigma: [false,false,false,false,false,false]
       # Fix mean and/or sigma

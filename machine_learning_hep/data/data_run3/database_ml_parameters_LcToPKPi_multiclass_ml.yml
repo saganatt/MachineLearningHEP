@@ -261,10 +261,10 @@ LcpKpi:
 
   multi:
     data:
-      nprocessesparallel: 20
+      nprocessesparallel: 10
       maxfiles : [-1] #list of periods
       chunksizeunp : [100] #list of periods
-      chunksizeskim: [3] #list of periods
+      chunksizeskim: [10] #list of periods
       fracmerge : [0.05] #list of periods
       seedmerge: [12] #list of periods
       period: [LHC22o] #list of periods
@@ -365,7 +365,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
       mc: [[0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.2, 0.15, 0.0], [0.5, 0.2, 0.0], [0.5, 0.2, 0.0]] #list of nbins
+    probcutoptimal: [[0.2, 0.0, 0.0], [0.05, 0.0, 0.0], [0.2, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" # D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "Nb" # fc, Nb
