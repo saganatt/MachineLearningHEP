@@ -280,7 +280,7 @@ LcpKpi:
       #select_jobs: [[hy_189959], [hy_189000]]
       mcreweights: [../Analyses]
     mc:
-      nprocessesparallel: 60
+      nprocessesparallel: 80
       maxfiles : [-1, -1] #list of periods
       chunksizeunp : [100, 100] #list of periods
       chunksizeskim: [100, 100] #list of periods
@@ -368,7 +368,7 @@ LcpKpi:
       mc: [[0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
     probcutoptimal: [[0.2, 0.0, 0.0], [0.05, 0.0, 0.0], [0.2, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
   analysis:
-    anahptspectrum: "LctopKpi" # D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
+    anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "Nb" # fc, Nb
     cctype: "pp"
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
