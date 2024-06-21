@@ -29,7 +29,8 @@ from ROOT import TStyle, kBlue, kGreen, kBlack, kRed, kOrange
 from ROOT import TLatex
 from ROOT import gInterpreter, gPad
 # HF specific imports
-from machine_learning_hep.fitting.helpers import MLFitter
+from machine_learning_hep.fitting.helpers import MLFitParsFactory
+from machine_learning_hep.fitting.roofitter import RooFitter
 from machine_learning_hep.logger import get_logger
 from machine_learning_hep.io import dump_yaml_from_dict
 from machine_learning_hep.utilities import folding, get_bins, make_latex_table, parallelizer
@@ -159,7 +160,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         self.root_objects = []
 
         # Fitting
-        self.fitter = None
+        self.fitter = RooFitter()
         self.p_performval = datap["analysis"].get(
             "event_cand_validation", None)
 
@@ -169,19 +170,33 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         tmp_is_root_batch = gROOT.IsBatch()
         gROOT.SetBatch(True)
 
-        self.fitter = MLFitter(self.case, self.datap, self.typean,
-                               self.n_filemass, self.n_filemass_mc)
-        self.fitter.perform_pre_fits()
-        self.fitter.perform_central_fits()
+        pars_factory = MLFitParsFactory(self.datap, self.typean,
+                                        self.n_filemass, self.n_filemass_mc)
+        bin1_name = self.datap["var_binning"]
+        bins1_edges_low = self.datap["analysis"]["sel_an_binmin"]
+        bins1_edges_up = self.datap["analysis"]["sel_an_binmax"]
+        n_bins1 = len(self.bins1_edges_low)
+        rebins = self.datap["analysis"]["rebin"]
+        roofit_cfg = self.datap["analysis"]["mass_roofit"]
+        mass_fit_lim = self.datap["analysis"]["mass_fit_lim"]
+
+        for ibin1, rebin, roofit_params in zip(range(n_bins1), rebins, roofit_cfg):
+            histo_data, histo_mc = pars_factory.get_histograms(ibin1, 1, get_data=True, get_mc=True)
+            histo_data.Rebin(rebin)
+            histo_mc.Rebin(rebin)
+            #histo_data.SetRange(*mass_fit_lim)
+            #histo_mc.SetRange(*mass_fit_lim)
+            _ws, frame = self.fitter.fit_mass(histo_data, roofit_params, True)
+            c = TCanvas()
+            frame.Draw()
+            self._save_canvas(c, filename)
+
+        # TODO: Saving the results
         fileout_name = self.make_file_path(self.d_resultsallpdata, self.yields_filename, "root",
                                            None, [self.case, self.typean])
         fileout = TFile(fileout_name, "RECREATE")
         self.fitter.draw_fits(self.d_resultsallpdata, fileout)
         fileout.Close()
-
-        if self.p_dobkgfromsideband:
-            self.fitter.bkg_fromsidebands(self.d_resultsallpdata, self.n_filemass,
-                                          self.p_mass_fit_lim, self.p_bkgfunc, self.p_masspeak)
 
         self.fitter.save_fits(self.fits_dirname)
         # Reset to former mode

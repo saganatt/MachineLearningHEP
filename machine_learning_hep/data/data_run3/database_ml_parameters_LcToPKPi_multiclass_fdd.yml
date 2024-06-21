@@ -414,6 +414,62 @@ LcpKpi:
       # To initialize the individual fits in pT bins
       # Decide whether to take the sigma from MC or data for individual fits
       init_fits_from: [mc,mc,mc,mc,mc,mc] # data or mc
+      mass_roofit: [
+        [
+        components:
+          sig:
+            fn: 'Gaussian::sig(m[2.18,2.40], mean[2.256,2.316], sigma[0.01, 0.08])'
+          bkg:
+            fn: 'Polynomial::bkg(m[2.18,2.40])'
+          sum:
+            fn: 'SUM::sum(frac[0.,1.]*sig, bkg)'
+        ],
+        [
+        components:
+          sig:
+            fn: 'Gaussian::sig(m[2.18,2.40], mean[2.256,2.316], sigma[0.01, 0.08])'
+          bkg:
+            fn: 'Polynomial::bkg(m[2.18,2.40])'
+          sum:
+            fn: 'SUM::sum(frac[0.,1.]*sig, bkg)'
+        ],
+        [
+        components:
+          sig:
+            fn: 'Gaussian::sig(m[2.16,2.42], mean[2.247,2.325], sigma[0.01, 0.08])'
+          bkg:
+            fn: 'Polynomial::bkg(m[2.16,2.42])'
+          sum:
+            fn: 'SUM::sum(frac[0.,1.]*sig, bkg)'
+        ],
+        [
+        components:
+          sig:
+            fn: 'Gaussian::sig(m[2.14,2.436], mean[2.241,2.331], sigma[0.01, 0.08])'
+          bkg:
+            fn: 'Polynomial::bkg(m[2.14,2.436])'
+          sum:
+            fn: 'SUM::sum(frac[0.,1.]*sig, bkg)'
+        ],
+        [
+        components:
+          sig:
+            fn: 'Gaussian::sig(m[2.13,2.446], mean[2.286,2.286], sigma[0.01, 0.08])'
+          bkg:
+            fn: 'Polynomial::bkg(m[2.13,2.446])'
+          sum:
+            fn: 'SUM::sum(frac[0.,1.]*sig, bkg)'
+        ],
+        [
+        components:
+          sig:
+            fn: 'Gaussian::sig(m[2.10,2.47], mean[2.226,2.346], sigma[0.01, 0.08])'
+          bkg:
+            fn: 'Polynomial::bkg(m[2.10,2.47])'
+          sum:
+            fn: 'SUM::sum(frac[0.,1.]*sig, bkg)'
+        ],
+      ]
       sgnfunc: [kGaus,kGaus,kGaus,kGaus,kGaus,kGaus]
       bkgfunc: [Pol2,Pol2,Pol2,Pol2,Pol2,Pol2]
       masspeak: 2.286
