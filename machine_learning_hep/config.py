@@ -62,8 +62,13 @@ def update_config(database: dict, run_config: dict, database_overwrite=None): # 
             database["mlapplication"][keys[0]][keys[1]][:] = \
                     [f"{path}_std" for path in database["mlapplication"][keys[0]][keys[1]]]
         # ...set the ML working point all to 0
+        # except for MultiClassification, where bkg cut of 1 is the loosest one
         for k in data_mc:
-            database["mlapplication"]["probcutpresel"][k][:] = \
-                    [0] * len(database["mlapplication"]["probcutpresel"][k])
-        database["mlapplication"]["probcutoptimal"][:] \
-                = [0] * len(database["mlapplication"]["probcutoptimal"])
+            database["mlapplication"]["probcutpresel"][k] = \
+              [[1 if i == 0 and database["ml"]["mltype"] == "MultiClassification" else 0 \
+                for i in range(len(pcut))] \
+                for pcut in database["mlapplication"]["probcutpresel"][k]]
+        database["mlapplication"]["probcutoptimal"] = \
+          [[1 if i == 0 and database["ml"]["mltype"] == "MultiClassification" else 0 \
+            for i in range(len(pcut))] \
+            for pcut in database["mlapplication"]["probcutoptimal"]]
