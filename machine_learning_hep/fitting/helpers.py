@@ -347,9 +347,15 @@ class MLFitParsFactory: # pylint: disable=too-many-instance-attributes
         histo_reflections = None
         if get_mc:
             histo_mc = file_mc.Get("hmass_sig" + suffix)
+            if not histo_mc:
+                file_mc.ls()
+                raise ValueError("Did not find", "hmass_sig" + suffix)
             histo_mc.SetDirectory(0)
         if get_reflections:
             histo_reflections = file_mc.Get("hmass_refl" + suffix)
+            if not histo_reflections:
+                file_mc.ls()
+                raise ValueError("Did not find", "hmass_refl" + suffix)
             histo_reflections.SetDirectory(0)
         file_mc.Close()
 
