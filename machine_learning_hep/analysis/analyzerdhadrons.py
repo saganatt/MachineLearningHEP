@@ -61,7 +61,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         self.d_resultsallpmc = self.d_prefix_mc + dp["mc"]["results"][period] \
             if period is not None \
             else self.d_prefix_mc + dp["mc"]["resultsallp"]
-        self.d_resultsallpdata =  + dp["data"]["results"][period] \
+        self.d_resultsallpdata = self.d_prefix_data + dp["data"]["results"][period] \
             if period is not None \
             else self.d_prefix_data + dp["data"]["resultsallp"]
 
