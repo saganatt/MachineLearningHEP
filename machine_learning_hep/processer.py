@@ -457,8 +457,6 @@ class Processer: # pylint: disable=too-many-instance-attributes
                 write_df(dfgensk, self.mptfiles_gensk[ipt][file_index])
 
     def applymodel(self, file_index):
-        from machine_learning_hep.models import \
-            apply  # pylint: disable=import-error, import-outside-toplevel
         for ipt in range(self.p_nptbins):
             if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
                 if os.stat(self.mptfiles_recoskmldec[ipt][file_index]).st_size != 0:
@@ -467,6 +465,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if self.p_mask_values:
                 mask_df(dfrecosk, self.p_mask_values)
             if self.doml is True:
+                from machine_learning_hep.models import \
+                    apply  # pylint: disable=import-error, import-outside-toplevel
                 if os.path.isfile(self.lpt_model[ipt]) is False:
                     print("Model file not present in bin %d" % ipt)
                 with openfile(self.lpt_model[ipt], 'rb') as mod_file:
