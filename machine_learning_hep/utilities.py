@@ -23,6 +23,7 @@ import os
 import pickle
 import sys
 import time
+import uproot
 from array import array
 from datetime import datetime
 
@@ -154,6 +155,24 @@ def selectdfrunlist(dfr, runlist, runvar):
         dfr = dfr[issel]
     return dfr
 
+def reweight(filename, histoname, df, var, weighted_var):
+    file = uproot.open(filename)
+    weights_hist = file[histoname]
+
+    histogram_data = weights_hist.to_numpy()
+    weights = histogram_data[0]
+    bin_edges = histogram_data[1]
+
+    # Extract pT values from DataFrame
+    var = df[var]
+
+    # Determine bin indices for each pT value
+    bin_index = np.digitize(var, bin_edges) - 1
+
+    # Ensure bin indices are within the valid range
+    bin_index = np.clip(bin_index, 0, len(weights) - 1)
+    df['weights'] = weights[bin_index]
+    df[weighted_var] =  df['weights'] * var
 
 def count_df_length_pkl(*pkls):
     """

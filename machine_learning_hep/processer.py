@@ -34,7 +34,7 @@ from .io import dump_yaml_from_dict
 from .logger import get_logger
 from .utilities import (count_df_length_pkl, dfquery, mask_df, merge_method,
                         mergerootfiles, openfile, read_df, seldf_singlevar,
-                        write_df)
+                        write_df, reweight)
 from .utilities_files import (appendmainfoldertolist, create_folder_struc,
                               createlist, list_folders)
 
@@ -119,6 +119,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.n_fileeff = datap["files_names"]["efffilename"]
         self.n_fileresp = datap["files_names"]["respfilename"]
         self.n_mcreweights = datap["files_names"]["namefile_mcweights"]
+        self.n_weights = datap["files_names"]["histoweights"]
 
         #selections
         self.s_reco_skim = datap["sel_reco_skim"]
@@ -142,6 +143,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.v_ismcbkg = datap["bitmap_sel"]["var_ismcbkg"]  # used in hadrons
         self.v_ismcrefl = datap["bitmap_sel"]["var_ismcrefl"]  # used in hadrons
         self.v_var_binning = datap["var_binning"]
+        self.do_ptshape = datap.get("do_ptshape", False)
+        self.v_var_binning_ptshape = datap.get("var_binning_ptshape", None)
         self.v_invmass = datap["variables"].get("var_inv_mass", "inv_mass")
         # self.v_rapy = datap["variables"].get("var_y", "y_cand")
 
@@ -173,6 +176,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
 
         self.f_totevt = os.path.join(self.d_pkl, self.n_evt)
         self.f_totevtorig = os.path.join(self.d_pkl, self.n_evtorig)
+        self.f_weigths = os.path.join(self.d_mcreweights, self.n_mcreweights)
 
         self.p_modelname = datap["mlapplication"]["modelname"]
         # Analysis pT bins
@@ -279,6 +283,24 @@ class Processer: # pylint: disable=too-many-instance-attributes
                                      for ipt in range(self.p_nptbins)]
         # self.triggerbit = datap["analysis"][self.typean]["triggerbit"]
         self.runlistrigger = runlisttrigger
+
+        if (self.do_ptshape and self.mcordata == "mc"):
+            self.mptfiles_recosk_ptshape = []
+            self.mptfiles_gensk_ptshape = []
+            lpt_recosk_ptshape = [None] * self.p_nptbins
+            lpt_gensk_ptshape = [None] * self.p_nptbins
+            lpt_recodec_ptshape = [None] * self.p_nptbins
+
+            for ipt in range(self.p_nptbins):
+                lpt_recosk_ptshape[ipt] = self.v_var_binning_ptshape + self.lpt_recosk[ipt]
+                lpt_gensk_ptshape[ipt] = self.v_var_binning_ptshape + self.lpt_gensk[ipt]
+                lpt_recodec_ptshape[ipt] = self.v_var_binning_ptshape + self.lpt_recodec[ipt]
+            self.mptfiles_recosk_ptshape = [createlist(d_pklsk, self.l_path, \
+                                            lpt_recosk_ptshape[ipt]) for ipt in range(self.p_nptbins)]
+            self.mptfiles_gensk_ptshape = [createlist(d_pklsk, self.l_path, \
+                                           lpt_gensk_ptshape[ipt]) for ipt in range(self.p_nptbins)]
+            self.mptfiles_recoskmldec_ptshape = [createlist(self.d_pkl_dec, self.l_path, \
+                                                 lpt_recodec_ptshape[ipt]) for ipt in range(self.p_nptbins)]
 
         # if os.path.exists(self.d_root) is False:
         #     self.logger.warning("ROOT tree folder is not there. Is it intentional?")
@@ -456,6 +478,23 @@ class Processer: # pylint: disable=too-many-instance-attributes
                 dfgensk = dfquery(dfgensk, self.s_gen_skim[ipt])
                 write_df(dfgensk, self.mptfiles_gensk[ipt][file_index])
 
+        if (self.do_ptshape and self.mcordata == 'mc'):
+            reweight(self.f_weigths, self.n_weights, dfreco, self.v_var_binning, self.v_var_binning_ptshape)
+            reweight(self.f_weigths, self.n_weights, dfgen, self.v_var_binning, self.v_var_binning_ptshape)
+
+            for ipt in range(self.p_nptbins):
+                dfrecosk_ptshape = seldf_singlevar(dfreco, self.v_var_binning_ptshape,
+                                                   self.lpt_anbinmin[ipt], self.lpt_anbinmax[ipt])
+                dfrecosk_ptshape = dfquery(dfrecosk_ptshape, self.s_reco_skim[ipt])
+                write_df(dfrecosk_ptshape, self.mptfiles_recosk_ptshape[ipt][file_index])
+
+                if dfgen is not None:
+                    dfgensk_ptshape = seldf_singlevar(dfgen, self.v_var_binning_ptshape,
+                                              self.lpt_anbinmin[ipt], self.lpt_anbinmax[ipt])
+                    dfgensk_ptshape = dfquery(dfgensk_ptshape, self.s_gen_skim[ipt])
+                    write_df(dfgensk_ptshape, self.mptfiles_gensk_ptshape[ipt][file_index])
+
+
     def applymodel(self, file_index):
         for ipt in range(self.p_nptbins):
             if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
@@ -471,6 +510,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                     print("Model file not present in bin %d" % ipt)
                 with openfile(self.lpt_model[ipt], 'rb') as mod_file:
                     mod = pickle.load(mod_file)
+
                 if self.mltype == "MultiClassification":
                     dfrecoskml = apply(self.mltype, [self.p_modelname], [mod],
                                        dfrecosk, self.v_train[ipt], self.class_labels)
@@ -487,6 +527,26 @@ class Processer: # pylint: disable=too-many-instance-attributes
             else:
                 dfrecoskml = dfrecosk.query("isstd == 1")
             write_df(dfrecoskml, self.mptfiles_recoskmldec[ipt][file_index])
+
+            if(self.do_ptshape and self.mcordata == 'mc'):
+                dfrecosk_ptshape = read_df(self.mptfiles_recosk_ptshape[ipt][file_index])
+                if self.doml is True:
+                    if self.mltype == "MultiClassification":
+                        dfrecoskml_ptshape = apply(self.mltype, [self.p_modelname], [mod],
+                                                   dfrecosk_ptshape, self.v_train[ipt], self.class_labels)
+                        probs = [f'y_test_prob{self.p_modelname}{label.replace("-", "_")}' \
+                                 for label in self.class_labels]
+                        dfrecoskml_ptshape = dfrecoskml_ptshape[(dfrecoskml_ptshape[probs[0]] <= self.lpt_probcutpre[ipt][0]) &
+                                                                (dfrecoskml_ptshape[probs[1]] >= self.lpt_probcutpre[ipt][1]) &
+                                                                (dfrecoskml_ptshape[probs[2]] >= self.lpt_probcutpre[ipt][2])]
+                    else:
+                        dfrecoskml_ptshape = apply("BinaryClassification", [self.p_modelname], [mod],
+                                                   dfrecosk_ptshape, self.v_train[ipt])
+                        probvar = f"y_test_prob{self.p_modelname}"
+                        dfrecoskml_ptshape = dfrecoskml_ptshape.loc[dfrecoskml_ptshape[probvar] > self.lpt_probcutpre[ipt]]
+                else:
+                    dfrecoskml_ptshape = dfrecosk_ptshape.query("isstd == 1")
+                write_df(dfrecoskml_ptshape, self.mptfiles_recoskmldec_ptshape[ipt][file_index])
 
     @staticmethod
     def callback(ex):
