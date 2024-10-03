@@ -330,10 +330,12 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
             hbkg.Write()
             fileoutbkgscaled.Close()
 
+        output_prompt = []
         hf_pt_spectrum(self.p_anahpt,
                            self.p_br,
                            self.p_inputfonllpred,
                            self.p_fd_method,
+                           None,
                            fileouteff,
                            namehistoeffprompt,
                            namehistoefffeed,
@@ -341,6 +343,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                            nameyield,
                            selnorm,
                            self.p_sigmamb,
+                           output_prompt,
                            fileoutcross)
 
         fileoutcrosstot = TFile.Open("%s/finalcross%s%stot.root" %
