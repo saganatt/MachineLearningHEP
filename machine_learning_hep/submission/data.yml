@@ -7,12 +7,12 @@ conversion: # pkl
   mc:
     activate: false
   data:
-    activate: true
+    activate: false
 skimming: # pkl_skimmed (pklsk), pkl_evtcounter_all
   mc:
     activate: false
   data:
-    activate: true
+    activate: false
 merging: # pkl_skimmed_merge_for_ml (pklskml)
   mc:
     activate: false
@@ -55,16 +55,18 @@ mlapplication:
     docontinueafterstop: false # set to true to resume interrupted processing (existing corrupted output will be overwritten)
 
 analysis:
-  type: "YYYY" # used unless specified explicitly as do_entire_analysis -a type_ana
+  type: "Run3analysis" # used unless specified explicitly as do_entire_analysis -a type_ana
   # Do each period separately including merged (true)
   # Do only merged (false)
   doperperiod: false
   data:
-    histomass: false # processer: process_histomass
+    histomass: true # processer: process_histomass
   mc:
-    histomass: false # processer: process_histomass
-    efficiency: false # processer: process_efficiency
-  steps:
+    histomass: true # processer: process_histomass
+    efficiency: true # processer: process_efficiency
+  steps: # list steps (name of method in analyzer) to run
+    #fit:
+    efficiency:
 
 systematics:
   cutvar:
