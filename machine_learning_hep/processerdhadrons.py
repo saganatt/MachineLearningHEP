@@ -112,7 +112,7 @@ class ProcesserDhadrons(Processer): # pylint: disable=too-many-instance-attribut
                     self.run_param[self.runlistrigger], "run_number")
 
             if self.doml is True:
-                df = df.query(self.l_selml[bin_id])
+                df = df.query(self.l_selml[ipt])
             df = seldf_singlevar(df, self.v_var_binning, \
                                  self.lpt_finbinmin[ipt], self.lpt_finbinmax[ipt])
 
@@ -209,14 +209,14 @@ class ProcesserDhadrons(Processer): # pylint: disable=too-many-instance-attribut
             df_reco_presel_pr = df_mc_reco.loc[(df_mc_reco.ismcprompt == 1) & (df_mc_reco.ismcsignal == 1)]
             df_reco_sel_pr = None
             if self.doml is True:
-                df_reco_sel_pr = df_reco_presel_pr.query(self.l_selml[bin_id])
+                df_reco_sel_pr = df_reco_presel_pr.query(self.l_selml[ipt])
             else:
                 df_reco_sel_pr = df_reco_presel_pr.copy()
             df_gen_sel_fd = df_mc_gen.loc[(df_mc_gen.ismcfd == 1) & (df_mc_gen.ismcsignal == 1)]
             df_reco_presel_fd = df_mc_reco.loc[(df_mc_reco.ismcfd == 1) & (df_mc_reco.ismcsignal == 1)]
             df_reco_sel_fd = None
             if self.doml is True:
-                df_reco_sel_fd = df_reco_presel_fd.query(self.l_selml[bin_id])
+                df_reco_sel_fd = df_reco_presel_fd.query(self.l_selml[ipt])
             else:
                 df_reco_sel_fd = df_reco_presel_fd.copy()
 
