@@ -259,7 +259,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                         for i in range(self.p_nptbins)] if self.n_gen_sl else None
 
         self.lpt_recodec = None
-        if self.doml is True:
+        if self.doml:
             if self.mltype == "MultiClassification":
                 self.lpt_recodec = [self.n_reco.replace(".p", "%d_%d_%.2f%.2f%.2f.p" % \
                                    (self.lpt_anbinmin[i], self.lpt_anbinmax[i],
@@ -696,7 +696,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.logger.debug("Doing masshisto %s %s", self.mcordata, self.period)
         self.logger.debug("Using run selection for mass histo %s %s %s",
                           self.runlistrigger, "for period", self.period)
-        if self.doml is True:
+        if self.doml:
             self.logger.debug("Doing ml analysis")
         elif self.do_custom_analysis_cuts:
             self.logger.debug("Using custom cuts")
@@ -716,7 +716,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         print("Doing efficiencies", self.mcordata, self.period)
         print("Using run selection for eff histo", \
                self.runlistrigger, "for period", self.period)
-        if self.doml is True:
+        if self.doml:
             print("Doing ml analysis")
         elif self.do_custom_analysis_cuts:
             print("Using custom cuts")
