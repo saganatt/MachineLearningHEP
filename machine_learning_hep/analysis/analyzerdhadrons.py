@@ -55,10 +55,13 @@ from machine_learning_hep.logger import get_logger
 from machine_learning_hep.utils.hist import get_dim, project_hist
 
 # pylint: disable=too-few-public-methods, too-many-instance-attributes, too-many-statements, fixme
-# pylint: disable=consider-using-enumerate fixme
+# pylint: disable=consider-using-enumerate, missing-function-docstring
 
 
 class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
+    """
+    An analyzer for D and L hadrons.
+    """
     species = "analyzer"
 
     def __init__(self, datap, case, typean, period):
@@ -418,7 +421,8 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         print(self.n_fileff)
         lfileeff = TFile.Open(self.n_fileff)
         lfileeff.ls()
-        fileouteff = TFile.Open(f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root", "recreate")
+        fileouteff = TFile.Open(f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root",
+                                "recreate")
 
         def do_eff(gen_hist, sel_hist, histname, outname, eff_case):
             cEff = TCanvas(f"c{outname}", "The Fit Canvas")
@@ -449,7 +453,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         do_eff("h_gen_pr", "h_sel_pr", "eff", "Eff", "prompt")
         do_eff("h_gen_fd", "h_sel_fd", "eff_fd", "EffFD", "feed-down")
-        if self.do_ptshape:
+        if self.do_ptshape: # pylint: disable=no-member
             do_eff("h_gen_fd_ptshape", "h_sel_fd_ptshape", "eff_fd_ptshape", "EffFDPtShape", "feed-down")
 
     @staticmethod
