@@ -381,6 +381,7 @@ LcpKpi:
     cctype: "pp"
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
     inputfonllpred: /data8/majak/fdd-results/10092024/fdd-results-precise/CutVarLc_pp13TeV_LHC24d3.root
+    eff_for_crosssec: /data8/majak/MLHEP/input-fd-10092024/efficienciesLcpKpiRun3analysis_1224_split_bkg_0.60_0.60_fd_0.00_0.00_0.00_0.00_0.00_0.00_0.00_0.00_0.00.root
     dir_general_plots: analysis_plots
 
     Run3analysis:
