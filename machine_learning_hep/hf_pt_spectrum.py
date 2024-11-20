@@ -255,11 +255,17 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
         elif frac_method == "ext":
             frac[0] = prompt_frac[i_pt]
         elif frac_method == "dd":
+            print(f'bin {i_pt + 1} corr yields prompt {histos["corryields_fdd"]["prompt"].GetBinContent(i_pt + 1)} ' \
+                  f'non-prompt {histos["corryields_fdd"]["nonprompt"].GetBinContent(i_pt + 1)} ' \
+                  f'eff prompt {eff_times_acc_prompt} non-prompt {eff_times_acc_nonprompt}')
             yield_times_acceff_prompt = histos["corryields_fdd"]["prompt"].GetBinContent(i_pt + 1) * eff_times_acc_prompt
             yield_times_acceff_nonprompt = histos["corryields_fdd"]["nonprompt"].GetBinContent(i_pt + 1) * eff_times_acc_nonprompt
             yield_times_acceff_own = yield_times_acceff_prompt if crosssec_prompt else yield_times_acceff_nonprompt
             yield_times_acceff_other = yield_times_acceff_nonprompt if crosssec_prompt else yield_times_acceff_prompt
             frac_v = yield_times_acceff_own / (yield_times_acceff_own + yield_times_acceff_other)
+            print(f"yield times acceff prompt {yield_times_acceff_prompt} non-prompt {yield_times_acceff_nonprompt} " \
+                  f"do prompt: {crosssec_prompt} own yield times acceff: {yield_times_acceff_own} " \
+                  f"other {yield_times_acceff_other} final frac: {frac_v}")
             frac = [frac_v] * 3
 
         # compute cross section times BR
