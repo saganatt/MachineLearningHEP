@@ -1,11 +1,11 @@
 #!/bin/bash
 
 MLHEP_DIR="/data8/majak/MLHEP"
-OUTPUT_DIR="${MLHEP_DIR}/input-fd-10092024"
+OUTPUT_DIR="${MLHEP_DIR}/input-fd-precise-07112024"
 
-RESDIR_PATTERN="${MLHEP_DIR}/results-2308-hyp-ml_fd_precise_"
+RESDIR_PATTERN="${MLHEP_DIR}/results-0711-fdd-precise_"
 
-for dir in "${RESDIR_PATTERN}"1224_split* ; do
+for dir in "${RESDIR_PATTERN}"* ; do
   suffix=${dir##"${RESDIR_PATTERN}"}
   echo "$suffix"
 
