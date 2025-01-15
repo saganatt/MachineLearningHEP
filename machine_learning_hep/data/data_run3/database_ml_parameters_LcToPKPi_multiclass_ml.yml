@@ -288,14 +288,13 @@ LcpKpi:
       seedmerge: [12] #list of periods
       period: [LHC22o] #list of periods
       select_period: [1]
-      prefix_dir: /data8/majak/MLHEP-data/10062024/
-      unmerged_tree_dir: [LHC22o_medium/alice/cern.ch/user/a/alihyperloop/jobs/0049] #list of periods
-      pkl: [LHC22pp_pass6/period_LHC22o/pkldata] #list of periods
-      pkl_skimmed: [LHC22pp_pass6_finer_bins/period_LHC22o/pklskdata] #list of periods
-      pkl_skimmed_merge_for_ml: [LHC22pp_pass6_finer_bins/period_LHC22o/pklskmldata] #list of periods
-      pkl_skimmed_merge_for_ml_all: LHC22pp_pass6_finer_bins/mltotdata
-      pkl_evtcounter_all: LHC22pp_pass6_finer_bins/evttotdata
-      #select_jobs: [[hy_189959], [hy_189000]]
+      prefix_dir: /data8/majak/MLHEP-data/13012025/
+      unmerged_tree_dir: [LHC23_pass4_thin_small_324271/alice/cern.ch/user/a/alihyperloop/jobs/0115] #list of periods
+      pkl: [LHC23pp_pass4/period_LHC23_pass4_thin/pkldata] #list of periods
+      pkl_skimmed: [LHC23pp_pass4/period_LHC23_pass4_thin/pklskdata] #list of periods
+      pkl_skimmed_merge_for_ml: [LHC23pp_pass4/period_LHC23_pass4_thin/pklskmldata] #list of periods
+      pkl_skimmed_merge_for_ml_all: LHC23pp_pass4/mltotdata
+      pkl_evtcounter_all: LHC23pp_pass4/evttotdata
       mcreweights: [../Analyses]
     mc:
       nprocessesparallel: 80
@@ -306,17 +305,13 @@ LcpKpi:
       seedmerge: [12, 12] #list of periods
       period: [LHC24d3a, LHC24e3] #list of periods
       select_period: [1, 1]
-      prefix_dir: /data8/majak/MLHEP-data/10062024/
-      unmerged_tree_dir: [LHC24d3a/alice/cern.ch/user/a/alihyperloop/outputs,
-                          LHC24e3/alice/cern.ch/user/a/alihyperloop/outputs] #list of periods
-      pkl: [LHC22pp_mc_tuner/prod_LHC24d3a/pklmc,
-            LHC22pp_mc_tuner/prod_LHC24e3/pklmc] #list of periods
-      pkl_skimmed: [LHC22pp_mc_tuner_finer_bins/prod_LHC24d3a/pklskmc,
-                    LHC22pp_mc_tuner_finer_bins/prod_LHC24e3/pklskmc] #list of periods
-      pkl_skimmed_merge_for_ml: [LHC22pp_mc_tuner_finer_bins/prod_LHC24d3a/pklskmlmc,
-                                 LHC22pp_mc_tuner_finer_bins/prod_LHC24e3/pklskmlmc] #list of periods
-      pkl_skimmed_merge_for_ml_all: LHC22pp_mc_tuner_finer_bins/prod_LHC22/mltotmc
-      pkl_evtcounter_all: LHC22pp_mc_tuner_finer_bins/prod_LHC22/evttotmc
+      prefix_dir: /data8/majak/MLHEP-data/13012025/
+      unmerged_tree_dir: [LHC24g5_324269/alice/cern.ch/user/a/alihyperloop/jobs/0115] #list of periods
+      pkl: [LHC24pp_mc/prod_LHC24g5/pklmc] #list of periods
+      pkl_skimmed: [LHC24pp_mc/prod_LHC24g5/pklskmc] #list of periods
+      pkl_skimmed_merge_for_ml: [LHC24pp_mc/prod_LHC24g5/pklskmlmc] #list of periods
+      pkl_skimmed_merge_for_ml_all: LHC24pp_mc/prod_LHC24g5/mltotmc
+      pkl_evtcounter_all: LHC24pp_mc/prod_LHC24g5/evttotmc
       mcreweights: [../Analyses, ../Analyses]
   ml:
     evtsel: null
@@ -341,7 +336,7 @@ LcpKpi:
     binmax: [2,3,4,5,6,8,12,24] # must be equal to sel_skim_binmax (sel_skim_binmin bins)
     mltype: MultiClassification
     ncorescrossval: 10
-    prefix_dir_ml: /data8/majak/MLHEP/results-data-1006-finer-bins/
+    prefix_dir_ml: /data8/majak/MLHEP/results-data-13012025/
     mlplot: mlplot # to be removed
     mlout: mlout # to be removed
 
@@ -365,15 +360,13 @@ LcpKpi:
 
   mlapplication:
     data:
-      prefix_dir_app: /data8/majak/MLHEP/results-data-1006/
-      pkl_skimmed_dec: [LHC22pp/MLapplication/prod_LHC22o/skpkldecdata] #list of periods
-      pkl_skimmed_decmerged: [LHC22pp/MLapplication/prod_LHC22o/skpkldecdatamerged] #list of periods
+      prefix_dir_app: /data8/majak/MLHEP/results-data-13012025/
+      pkl_skimmed_dec: [LHC23pp_pass4/MLapplication/period_LHC23_pass4_thin/skpkldecdata] #list of periods
+      pkl_skimmed_decmerged: [LHC23pp_pass4/MLapplication/period_LHC23_pass4_thin/skpkldecdatamerged] #list of periods
     mc:
-      prefix_dir_app: /data8/majak/MLHEP/results-data-1006/
-      pkl_skimmed_dec: [LHC22pp_mc/MLapplication/prod_LHC24d3a/skpkldecmc,
-                        LHC22pp_mc/MLapplication/prod_LHC24e3/skpkldecmc] #list of periods
-      pkl_skimmed_decmerged: [LHC22pp_mc/MLapplication/prod_LHC24d3a/skpkldecmcmerged,
-                              LHC22pp_mc/MLapplication/prod_LHC24e3/skpkldecmcmerged] #list of periods
+      prefix_dir_app: /data8/majak/MLHEP/results-data-13012025/
+      pkl_skimmed_dec: [LHC24pp_mc/MLapplication/prod_LHC24g5/skpkldecmc] #list of periods
+      pkl_skimmed_decmerged: [LHC24pp_mc/MLapplication/prod_LHC24g5/skpkldecmcmerged] #list of periods
     modelname: xgboost
     modelsperptbin: [xgboost_classifierLcpKpi_dfselection_fPt_1.0_2.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_2.0_3.0.sav,
