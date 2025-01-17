@@ -52,26 +52,26 @@ LcpKpi:
     read:
       evtorig:
         level: all
-        index: fIndexHf3PCollBases
+        index: fIndexHFLCCOLLBASES
         trees:
-          O2hf3pcollbase: [fPosX, fPosY, fPosZ, fNumContrib, fMultZeqNTracksPV, fCentFT0A, fCentFT0C, fCentFT0M, fCentFV0A]
+          O2hflccollbase: [fPosX, fPosY, fPosZ, fNumContrib, fMultZeqNTracksPV, fCentFT0A, fCentFT0C, fCentFT0M, fCentFV0A]
         extra:
           fIsEventReject: 0
 
       reco:
         level: all
-        index: fIndexHf3PBases
+        index: fIndexHFLCBASES
         trees:
-          O2hf3pbase: [fIndexHf3PCollBases, fPt, fEta, fPhi, fM]
-          O2hf3ppar: [fNProngsContributorsPV, fCpa, fCpaXY, fChi2PCA, fDecayLength, fDecayLengthXY,
+          O2hflcbase: [fIndexHfLcCollBases, fPt, fEta, fPhi, fM]
+          O2hflcpar: [fNProngsContributorsPV, fCpa, fCpaXY, fChi2PCA, fDecayLength, fDecayLengthXY,
                       fPtProng0, fPtProng1, fPtProng2, fImpactParameter0, fImpactParameter1, fImpactParameter2,
                       fNSigTpcPi0, fNSigTpcPr0, fNSigTpcKa1, fNSigTpcPi2, fNSigTpcPr2,
                       fNSigTofPi0, fNSigTofPr0, fNSigTofKa1, fNSigTofPi2, fNSigTofPr2,
                       fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2]
-          O2hf3pmc:
+          O2hflcmc:
             level: mc
             vars: [fFlagMcMatchRec, fOriginMcRec, fIsCandidateSwapped]
-          O2hf3psel:
+          O2hflcsel:
             level: mc
             vars: [fCandidateSelFlag]
         filter: "fPt > 1."
@@ -88,7 +88,7 @@ LcpKpi:
       gen:
         level: mc
         trees:
-          O2hf3ppbase: [fPt, fEta, fPhi, fFlagMcMatchGen, fOriginMcGen]
+          O2hflcpbase: [fPt, fEta, fPhi, fFlagMcMatchGen, fOriginMcGen]
         tags:
           isstd: {var: fFlagMcMatchGen, req: [[1],[]], level: mc}
           ismcsignal: {var: fFlagMcMatchGen, req: [[1],[]], abs: true, level: mc}
@@ -277,6 +277,7 @@ LcpKpi:
     histoweights: "ptWeigths"
     respfilename: "resphisto.root"
     crossfilename: "cross_section_tot.root"
+    namefile_bccnt: "bccnt.root"
 
   multi:
     data:
@@ -382,7 +383,8 @@ LcpKpi:
     probcutoptimal: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.06, 0.0, 0.0], [0.06, 0.0, 0.0], [0.10, 0.0, 0.0], [0.25, 0.0, 0.0], [0.60, 0.0, 0.0]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
-    fd_method: "Nb" # fc, Nb
+    fd_method: "dd" # fc, Nb, dd, dd_N
+    crosssec_prompt: True # True for prompt, False for non-prompt
     cctype: "pp"
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
     inputfonllpred: data/fonll/DmesonLcPredictions_13TeV_y05_FFptDepLHCb_BRpythia8_PDG2020.root
