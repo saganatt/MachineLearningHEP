@@ -327,8 +327,8 @@ LcpKpi:
       seedmerge: [12] #list of periods
       period: [LHC23_pass4_thin] #list of periods
       select_period: [1]
-      prefix_dir: /data8/majak/MLHEP-data/20012025/
-      unmerged_tree_dir: [LHC23_pass4_thin_small_327051/alice/cern.ch/user/a/alihyperloop/jobs/0119] #list of periods
+      prefix_dir: /data8/majak/MLHEP-data/24012025/
+      unmerged_tree_dir: [LHC23_pass4_thin_hy_applied_331623/alice/cern.ch/user/a/alihyperloop/jobs/0123] #list of periods
       pkl: [LHC23pp_pass4/prod_LHC23_pass4_thin/pkldata] #list of periods
       pkl_skimmed: [LHC23pp_pass4/prod_LHC23_pass4_thin/pklskdata] #list of periods
       pkl_skimmed_merge_for_ml: [LHC23pp_pass4/prod_LHC23_pass4_thin/pklskmldata] #list of periods
@@ -342,15 +342,15 @@ LcpKpi:
       chunksizeskim: [100] #list of periods
       fracmerge : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of periods
       seedmerge: [12] #list of periods
-      period: [LHC24g5] #list of periods
+      period: [LHC24h1] #list of periods
       select_period: [1]
-      prefix_dir: /data8/majak/MLHEP-data/13012025/ # FIXME: To be replaced by LHC24h1
-      unmerged_tree_dir: [LHC24g5_324269/alice/cern.ch/user/a/alihyperloop/jobs/0115] #list of periods
-      pkl: [LHC24pp_mc/prod_LHC24g5/pklmc] #list of periods
-      pkl_skimmed: [LHC24pp_mc/prod_LHC24g5/pklskmc] #list of periods
-      pkl_skimmed_merge_for_ml: [LHC24pp_mc/prod_LHC24g5/pklskmlmc] #list of periods
-      pkl_skimmed_merge_for_ml_all: LHC24pp_mc/prod_LHC24g5/mltotmc
-      pkl_evtcounter_all: LHC24pp_mc/prod_LHC24g5/evttotmc
+      prefix_dir: /data8/majak/MLHEP-data/23012025/
+      unmerged_tree_dir: [LHC24h1_hy_applied_327181/alice/cern.ch/user/a/alihyperloop/jobs/0119] #list of periods
+      pkl: [LHC24pp_mc/prod_LHC24h1/pklmc] #list of periods
+      pkl_skimmed: [LHC24pp_mc/prod_LHC24h1/pklskmc] #list of periods
+      pkl_skimmed_merge_for_ml: [LHC24pp_mc/prod_LHC24h1/pklskmlmc] #list of periods
+      pkl_skimmed_merge_for_ml_all: LHC24pp_mc/prod_LHC24h1/mltotmc
+      pkl_evtcounter_all: LHC24pp_mc/prod_LHC24h1/evttotmc
       mcreweights: [../Analyses, ../Analyses]
   ml:
     evtsel: null
@@ -401,13 +401,13 @@ LcpKpi:
 
   mlapplication:
     data:
-      prefix_dir_app: /data8/majak/MLHEP/results-data-20012025/
+      prefix_dir_app: /data8/majak/MLHEP/results-data-24012025-zero-cuts/
       pkl_skimmed_dec: [LHC23pp_pass4/MLapplication/prod_LHC23_pass4_thin/skpkldecdata] #list of periods
       pkl_skimmed_decmerged: [LHC23pp_pass4/MLapplication/prod_LHC23_pass4_thin/skpkldecdatamerged] #list of periods
     mc:
-      prefix_dir_app: /data8/majak/MLHEP/results-mc-13012025/
-      pkl_skimmed_dec: [LHC24pp_mc/MLapplication/prod_LHC24g5/skpkldecmc] #list of periods
-      pkl_skimmed_decmerged: [LHC24pp_mc/MLapplication/prod_LHC24g5/skpkldecmcmerged] #list of periods
+      prefix_dir_app: /data8/majak/MLHEP/results-mc-23012025-zero-cuts/
+      pkl_skimmed_dec: [LHC24pp_mc/MLapplication/prod_LHC24h1/skpkldecmc] #list of periods
+      pkl_skimmed_decmerged: [LHC24pp_mc/MLapplication/prod_LHC24h1/skpkldecmcmerged] #list of periods
     modelname: xgboost
     modelsperptbin: [xgboost_classifierLcpKpi_dfselection_fPt_1.0_2.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_2.0_3.0.sav,
@@ -463,13 +463,13 @@ LcpKpi:
 
       data:
         runselection: [null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-data-20012025/
+        prefix_dir_res: /data8/majak/MLHEP/results-data-24012025/
         results: [LHC23pp_pass4/Results/prod_LHC23_pass4_thin/resultsdata] #list of periods
         resultsallp: LHC23pp_pass4/Results/resultsdatatot
       mc:
         runselection: [null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-mc-13012025/
-        results: [LHC24pp_mc/Results/prod_LHC24g5/resultsmc] #list of periods
+        prefix_dir_res: /data8/majak/MLHEP/results-mc-23012025/
+        results: [LHC24pp_mc/Results/prod_LHC24h1/resultsmc] #list of periods
         resultsallp: LHC24pp_mc/Results/resultsmctot
 
       dobkgfromsideband: false
