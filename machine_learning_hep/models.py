@@ -151,14 +151,15 @@ def apply(ml_type, names_, trainedmodels_, test_set_, mylistvariables_, labels_=
 
     if len(test_set_[mylistvariables_]) == 0:
         logger.warning("Empty dataframe provided.")
-        if  ml_type == "BinaryClassification":
+        if ml_type == "BinaryClassification":
             for name in names_:
                 test_set_[f"y_test_prediction{name}"]=0
                 test_set_[f"y_test_prob{name}"]=0
             return test_set_
-        if  ml_type == "MultiClassification":
+        if ml_type == "MultiClassification" and labels_ is not None:
             for name in names_:
                 for pred, lab in enumerate(labels_):
+                    # pandas query() used in further analysis cannot accept '-' in column names
                     safe_lab = lab.replace('-', '_')
                     if pred == 0:
                         # bkg cuts work differently
@@ -168,6 +169,7 @@ def apply(ml_type, names_, trainedmodels_, test_set_, mylistvariables_, labels_=
                         test_set_[f"y_test_prediction{name}{safe_lab}"] = -1
                         test_set_[f"y_test_prob{name}{safe_lab}"] = -1
             return test_set_
+        logger.fatal("Unknown mltype")
 
     x_values = test_set_[mylistvariables_]
     for name, model in zip(names_, trainedmodels_):
