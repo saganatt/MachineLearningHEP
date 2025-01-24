@@ -463,12 +463,12 @@ LcpKpi:
 
       data:
         runselection: [null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-data-24012025/
+        prefix_dir_res: /data8/majak/MLHEP/results-data-24012025-zero-cuts/
         results: [LHC23pp_pass4/Results/prod_LHC23_pass4_thin/resultsdata] #list of periods
         resultsallp: LHC23pp_pass4/Results/resultsdatatot
       mc:
         runselection: [null] #FIXME
-        prefix_dir_res: /data8/majak/MLHEP/results-mc-23012025/
+        prefix_dir_res: /data8/majak/MLHEP/results-mc-23012025-zero-cuts/
         results: [LHC24pp_mc/Results/prod_LHC24h1/resultsmc] #list of periods
         resultsallp: LHC24pp_mc/Results/resultsmctot
 
