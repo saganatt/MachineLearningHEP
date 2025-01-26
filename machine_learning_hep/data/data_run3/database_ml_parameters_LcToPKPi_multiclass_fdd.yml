@@ -353,11 +353,6 @@ LcpKpi:
       pkl_evtcounter_all: LHC24pp_mc/prod_LHC24h1/evttotmc
       mcreweights: [../Analyses, ../Analyses]
   ml:
-    evtsel: null
-    triggersel:
-      data: null
-      mc: null
-
     nclasses: [150000, 150000, 150000]
     #nclasses: [10752, 10752, 10752] #10-12
     #nclasses: [9983, 9983, 9983] #12-24
@@ -422,7 +417,7 @@ LcpKpi:
     probcutpresel:
       data: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
       mc: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [%bkg1012%, 0.0, 0.0], [%bkg1216%, 0.0, 0.0], [%bkg1624%, 0.0, 0.0]] #list of nbins
+    probcutoptimal: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.04, 0.0, 0.0], [0.07, 0.0, 0.0], [0.09, 0.0, 0.0], [0.11, 0.0, 0.0], [0.15, 0.0, 0.0], [0.18, 0.0, 0.0], [%bkg1012%, 0.0, 0.0], [%bkg1216%, 0.0, 0.0], [%bkg1624%, 0.0, 0.0]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "dd" # fc, Nb, dd, dd_N
@@ -431,6 +426,10 @@ LcpKpi:
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
     inputfonllpred: data/fonll/DmesonLcPredictions_13TeV_y05_FFptDepLHCb_BRpythia8_PDG2020.root
     dir_general_plots: analysis_plots
+    evtsel: null
+    triggersel:
+      data: null
+      mc: null
 
     Run3analysis:
       proc_type: Dhadrons
@@ -460,7 +459,6 @@ LcpKpi:
       sel_an_binmax: [2,3,4,5,6,7,8,10,12,16,24]
       binning_matching: [0,1,2,3,4,5,6,7,8,9,9]
       presel_gen_eff: "abs(fY) < 0.5"
-      evtsel: "abs(fPosZ < 10)"
 
       data:
         runselection: [null] #FIXME
@@ -473,11 +471,12 @@ LcpKpi:
         results: [LHC24pp_mc/Results/prod_LHC24h1/resultsmc] #list of periods
         resultsallp: LHC24pp_mc/Results/resultsmctot
 
+      nevents: null
       dobkgfromsideband: false
       latexnamehadron: "#Lambda_{c}^{pK#pi}"
-      mass_fit_lim: [2.05, 2.50] # region for the fit of the invariant mass distribution [GeV/c^2]
+      mass_fit_lim: [2.10, 2.47] # region for the fit of the invariant mass distribution [GeV/c^2]
       bin_width: 0.001 # bin width of the invariant mass histogram
-      n_rebin: [3,3,3,4,5,6,7,7,8,8,8]  # number of mass bins to merge
+      n_rebin: [2,2,2,2,3,3,3,4,5,6,6]  # number of mass bins to merge
 
       pdf_names:
         pdf_sig: "sig"
