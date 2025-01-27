@@ -5,11 +5,11 @@ source "${HOME}/Run3Analysisvalidation/exec/utilities.sh"
 WORKDIR="${HOME}/MachineLearningHEP/machine_learning_hep/"
 DATABASE="${WORKDIR}/data/data_run3/database_ml_parameters_LcToPKPi_multiclass_fdd"
 DATABASE_EXT="${DATABASE}.yml"
-RESDIR_PATTERN="results-24012025-hyp-ml_"
+RESDIR_PATTERN="results-24012025-hyp-ml-luigi-cuts_"
 
 fd=0.0
 
-for bkg in $(seq 0.55 0.05 0.80) ; do
+for bkg in $(seq 0.25 0.05 0.35) ; do
   echo "bkg ${bkg}"
 
   suffix="bkg_${bkg}"
@@ -50,5 +50,6 @@ for bkg in $(seq 0.55 0.05 0.80) ; do
       --delete \
      > "debug_${suffix}.txt" 2>&1 || ErrExit "Analysis failed"
 
+  rm -rf ${RESPATH}/fig/
   mv fig/ ${RESPATH}/
 done
