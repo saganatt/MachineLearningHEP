@@ -60,7 +60,7 @@ LcpKpi:
 
       reco:
         level: all
-        index: fIndexHfLCBases
+        index: fIndexHfLcBases
         trees:
           O2hflcbase: [fIndexHFLCCOLLBASES, fPt, fY, fEta, fPhi, fM]
           O2hflcpar: [fNProngsContributorsPV, fCpa, fCpaXY, fChi2PCA, fDecayLength, fDecayLengthXY,
@@ -323,7 +323,7 @@ LcpKpi:
       maxfiles : [-1] #list of periods
       chunksizeunp : [100] #list of periods
       chunksizeskim: [100] #list of periods
-      fracmerge : [0.05,0.05,0.05,0.05,0.05,0.1,0.1,0.2,0.2,0.3] #list of periods
+      fracmerge : [0.05] #list of periods
       seedmerge: [12] #list of periods
       period: [LHC23_pass4_thin] #list of periods
       select_period: [1]
@@ -340,7 +340,7 @@ LcpKpi:
       maxfiles : [-1] #list of periods
       chunksizeunp : [100] #list of periods
       chunksizeskim: [100] #list of periods
-      fracmerge : [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of periods
+      fracmerge : [1.0] #list of periods
       seedmerge: [12] #list of periods
       period: [LHC24h1] #list of periods
       select_period: [1]
@@ -353,6 +353,11 @@ LcpKpi:
       pkl_evtcounter_all: LHC24pp_mc/prod_LHC24h1/evttotmc
       mcreweights: [../Analyses, ../Analyses]
   ml:
+    evtsel: null
+    triggersel:
+      data: null
+      mc: null
+
     nclasses: [150000, 150000, 150000]
     #nclasses: [10752, 10752, 10752] #10-12
     #nclasses: [9983, 9983, 9983] #12-24
@@ -420,16 +425,12 @@ LcpKpi:
     probcutoptimal: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.04, 0.0, 0.0], [0.07, 0.0, 0.0], [0.09, 0.0, 0.0], [0.11, 0.0, 0.0], [0.15, 0.0, 0.0], [0.18, 0.0, 0.0], [%bkg1012%, 0.0, 0.0], [%bkg1216%, 0.0, 0.0], [%bkg1624%, 0.0, 0.0]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
-    fd_method: "dd" # fc, Nb, dd, dd_N
+    fd_method: "Nb" # fc, Nb, dd, dd_N
     crosssec_prompt: True # True for prompt, False for non-prompt
     cctype: "pp"
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
     inputfonllpred: data/fonll/DmesonLcPredictions_13TeV_y05_FFptDepLHCb_BRpythia8_PDG2020.root
     dir_general_plots: analysis_plots
-    evtsel: null
-    triggersel:
-      data: null
-      mc: null
 
     Run3analysis:
       proc_type: Dhadrons
@@ -459,6 +460,10 @@ LcpKpi:
       sel_an_binmax: [2,3,4,5,6,7,8,10,12,16,24]
       binning_matching: [0,1,2,3,4,5,6,7,8,9,9]
       presel_gen_eff: "abs(fY) < 0.5"
+      evtsel: null
+      triggersel:
+        data: null
+        mc: null
 
       data:
         runselection: [null] #FIXME
