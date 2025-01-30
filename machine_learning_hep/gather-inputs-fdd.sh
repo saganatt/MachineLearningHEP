@@ -1,15 +1,16 @@
 #!/bin/bash
 
 MLHEP_DIR="/data8/majak/MLHEP"
-OUTPUT_DIR="${MLHEP_DIR}/input-fd-precise-07112024"
+OUTPUT_DIR="${MLHEP_DIR}/input-fd-012025"
 
-RESDIR_PATTERN="${MLHEP_DIR}/results-0711-fdd-precise_"
+RESDIR_PATTERN="${MLHEP_DIR}/results-24012025-hyp-ml-luigi-cuts_"
+PERM_PATTERN="fd_"
 
-for dir in "${RESDIR_PATTERN}"* ; do
+for dir in "${RESDIR_PATTERN}${PERM_PATTERN}"* ; do
   suffix=${dir##"${RESDIR_PATTERN}"}
   echo "$suffix"
 
-  cp "${dir}/LHC22pp_mc/Results/prod_LHC24d3b/resultsmctot/efficienciesLcpKpiRun3analysis.root" \
+  cp "${dir}/LHC24pp_mc/Results/resultsmctot/efficienciesLcpKpiRun3analysis.root" \
      "${OUTPUT_DIR}/efficienciesLcpKpiRun3analysis_${suffix}.root"
   #cp "${dir}/LHC22pp/Results/resultsdatatot/Yields_LcpKpi_Run3analysis.root" \
   #   "${OUTPUT_DIR}/yieldsLcpKpiRun3analysis-${suffix}.root"

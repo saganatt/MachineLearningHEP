@@ -9,7 +9,7 @@ DATABASE_PATH="${WORKDIR}/data/data_run3/${DATABASE_EXT}"
 RESDIR_PATTERN="results-24012025-hyp-ml-luigi-cuts_"
 
 bkg=0.00
-for fd in $(seq 0.05 0.00 0.95) ; do
+for fd in $(seq 0.00 0.01 0.95) ; do
   echo "fd ${fd}"
 
   suffix="fd_${fd}"
@@ -38,8 +38,10 @@ for fd in $(seq 0.05 0.00 0.95) ; do
   sed -i "s/%fd34%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd45%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd56%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd68%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd812%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd67%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd78%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd810%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd1012%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd1216%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd1624%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
 
