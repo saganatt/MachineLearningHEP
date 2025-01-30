@@ -476,7 +476,7 @@ LcpKpi:
         results: [LHC24pp_mc/Results/prod_LHC24h1/resultsmc] #list of periods
         resultsallp: LHC24pp_mc/Results/resultsmctot
 
-      nevents: null
+      nevents: 300776750000
       dobkgfromsideband: false
       latexnamehadron: "#Lambda_{c}^{pK#pi}"
       mass_fit_lim: [2.10, 2.47] # region for the fit of the invariant mass distribution [GeV/c^2]
