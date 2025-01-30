@@ -3,23 +3,23 @@
 source "${HOME}/Run3Analysisvalidation/exec/utilities.sh"
 
 WORKDIR="${HOME}/MachineLearningHEP/machine_learning_hep/"
-DATABASE="${WORKDIR}/data/data_run3/database_ml_parameters_LcToPKPi_multiclass_fdd"
+DATABASE="database_ml_parameters_LcToPKPi_multiclass_fdd"
 DATABASE_EXT="${DATABASE}.yml"
+DATABASE_PATH="${WORKDIR}/data/data_run3/${DATABASE_EXT}"
 RESDIR_PATTERN="results-24012025-hyp-ml-luigi-cuts_"
 
-fd=0.0
+bkg=0.00
+for fd in $(seq 0.05 0.00 0.95) ; do
+  echo "fd ${fd}"
 
-for bkg in $(seq 0.25 0.05 0.35) ; do
-  echo "bkg ${bkg}"
-
-  suffix="bkg_${bkg}"
+  suffix="fd_${fd}"
   RESDIR="${RESDIR_PATTERN}${suffix}"
   RESPATH="/data8/majak/MLHEP/${RESDIR}/"
 
-  #rm -rf "${RESPATH}"
+  rm -rf "${RESPATH}"
 
   CUR_DB="${DATABASE}_edit_bkg${bkg}.yml"
-  cp "${DATABASE_EXT}" "${CUR_DB}" || ErrExit "Could not copy database"
+  cp "${DATABASE_PATH}" "${CUR_DB}" || ErrExit "Could not copy database"
 
   sed -i "s/%resdir%/${RESDIR}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%bkg12%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"

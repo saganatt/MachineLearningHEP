@@ -68,7 +68,7 @@ analysis:
     ##### Inclusive hadrons
     #fit:
     efficiency:
-    makenormyields:
+    #makenormyields:
     ##### Jets
     #init:
     #calculate_efficiencies:
