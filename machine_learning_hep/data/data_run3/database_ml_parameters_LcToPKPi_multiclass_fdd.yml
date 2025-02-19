@@ -497,6 +497,17 @@ LcpKpi:
       # Decide whether to take the sigma from MC or data for individual fits
       mass_roofit:
         - level: mc
+          ptrange: [0., 6.]
+          range: [2.18, 2.39]
+          components:
+            sig:
+              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[.007,.006,.016])'
+            bkg:
+              fn: 'Exponential::mcbkg(m, mcalpha[0.])'
+            model:
+              fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
+        - level: mc
+          ptrange: [6., 24.]
           range: [2.10, 2.45]
           components:
             sig:
