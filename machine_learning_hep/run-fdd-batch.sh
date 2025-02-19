@@ -9,7 +9,7 @@ DATABASE_PATH="${WORKDIR}/data/data_run3/${DATABASE_EXT}"
 RESDIR_PATTERN="results-24012025-hyp-ml-luigi-cuts_"
 
 bkg=0.00
-for fd in $(seq 0.00 0.01 0.95) ; do
+for fd in $(seq 0.00 0.005 0.605) ; do
   echo "fd ${fd}"
 
   suffix="fd_${fd}"
@@ -18,7 +18,7 @@ for fd in $(seq 0.00 0.01 0.95) ; do
 
   rm -rf "${RESPATH}"
 
-  CUR_DB="${DATABASE}_edit_bkg${bkg}.yml"
+  CUR_DB="${DATABASE}_edit_fd${fd}.yml"
   cp "${DATABASE_PATH}" "${CUR_DB}" || ErrExit "Could not copy database"
 
   sed -i "s/%resdir%/${RESDIR}/g" "${CUR_DB}" || ErrExit "Could not edit database"
