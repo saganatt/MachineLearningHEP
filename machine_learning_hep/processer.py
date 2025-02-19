@@ -254,9 +254,9 @@ class Processer: # pylint: disable=too-many-instance-attributes
                             for ipt in range(self.p_nptbins)]
         self.f_evt_count_ml = os.path.join(self.d_pkl_ml, self.n_evt_count_ml)
 
-          self.lpt_gensk_sl = [self.n_gen_sl.replace(".p", "_%s%d_%d.p" %
-                        (self.v_var_binning, self.lpt_anbinmin[i], self.lpt_anbinmax[i]))
-                        for i in range(self.p_nptbins)] if self.n_gen_sl else None
+        self.lpt_gensk_sl = [self.n_gen_sl.replace(".p", "_%s%d_%d.p" %
+                             (self.v_var_binning, self.lpt_anbinmin[i], self.lpt_anbinmax[i]))
+                             for i in range(self.p_nptbins)] if self.n_gen_sl else None
 
         self.lpt_recodec = None
         if self.doml:
@@ -286,8 +286,9 @@ class Processer: # pylint: disable=too-many-instance-attributes
                                     self.lpt_gensk[ipt]) for ipt in range(self.p_nptbins)]
             self.lpt_gendecmerged = [os.path.join(self.d_pkl_decmerged, self.lpt_gensk[ipt])
                                      for ipt in range(self.p_nptbins)]
-              self.mptfiles_gensk_sl = [createlist(self.d_pklsk, self.l_path,
-                                         self.lpt_gensk_sl[ipt]) for ipt in range(self.p_nptbins)] if self.lpt_gensk_sl else None
+            self.mptfiles_gensk_sl = [createlist(self.d_pklsk, self.l_path,
+                                      self.lpt_gensk_sl[ipt]) for ipt in range(self.p_nptbins)] \
+                                      if self.lpt_gensk_sl else None
 
         # self.triggerbit = datap["analysis"][self.typean]["triggerbit"]
         self.runlistrigger = runlisttrigger
@@ -499,7 +500,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                                           self.lpt_anbinmin[ipt], self.lpt_anbinmax[ipt])
                 dfgensk_sl = dfquery(dfgensk_sl, self.s_gen_skim[ipt])
                 write_df(dfgensk_sl, self.mptfiles_gensk_sl[ipt][file_index])
-        
+
         if (self.do_ptshape and self.mcordata == 'mc'):
             reweight(self.f_weigths, self.n_weights, dfreco, self.v_var_binning, self.v_var_binning_ptshape)
             reweight(self.f_weigths, self.n_weights, dfgen, self.v_var_binning, self.v_var_binning_ptshape)
@@ -517,6 +518,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                     write_df(dfgensk_ptshape, self.mptfiles_gensk_ptshape[ipt][file_index])
 
 
+    # pylint: disable=too-many-branches
     def applymodel(self, file_index):
         for ipt in range(self.p_nptbins):
             if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
@@ -558,14 +560,16 @@ class Processer: # pylint: disable=too-many-instance-attributes
                                                    dfrecosk_ptshape, self.v_train[ipt], self.class_labels)
                         probs = [f'y_test_prob{self.p_modelname}{label.replace("-", "_")}' \
                                  for label in self.class_labels]
-                        dfrecoskml_ptshape = dfrecoskml_ptshape[(dfrecoskml_ptshape[probs[0]] <= self.lpt_probcutpre[ipt][0]) &
-                                                                (dfrecoskml_ptshape[probs[1]] >= self.lpt_probcutpre[ipt][1]) &
-                                                                (dfrecoskml_ptshape[probs[2]] >= self.lpt_probcutpre[ipt][2])]
+                        dfrecoskml_ptshape = dfrecoskml_ptshape[
+                                (dfrecoskml_ptshape[probs[0]] <= self.lpt_probcutpre[ipt][0]) &
+                                (dfrecoskml_ptshape[probs[1]] >= self.lpt_probcutpre[ipt][1]) &
+                                (dfrecoskml_ptshape[probs[2]] >= self.lpt_probcutpre[ipt][2])]
                     else:
                         dfrecoskml_ptshape = apply("BinaryClassification", [self.p_modelname], [mod],
                                                    dfrecosk_ptshape, self.v_train[ipt])
                         probvar = f"y_test_prob{self.p_modelname}"
-                        dfrecoskml_ptshape = dfrecoskml_ptshape.loc[dfrecoskml_ptshape[probvar] > self.lpt_probcutpre[ipt]]
+                        dfrecoskml_ptshape = dfrecoskml_ptshape.loc[
+                                              dfrecoskml_ptshape[probvar] > self.lpt_probcutpre[ipt]]
                 else:
                     dfrecoskml_ptshape = dfrecosk_ptshape.query("isstd == 1")
                 write_df(dfrecoskml_ptshape, self.mptfiles_recoskmldec_ptshape[ipt][file_index])
