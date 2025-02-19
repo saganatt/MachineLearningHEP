@@ -282,7 +282,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                     self.logger.debug('fitting %s - %i', level, ipt)
                     roows = self.roows.get(ipt)
                     if self.mltype == "MultiClassification":
-                        suffix = "%s%d_%d_%.2f%.2f%.2f" % \
+                        suffix = "%s%d_%d_%.2f%.2f%.3f" % \
                          (self.v_var_binning, self.lpt_finbinmin[ipt],
                           self.lpt_finbinmax[ipt], self.lpt_probcutfin[ipt][0],
                           self.lpt_probcutfin[ipt][1], self.lpt_probcutfin[ipt][2])
