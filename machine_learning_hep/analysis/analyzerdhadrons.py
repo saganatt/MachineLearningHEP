@@ -81,6 +81,8 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         self.n_fileff = os.path.join(self.d_resultsallpmc, self.n_fileff)
         self.p_bin_width = datap["analysis"][self.typean]['bin_width']
         self.p_rebin = datap["analysis"][self.typean]['n_rebin']
+        self.p_fixed_sigma = datap["analysis"][self.typean]['fixed_sigma']
+        self.p_fixed_sigma_val = datap["analysis"][self.typean]['fixed_sigma_val']
         self.p_pdfnames = datap["analysis"][self.typean]['pdf_names']
         self.p_param_names = datap["analysis"][self.typean]['param_names']
 
@@ -105,7 +107,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         self.fit_func_bkg = {}
         self.fit_range = {}
 
-        self.path_fig = Path(f'fig/{self.case}/{self.typean}')
+        self.path_fig = Path(f'fig-2-fixed-sigma/{self.case}/{self.typean}')
         for folder in ['qa', 'fit', 'roofit', 'sideband', 'signalextr', 'fd', 'uf']:
             (self.path_fig / folder).mkdir(parents=True, exist_ok=True)
 
@@ -142,7 +144,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
     #region helpers
     def _save_canvas(self, canvas, filename):
         # folder = self.d_resultsallpmc if mcordata == 'mc' else self.d_resultsallpdata
-        canvas.SaveAs(f'fig/{self.case}/{self.typean}/{filename}')
+        canvas.SaveAs(f'fig-2-fixed-sigma/{self.case}/{self.typean}/{filename}')
 
 
     def _save_hist(self, hist, filename, option = ''):
@@ -160,10 +162,12 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         self.rfigfile.WriteObject(hist, rfilename)
 
     #region fitting
-    def _roofit_mass(self, level, hist, ipt, pdfnames, param_names, fitcfg, roows = None, filename = None):
+    def _roofit_mass(self, level, hist, ipt, pdfnames, param_names, fitcfg, fixed_sigma, fixed_sigma_val, # pylint: disable=too-many-arguments
+                     roows = None, filename = None):
         if fitcfg is None:
             return None, None
-        res, ws, frame, residual_frame = self.fitter.fit_mass_new(hist, pdfnames, fitcfg, level, roows, True)
+        res, ws, frame, residual_frame = self.fitter.fit_mass_new(hist, pdfnames, param_names, fitcfg, level,
+                                                                  fixed_sigma, fixed_sigma_val, roows, True)
         frame.SetTitle(f'inv. mass for p_{{T}} {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]} GeV/c')
         c = TCanvas()
 
@@ -330,7 +334,9 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                         if h_invmass.GetEntries() == 0:
                             continue
                         roo_res, roo_ws = self._roofit_mass(
-                            level, h_invmass, ipt, self.p_pdfnames, self.p_param_names, fitcfg, roows,
+                            level, h_invmass, ipt, self.p_pdfnames, self.p_param_names, fitcfg,
+                            self.p_fixed_sigma[ipt], self.p_fixed_sigma_val[ipt],
+                            roows,
                             f'roofit/h_mass_fitted_pthf-{ptrange[0]}-{ptrange[1]}_{level}.png')
                         self.roo_ws[level][ipt] = roo_ws
                         self.roows[ipt] = roo_ws

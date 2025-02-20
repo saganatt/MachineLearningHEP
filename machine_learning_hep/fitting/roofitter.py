@@ -25,7 +25,9 @@ class RooFitter:
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.ERROR)
 
-    def fit_mass_new(self, hist, pdfnames, fit_spec, level, roows = None, plot = False):
+    # pylint: disable=too-many-branches
+    def fit_mass_new(self, hist, pdfnames, param_names, fit_spec, level, fixed_sigma, fixed_sigma_val,
+                     roows = None, plot = False):
         if hist.GetEntries() == 0:
             raise UserWarning('Cannot fit histogram with no entries')
         ws = roows or ROOT.RooWorkspace("ws")
@@ -39,6 +41,13 @@ class RooFitter:
             if comp == 'model':
                 model = fn
         m = ws.var(var_m)
+
+        if level == "mc":
+            print(f"fit spec\n{fit_spec}")
+            sigma_sgn = ws.var(param_names["gauss_sigma"])
+            if fixed_sigma:
+                sigma_sgn.setVal(fixed_sigma_val)
+                sigma_sgn.setConstant(True)
 
         if level == "data":
             signal_pdf = ws.pdf(pdfnames["pdf_sig"])
