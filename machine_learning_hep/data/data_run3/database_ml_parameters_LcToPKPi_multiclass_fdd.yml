@@ -482,7 +482,7 @@ LcpKpi:
       mass_fit_lim: [2.10, 2.47] # region for the fit of the invariant mass distribution [GeV/c^2]
       bin_width: 0.001 # bin width of the invariant mass histogram
       n_rebin: [2,2,2,2,3,3,3,4,5,6,6]  # number of mass bins to merge
-      fixed_sigma: [True, True, True, True, True, True, True, True, True, True, True]
+      fixed_sigma: [False, False, False, False, False, False, False, False, False, False, False]
       fixed_sigma_val: [0.0088, 0.0092, 0.0090, 0.0117, 0.0138, 0.0148, 0.0160, 0.0174, 0.0207, 0.0259, 0.0260]
 
       pdf_names:

@@ -107,7 +107,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         self.fit_func_bkg = {}
         self.fit_range = {}
 
-        self.path_fig = Path(f'fig-2-fixed-sigma/{self.case}/{self.typean}')
+        self.path_fig = Path(f'fig/{self.case}/{self.typean}')
         for folder in ['qa', 'fit', 'roofit', 'sideband', 'signalextr', 'fd', 'uf']:
             (self.path_fig / folder).mkdir(parents=True, exist_ok=True)
 
@@ -144,7 +144,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
     #region helpers
     def _save_canvas(self, canvas, filename):
         # folder = self.d_resultsallpmc if mcordata == 'mc' else self.d_resultsallpdata
-        canvas.SaveAs(f'fig-2-fixed-sigma/{self.case}/{self.typean}/{filename}')
+        canvas.SaveAs(f'fig/{self.case}/{self.typean}/{filename}')
 
 
     def _save_hist(self, hist, filename, option = ''):
