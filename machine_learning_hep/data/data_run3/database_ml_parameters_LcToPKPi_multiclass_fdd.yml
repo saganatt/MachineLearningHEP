@@ -344,8 +344,8 @@ LcpKpi:
       seedmerge: [12] #list of periods
       period: [LHC24h1] #list of periods
       select_period: [1]
-      prefix_dir: /data8/majak/MLHEP-data/23012025/
-      unmerged_tree_dir: [LHC24h1_hy_applied_327181/alice/cern.ch/user/a/alihyperloop/jobs/0119] #list of periods
+      prefix_dir: /data8/majak/MLHEP-data/24022025/
+      unmerged_tree_dir: [LHC24h1_341075/alice/cern.ch/user/a/alihyperloop/jobs/0132] #list of periods
       pkl: [LHC24pp_mc/prod_LHC24h1/pklmc] #list of periods
       pkl_skimmed: [LHC24pp_mc/prod_LHC24h1/pklskmc] #list of periods
       pkl_skimmed_merge_for_ml: [LHC24pp_mc/prod_LHC24h1/pklskmlmc] #list of periods
@@ -405,7 +405,7 @@ LcpKpi:
       pkl_skimmed_dec: [LHC23pp_pass4/MLapplication/prod_LHC23_pass4_thin/skpkldecdata] #list of periods
       pkl_skimmed_decmerged: [LHC23pp_pass4/MLapplication/prod_LHC23_pass4_thin/skpkldecdatamerged] #list of periods
     mc:
-      prefix_dir_app: /data8/majak/MLHEP/results-mc-23012025/
+      prefix_dir_app: /data8/majak/MLHEP/results-mc-24022025/
       pkl_skimmed_dec: [LHC24pp_mc/MLapplication/prod_LHC24h1/skpkldecmc] #list of periods
       pkl_skimmed_decmerged: [LHC24pp_mc/MLapplication/prod_LHC24h1/skpkldecmcmerged] #list of periods
     modelname: xgboost
