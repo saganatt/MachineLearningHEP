@@ -512,13 +512,13 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         yield_filename = self.make_file_path(self.d_resultsallpdata, self.yields_filename, "root",
                                              None, [self.case, self.typean])
-        yield_filename = "/data8/majak/crosssec/202501/yields_LcpKpi_Run3analysis_forward.root"
+        yield_filename = "/data8/majak/crosssec/202502/yieldsLcpKpiRun3analysis_fd_0.000.root"
         if not os.path.exists(yield_filename):
             self.logger.fatal(
                 "Yield file %s could not be found", yield_filename)
 
         fileouteff = f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root"
-        fileouteff = "/data8/majak/crosssec/202501/efficienciesLcpKpiRun3analysis.root"
+        fileouteff = "/data8/majak/crosssec/202502/efficienciesLcpKpiRun3analysis_fd_0.000.root"
         if not os.path.exists(fileouteff):
             self.logger.fatal(
                 "Efficiency file %s could not be found", fileouteff)
@@ -529,7 +529,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         namehistoeffprompt = "eff"
         namehistoefffeed = "eff_fd"
-        nameyield = "hyields0"
+        nameyield = "hRawYields"
 
         histonorm = TH1F("histonorm", "histonorm", 1, 0, 1)
 
