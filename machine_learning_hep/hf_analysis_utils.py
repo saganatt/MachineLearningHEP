@@ -281,6 +281,18 @@ def compute_fraction_nb(
                         delta_raa = abs((raa_other - raa_other_old) / raa_other)
             else:
                 if raa_rat == 1.0 and taa == 1.0:  # pp
+                    frac_tmp = (
+                        1
+                        - sigma
+                        * delta_pt
+                        * delta_y
+                        * acc_eff_other
+                        * b_ratio
+                        * n_events
+                        * 2
+                        / rawy
+                        / sigma_mb
+                    )
                     frac.append(
                         1
                         - sigma
@@ -296,7 +308,7 @@ def compute_fraction_nb(
                     print(f"Nb pp fraction {i_sigma} raa ratio {i_raa_ratio} sigma {sigma} "
                           f"delta_pt {delta_pt} delta_y {delta_y} " \
                           f"acceff other {acc_eff_other} b_ratio {b_ratio} n_events {n_events} " \
-                          f"rawyields {rawy} sigmamb {sigma_mb} final frac {frac_cent}")
+                          f"rawyields {rawy} sigmamb {sigma_mb} final frac {frac_tmp}")
                 else:  # p-Pb or Pb-Pb: iterative evaluation of Raa needed
                     delta_raa = 1.0
                     frac_tmp = 1.0
@@ -332,7 +344,9 @@ def compute_fraction_nb(
     if frac:
         frac.sort()
         frac = [frac_cent, frac[0], frac[-1]]
+        print(f"Returning vector of frac: {frac}")
     else:
+        print(f"Returning only central value: {frac_cent}")
         frac = [frac_cent, frac_cent, frac_cent]
 
     return frac
