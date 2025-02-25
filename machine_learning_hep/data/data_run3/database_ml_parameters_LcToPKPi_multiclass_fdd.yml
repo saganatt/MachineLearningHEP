@@ -19,10 +19,10 @@ LcpKpi:
   sel_gen_unp: "fPt>0"
   sel_cen_unp: null
   sel_good_evt_unp: null
-  sel_reco_skim: [null,null,null,null,null,null,null,null,null,null]
-  sel_gen_skim: [null,null,null,null,null,null,null,null,null,null]
-  sel_skim_binmin: [1,2,3,4,5,6,7,8,10,12] #list of nbins
-  sel_skim_binmax: [2,3,4,5,6,7,8,10,12,24] #list of nbins
+  sel_reco_skim: [null,null,null,null,null,null,null,null,null,null,null]
+  sel_gen_skim: [null,null,null,null,null,null,null,null,null,null,null]
+  sel_skim_binmin: [0,1,2,3,4,5,6,7,8,10,12] #list of nbins
+  sel_skim_binmax: [1,2,3,4,5,6,7,8,10,12,24] #list of nbins
   apply_yptacccut: false
   var_binning: fPt
   do_ptshape: false
@@ -159,8 +159,15 @@ LcpKpi:
                    [fImpactParameter0, fImpactParameter1, fImpactParameter2, fCpa, fChi2PCA, fDecayLength, fDecayLengthXY,
                     fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2],
                    [fImpactParameter0, fImpactParameter1, fImpactParameter2, fCpa, fChi2PCA, fDecayLength, fDecayLengthXY,
+                    fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2],
+                   [fImpactParameter0, fImpactParameter1, fImpactParameter2, fCpa, fChi2PCA, fDecayLength, fDecayLengthXY,
                     fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2]]
     var_selected: [[fM, fY, fEta, fPt, fCpa, fCpaXY, fChi2PCA, fDecayLength, fDecayLengthXY,
+                   fPtProng0, fPtProng1, fPtProng2, fImpactParameter0, fImpactParameter1, fImpactParameter2,
+                   fNSigTpcPi0, fNSigTpcPr0, fNSigTpcKa1, fNSigTpcPi2, fNSigTpcPr2,
+                   fNSigTofPi0, fNSigTofPr0, fNSigTofKa1, fNSigTofPi2, fNSigTofPr2,
+                   fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2],
+                  [fM, fY, fEta, fPt, fCpa, fCpaXY, fChi2PCA, fDecayLength, fDecayLengthXY,
                    fPtProng0, fPtProng1, fPtProng2, fImpactParameter0, fImpactParameter1, fImpactParameter2,
                    fNSigTpcPi0, fNSigTpcPr0, fNSigTpcKa1, fNSigTpcPi2, fNSigTpcPr2,
                    fNSigTofPi0, fNSigTofPr0, fNSigTofKa1, fNSigTofPi2, fNSigTofPr2,
@@ -327,8 +334,8 @@ LcpKpi:
       seedmerge: [12] #list of periods
       period: [LHC23_pass4_thin] #list of periods
       select_period: [1]
-      prefix_dir: /data8/majak/MLHEP-data/24012025/
-      unmerged_tree_dir: [LHC23_pass4_thin_hy_applied_331623/alice/cern.ch/user/a/alihyperloop/jobs/0123] #list of periods
+      prefix_dir: /data8/majak/MLHEP-data/24022025/
+      unmerged_tree_dir: [LHC23_pass4_thin_hy_applied_342351/alice/cern.ch/user/a/alihyperloop/jobs/0133] #list of periods
       pkl: [LHC23pp_pass4/prod_LHC23_pass4_thin/pkldata] #list of periods
       pkl_skimmed: [LHC23pp_pass4/prod_LHC23_pass4_thin/pklskdata] #list of periods
       pkl_skimmed_merge_for_ml: [LHC23pp_pass4/prod_LHC23_pass4_thin/pklskmldata] #list of periods
@@ -401,7 +408,7 @@ LcpKpi:
 
   mlapplication:
     data:
-      prefix_dir_app: /data8/majak/MLHEP/results-data-24012025/
+      prefix_dir_app: /data8/majak/MLHEP/results-data-24022025/
       pkl_skimmed_dec: [LHC23pp_pass4/MLapplication/prod_LHC23_pass4_thin/skpkldecdata] #list of periods
       pkl_skimmed_decmerged: [LHC23pp_pass4/MLapplication/prod_LHC23_pass4_thin/skpkldecdatamerged] #list of periods
     mc:
@@ -409,7 +416,8 @@ LcpKpi:
       pkl_skimmed_dec: [LHC24pp_mc/MLapplication/prod_LHC24h1/skpkldecmc] #list of periods
       pkl_skimmed_decmerged: [LHC24pp_mc/MLapplication/prod_LHC24h1/skpkldecmcmerged] #list of periods
     modelname: xgboost
-    modelsperptbin: [xgboost_classifierLcpKpi_dfselection_fPt_1.0_2.0.sav,
+    modelsperptbin: [xgboost_classifierLcpKpi_dfselection_fPt_0.0_1.0.sav,
+                     xgboost_classifierLcpKpi_dfselection_fPt_1.0_2.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_2.0_3.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_3.0_4.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_4.0_5.0.sav,
@@ -420,9 +428,9 @@ LcpKpi:
                      xgboost_classifierLcpKpi_dfselection_fPt_10.0_12.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_12.0_24.0.sav]
     probcutpresel:
-      data: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
-      mc: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.02, 0.0, %fd12%], [0.03, 0.0, %fd23%], [0.04, 0.0, %fd34%], [0.07, 0.0, %fd45%], [0.09, 0.0, %fd56%], [0.11, 0.0, %fd67%], [0.15, 0.0, %fd78%], [0.18, 0.0, %fd810%], [0.25, 0.0, %fd1012%], [0.35, 0.0, %fd1216%], [0.35, 0.0, %fd1624%]] #list of nbins
+      data: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
+      mc: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
+    probcutoptimal: [[0.01, 0.0, %fd01%], [0.02, 0.0, %fd12%], [0.03, 0.0, %fd23%], [0.04, 0.0, %fd34%], [0.07, 0.0, %fd45%], [0.09, 0.0, %fd56%], [0.11, 0.0, %fd67%], [0.15, 0.0, %fd78%], [0.18, 0.0, %fd810%], [0.25, 0.0, %fd1012%], [0.35, 0.0, %fd1216%], [0.35, 0.0, %fd1624%]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "Nb" # fc, Nb, dd, dd_N
@@ -437,8 +445,8 @@ LcpKpi:
       useperiod: [1]
       plotbin: [1]
       usesinglebineff: 0
-      sel_binmin2: [1,2,3,4,5,6,7,8,10,12,16] #list of nbins
-      sel_binmax2: [2,3,4,5,6,7,8,10,12,16,24] #list of nbins
+      sel_binmin2: [0,1,2,3,4,5,6,7,8,10,12,16] #list of nbins
+      sel_binmax2: [1,2,3,4,5,6,7,8,10,12,16,24] #list of nbins
       var_binning2: null
       triggerbit: ''
       use_cuts: False
@@ -454,11 +462,12 @@ LcpKpi:
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
+        - "fDecayLength > 0.02"
 
 
-      sel_an_binmin: [1,2,3,4,5,6,7,8,10,12,16]
-      sel_an_binmax: [2,3,4,5,6,7,8,10,12,16,24]
-      binning_matching: [0,1,2,3,4,5,6,7,8,9,9]
+      sel_an_binmin: [0,1,2,3,4,5,6,7,8,10,12,16]
+      sel_an_binmax: [1,2,3,4,5,6,7,8,10,12,16,24]
+      binning_matching: [0,1,2,3,4,5,6,7,8,9,10,10]
       presel_gen_eff: "abs(fY) < 0.5"
       evtsel: null
       triggersel:
@@ -476,14 +485,14 @@ LcpKpi:
         results: [LHC24pp_mc/Results/prod_LHC24h1/resultsmc] #list of periods
         resultsallp: LHC24pp_mc/Results/resultsmctot
 
-      nevents: 300776750000
+      nevents: 290860860000
       dobkgfromsideband: false
       latexnamehadron: "#Lambda_{c}^{pK#pi}"
       mass_fit_lim: [2.10, 2.47] # region for the fit of the invariant mass distribution [GeV/c^2]
       bin_width: 0.001 # bin width of the invariant mass histogram
-      n_rebin: [2,2,2,2,3,3,3,4,5,6,6]  # number of mass bins to merge
-      fixed_sigma: [False, False, False, False, False, False, False, False, False, False, False]
-      fixed_sigma_val: [0.0088, 0.0092, 0.0090, 0.0117, 0.0138, 0.0148, 0.0160, 0.0174, 0.0207, 0.0259, 0.0260]
+      n_rebin: [2,2,2,2,2,3,3,3,4,5,6,6]  # number of mass bins to merge
+      fixed_sigma: [False,False, False, False, False, False, False, False, False, False, False, False]
+      fixed_sigma_val: [0.0080, 0.0088, 0.0092, 0.0090, 0.0117, 0.0138, 0.0148, 0.0160, 0.0174, 0.0207, 0.0259, 0.0260]
 
       pdf_names:
         pdf_sig: "sig"
@@ -536,6 +545,16 @@ LcpKpi:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
               fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
+        - ptrange: [0., 1.]
+          range: [2.216, 2.36] #2.21, 2.36
+          #fix_params: ['n', 'f_peak']
+          components:
+            # sig:
+            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
+            bkg:
+              fn: 'Polynomial::bkg(m, {a0[40000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+            model:
+              fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [1., 2.]
           range: [2.216, 2.36] #2.21, 2.36
           #fix_params: ['n', 'f_peak']
@@ -652,7 +671,7 @@ LcpKpi:
       useperiod: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] #period from where to define prob cuts
       ncutvar: 10 #number of looser and tighter variations
       maxperccutvar: 0.25 #max diff in efficiency for loosest/tightest var
-      cutvarminrange: [[0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Min starting point for scan
-      cutvarmaxrange: [[0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Max starting point for scan
+      cutvarminrange: [[0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Min starting point for scan
+      cutvarmaxrange: [[0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Max starting point for scan
       fixedmean: True #Fix mean cutvar histo to central fit
       fixedsigma: True #Fix sigma cutvar histo to central fit
