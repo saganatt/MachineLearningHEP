@@ -512,7 +512,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         yield_filename = self.make_file_path(self.d_resultsallpdata, self.yields_filename, "root",
                                              None, [self.case, self.typean])
-        yield_filename = "/data8/majak/crosssec/202502/yieldsLcpKpiRun3analysis_fd_0.000.root"
+        yield_filename = "/data8/majak/crosssec/202502/yieldsLcpKpiRun3analysis_fd_0.000_roofit.root"
         if not os.path.exists(yield_filename):
             self.logger.fatal(
                 "Yield file %s could not be found", yield_filename)
@@ -529,7 +529,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         namehistoeffprompt = "eff"
         namehistoefffeed = "eff_fd"
-        nameyield = "hRawYields"
+        nameyield = "hyields0"
 
         histonorm = TH1F("histonorm", "histonorm", 1, 0, 1)
 
