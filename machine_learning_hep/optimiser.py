@@ -46,6 +46,8 @@ from machine_learning_hep.correlations import vardistplot_probscan, efficiency_c
 from machine_learning_hep.utilities_files import checkdirs, checkmakedirlist
 from machine_learning_hep.io_ml_utils import parse_yaml, dump_yaml_from_dict
 
+HIST_COLORS = ['r', 'b', 'g']
+
 
 # pylint: disable=too-many-instance-attributes, too-many-statements, unbalanced-tuple-unpacking, fixme
 class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-string, unused-argument, too-many-arguments
@@ -634,6 +636,24 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         with open(f"{self.dirmlplot}/Efficiency_{self.s_suffix}.pickle", 'wb') as out:
             pickle.dump(fig_eff, out)
 
+    # TODO: Refactor calc_bkg and calc_signif to have 2D thresholds passed as arguments:
+    #       1) basically everything that is not plotting figures
+    #       2) do_significance works only in 1D! Can we have both 1D and 2D after the refactor? Or: will do_significance be only for BinaryClassification?
+    # TODO: In Fabio's thesis, there are equal steps (get_x_axis), but only in specific regions
+    # TODO: Factor out common parts out of do_significance
+    # TODO: Double loop over bkg and prompt/non-prompt cut, get significance, S/B
+    # TODO: Make 2D plots for significance and S/B
+    # TODO: Add calculation of prompt/non-prompt fraction
+    def do_cut_optimization(self):
+        if self.step_done("cut_optimization"):
+            return
+
+        self.do_significance()
+
+        self.logger.info("Doing BDT cut optimization")
+
+        signif_db = pd.read_parquet(f"{self.dirmlplot}/Significance.parquet")
+
     #pylint: disable=too-many-locals
     def do_significance(self):
         if self.step_done("significance"):
@@ -647,12 +667,12 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         gROOT.SetBatch(True)
         gROOT.ProcessLine("gErrorIgnoreLevel = kWarning;")
         #first extract the number of data events in the ml sample
+        #and the total number of events
         # This might need a revisit, for now just extract the numbers from the ML merged
         # event count (aka from a YAML since the actual events are not needed)
         # Before the ML count was always taken from the ML merged event df while the total
         # number was taken from the event counter. But the latter is basically not used
         # anymore for a long time cause "dofullevtmerge" is mostly "false" in the DBs
-        #and the total number of events
         count_dict = parse_yaml(self.f_evt_count_ml)
         self.p_nevttot = count_dict["evtorig"]
         self.p_nevtml = count_dict["evt"]
@@ -755,12 +775,13 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                              for bkg_err in bkg_err_array]
             signif_array, signif_err_array = optz.calc_signif(sig_array, sig_err_array,
                                                               bkg_array, bkg_err_array)
-            plt.figure(fig_signif_pevt.number)
-            plt.errorbar(x_axis, signif_array, yerr=signif_err_array,
-                         fmt=".", c="b", label=name, elinewidth=2.5, linewidth=5.0)
 
             signif_array_ml = [sig * sqrt(self.p_nevtml) for sig in signif_array]
             signif_err_array_ml = [sig_err * sqrt(self.p_nevtml) for sig_err in signif_err_array]
+
+            plt.figure(fig_signif_pevt.number)
+            plt.errorbar(x_axis, signif_array, yerr=signif_err_array,
+                         fmt=".", c="b", label=name, elinewidth=2.5, linewidth=5.0)
             plt.figure(fig_signif.number)
             plt.errorbar(x_axis,  signif_array_ml, yerr=signif_err_array_ml,
                          c="b", label=name, elinewidth=2.5, linewidth=5.0)
