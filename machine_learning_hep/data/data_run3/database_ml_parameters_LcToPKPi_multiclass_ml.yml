@@ -19,10 +19,10 @@ LcpKpi:
   sel_gen_unp: "fPt>0"
   sel_cen_unp: null
   sel_good_evt_unp: null
-  sel_reco_skim: [null,null,null,null,null,null,null,null,null,null]
-  sel_gen_skim: [null,null,null,null,null,null,null,null,null,null]
-  sel_skim_binmin: [1,2,3,4,5,6,7,8,10,12] #list of nbins
-  sel_skim_binmax: [2,3,4,5,6,7,8,10,12,24] #list of nbins
+  sel_reco_skim: [null,null,null,null,null,null,null,null,null,null,null]
+  sel_gen_skim: [null,null,null,null,null,null,null,null,null,null,null]
+  sel_skim_binmin: [0,1,2,3,4,5,6,7,8,10,12] #list of nbins
+  sel_skim_binmax: [1,2,3,4,5,6,7,8,10,12,24] #list of nbins
   apply_yptacccut: false
   var_binning: fPt
   do_ptshape: false
@@ -159,8 +159,15 @@ LcpKpi:
                    [fImpactParameter0, fImpactParameter1, fImpactParameter2, fCpa, fChi2PCA, fDecayLength, fDecayLengthXY,
                     fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2],
                    [fImpactParameter0, fImpactParameter1, fImpactParameter2, fCpa, fChi2PCA, fDecayLength, fDecayLengthXY,
+                    fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2],
+                   [fImpactParameter0, fImpactParameter1, fImpactParameter2, fCpa, fChi2PCA, fDecayLength, fDecayLengthXY,
                     fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2]]
     var_selected: [[fM, fY, fEta, fPt, fCpa, fCpaXY, fChi2PCA, fDecayLength, fDecayLengthXY,
+                   fPtProng0, fPtProng1, fPtProng2, fImpactParameter0, fImpactParameter1, fImpactParameter2,
+                   fNSigTpcPi0, fNSigTpcPr0, fNSigTpcKa1, fNSigTpcPi2, fNSigTpcPr2,
+                   fNSigTofPi0, fNSigTofPr0, fNSigTofKa1, fNSigTofPi2, fNSigTofPr2,
+                   fNSigTpcTofPi0, fNSigTpcTofPr0, fNSigTpcTofKa1, fNSigTpcTofPi2, fNSigTpcTofPr2],
+                  [fM, fY, fEta, fPt, fCpa, fCpaXY, fChi2PCA, fDecayLength, fDecayLengthXY,
                    fPtProng0, fPtProng1, fPtProng2, fImpactParameter0, fImpactParameter1, fImpactParameter2,
                    fNSigTpcPi0, fNSigTpcPr0, fNSigTpcKa1, fNSigTpcPi2, fNSigTpcPr2,
                    fNSigTofPi0, fNSigTofPr0, fNSigTofKa1, fNSigTofPi2, fNSigTofPr2,
@@ -362,7 +369,7 @@ LcpKpi:
     #nclasses: [10752, 10752, 10752] #10-12
     #nclasses: [9983, 9983, 9983] #12-24
     equalise_sig_bkg: True
-    mult_bkg: [1,1,1,1,1,1,1,1,1,1]
+    mult_bkg: [1,1,1,1,1,1,1,1,1,1,1,1]
     sampletags: [0, 1, 1]
     sel_bkg: fM < 2.22 or fM > 2.35 # for plotting significance; should agree with bkg selection in sel_ml
     # best to have non-prompt (the smallest class) last, so the plots won't complain about the middle class missing
@@ -373,11 +380,11 @@ LcpKpi:
     rnd_splt: 12
     rnd_all: 12 # Set to None for pure randomness
     test_frac: 0.2
-    binmin: [1,2,3,4,5,6,7,8,10,12] # must be equal to sel_skim_binmin (sel_skim_binmin bins)
-    binmax: [2,3,4,5,6,7,8,10,12,24] # must be equal to sel_skim_binmax (sel_skim_binmin bins)
+    binmin: [0,1,2,3,4,5,6,7,8,10,12] # must be equal to sel_skim_binmin (sel_skim_binmin bins)
+    binmax: [1,2,3,4,5,6,7,8,10,12,24] # must be equal to sel_skim_binmax (sel_skim_binmin bins)
     mltype: MultiClassification
     ncorescrossval: 10
-    prefix_dir_ml: /data8/majak/MLHEP/results-data-13012025/
+    prefix_dir_ml: /data8/majak/MLHEP/results-data-20012025/
     mlplot: mlplot # to be removed
     mlout: mlout # to be removed
 
@@ -395,7 +402,7 @@ LcpKpi:
       num_steps: 111 # number of steps used in efficiency and signif. estimation
       bkg_function: pol2 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
-      raahp: [1,1,1,1,1,1,1,1,1,1] # sel_skim_binmin bins
+      raahp: [1,1,1,1,1,1,1,1,1,1,1,1] # sel_skim_binmin bins
       presel_gen_eff: "abs(fY) < 0.8"
       #presel_gen_eff: "abs(fY) < 0.8 and abs(fPosZ) < 10"
 
@@ -409,7 +416,8 @@ LcpKpi:
       pkl_skimmed_dec: [LHC24pp_mc/MLapplication/prod_LHC24g5/skpkldecmc] #list of periods
       pkl_skimmed_decmerged: [LHC24pp_mc/MLapplication/prod_LHC24g5/skpkldecmcmerged] #list of periods
     modelname: xgboost
-    modelsperptbin: [xgboost_classifierLcpKpi_dfselection_fPt_1.0_2.0.sav,
+    modelsperptbin: [xgboost_classifierLcpKpi_dfselection_fPt_0.0_1.0.sav,
+                     xgboost_classifierLcpKpi_dfselection_fPt_1.0_2.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_2.0_3.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_3.0_4.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_4.0_5.0.sav,
@@ -420,9 +428,10 @@ LcpKpi:
                      xgboost_classifierLcpKpi_dfselection_fPt_10.0_12.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_12.0_24.0.sav]
     probcutpresel:
-      data: [[0.1, 0.0, 0.0], [0.1, 0.0, 0.0], [0.1, 0.0, 0.0], [0.3, 0.0, 0.0], [0.4, 0.0, 0.0], [0.4, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
-      mc: [[0.1, 0.0, 0.0], [0.1, 0.0, 0.0], [0.1, 0.0, 0.0], [0.3, 0.0, 0.0], [0.4, 0.0, 0.0], [0.4, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.7, 0.0, 0.0], [0.7, 0.0, 0.0]] #list of nbins
+      data: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
+      mc: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
     probcutoptimal: [[0.05, 0.0, 0.0], [0.05, 0.0, 0.0], [0.05, 0.0, 0.0], [0.1, 0.0, 0.0], [0.2, 0.0, 0.0], [0.3, 0.0, 0.0], [0.4, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0]] #list of nbins
+    probcutoptimal: [[0.01, 0.0, 0.00], [0.02, 0.0, 0.00], [0.03, 0.0, 0.00], [0.04, 0.0, 0.00], [0.07, 0.0, 0.00], [0.09, 0.0, 0.00], [0.11, 0.0, 0.00], [0.15, 0.0, 0.00], [0.18, 0.0, 0.00], [0.25, 0.0, 0.00], [0.35, 0.0, 0.00], [0.35, 0.0, 0.00]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "dd" # fc, Nb, dd, dd_N
@@ -453,13 +462,18 @@ LcpKpi:
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
+        - "fDecayLength > 0.02"
+        - "fDecayLength > 0.02"
 
 
-      sel_an_binmin: [1,2,3,4,5,6,7,8,10,12]
-      sel_an_binmax: [2,3,4,5,6,7,8,10,12,24]
-      binning_matching: [0,1,2,3,4,5,6,7,8,9]
+      sel_an_binmin: [0,1,2,3,4,5,6,7,8,10,12,16]
+      sel_an_binmax: [1,2,3,4,5,6,7,8,10,12,16,24]
+      binning_matching: [0,1,2,3,4,5,6,7,8,9,10,10]
       presel_gen_eff: "abs(fY) < 0.5"
-      evtsel: "abs(fPosZ < 10)"
+      evtsel: null
+      triggersel:
+        data: null
+        mc: null
 
       data:
         runselection: [null] #FIXME
@@ -472,11 +486,14 @@ LcpKpi:
         results: [LHC24pp_mc/Results/prod_LHC24g5/resultsmc] #list of periods
         resultsallp: LHC24pp_mc/Results/resultsmctot
 
+      nevents: 290860860000
       dobkgfromsideband: false
       latexnamehadron: "#Lambda_{c}^{pK#pi}"
-      mass_fit_lim: [2.05, 2.50] # region for the fit of the invariant mass distribution [GeV/c^2]
+      mass_fit_lim: [2.10, 2.47] # region for the fit of the invariant mass distribution [GeV/c^2]
       bin_width: 0.001 # bin width of the invariant mass histogram
-      n_rebin: [3,3,3,4,5,6,7,7,8,8]  # number of mass bins to merge
+      n_rebin: [4,2,2,2,2,3,3,3,4,5,6,6]  # number of mass bins to merge
+      fixed_sigma: [False,False, False, False, False, False, False, False, False, False, False, False]
+      fixed_sigma_val: [0.0080, 0.0088, 0.0092, 0.0090, 0.0117, 0.0138, 0.0148, 0.0160, 0.0174, 0.0207, 0.0259, 0.0260]
 
       pdf_names:
         pdf_sig: "sig"
@@ -492,10 +509,35 @@ LcpKpi:
       # Decide whether to take the sigma from MC or data for individual fits
       mass_roofit:
         - level: mc
+          ptrange: [0., 4.]
+          range: [2.18, 2.39]
+          components:
+            sig:
+              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.2832,2.289], sigma_g1[.007,.007,.012])'
+            bkg:
+              fn: 'Exponential::mcbkg(m, mcalpha[0.])'
+            model:
+              fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
+        - level: mc
+          ptrange: [4., 6.]
+          range: [2.18, 2.39]
+          components:
+            sig:
+              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.283,2.289], sigma_g1[.012,.01,.016])'
+            #wide:
+             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
+            #model:
+            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
+            bkg:
+              fn: 'Exponential::mcbkg(m, mcalpha[0.])'
+            model:
+              fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
+        - level: mc
+          ptrange: [6., 10.]
           range: [2.10, 2.45]
           components:
             sig:
-              fn: 'Gaussian::sig(m[1., 5.], mean[2.27,2.29], sigma_g1[.01,.005,.03])'
+              fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.013,.013,.020])'
             #wide:
               #fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
             #model:
@@ -503,64 +545,138 @@ LcpKpi:
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
-              fn: 'SUM::mctot(mcfrac[0.,1.]*sig, mcbkg)'
+              fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
+        - level: mc
+          ptrange: [10., 24.]
+          range: [2.10, 2.45]
+          components:
+            sig:
+              fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.013,.020,.029])'
+            #wide:
+              # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
+            #model:
+              # fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
+            bkg:
+              fn: 'Exponential::mcbkg(m, mcalpha[0.])'
+            model:
+              fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
+        - ptrange: [0., 1.]
+          range: [2.216, 2.36] #2.21, 2.36
+          #fix_params: ['n', 'f_peak']
+          components:
+            # sig:
+            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
+            bkg:
+              fn: 'Polynomial::bkg(m, {a0[-1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+            model:
+              fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [1., 2.]
-          range: [2.20, 2.38]
+          range: [2.216, 2.36] #2.21, 2.36
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[0.2, -5, 5], a1[-0.1, -3, 0.], a2[0.1, -3, 3]})'
+              fn: 'Polynomial::bkg(m, {a0[-1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
-        - ptrange: [2., 4.]
-          range: [2.20, 2.38]
+        - ptrange: [2., 3.]
+          range: [2.21, 2.36]
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[0.2, -5, 5], a1[-0.1, -3, 3], a2[0.1, -3, 3]})'
+              fn: 'Polynomial::bkg(m, {a0[-1e8, 1e8], a1[-1e8, 1e8], a2[-1e8, 1e8]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
-        - ptrange: [4., 6.]
-          range: [2.15, 2.41]
+        - ptrange: [3., 4.]
+          range: [2.20, 2.37]
+          #fix_params: ['n', 'f_peak']
+          components:
+            #sig:
+              #fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
+            bkg:
+              fn: 'Polynomial::bkg(m, {a0[-1e8, 1e8], a1[-1e8, 1e8], a2[-1e8, 1e8]})'
+            model:
+              fn: 'SUM::sum(f_sig[0., 0., 0.8]*sig, bkg)'
+        - ptrange: [4., 5.]
+          range: [2.19, 2.38]
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[0.2, -5., 5.], a1[-0.6, -2., -0.001], a2[-0.8, -3., -0.001]})'
+              fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
-        - ptrange: [6., 8.]
-          range: [2.1, 2.48]
+        - ptrange: [5., 6.]
+          range: [2.18, 2.40]
+          #fix_params: ['n', 'f_peak']
+          components:
+            # sig:
+            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
+            bkg:
+              fn: 'Polynomial::bkg(m, {a0[0, -1e10, 1e10], a1[0, -1e10, 1e10], a2[0, -1e10, 1e10]})'
+            model:
+              fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
+        - ptrange: [6., 7.]
+          range: [2.16, 2.42]
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[0.2, -5, 5], a1[0.2 , -3, 0.], a2[0.2, -3, 3]})'
+              fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
-        - ptrange: [8., 12.]
-          range: [2.07, 2.48]
+        - ptrange: [7., 8.]
+          range: [2.16, 2.42]
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[0.2, -5, 5], a1[0.2 , -3, 3], a2[0.2, -3, 3]})'
+              fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
-        - range: [2.05, 2.50]
+        - ptrange: [8., 10.]
+          range: [2.1, 2.46]
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[0.2, -5, 5], a1[0.2 , -3, 3], a2[0.2, -3, 3]})'
+              fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+            model:
+              fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
+        - ptrange: [10., 12.]
+          range: [2.1, 2.46]
+          #fix_params: ['n', 'f_peak']
+          components:
+            # sig:
+            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
+            bkg:
+              fn: 'Polynomial::bkg(m, {a0[10000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+            model:
+              fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
+        - ptrange: [12., 16.]
+          range: [2.1, 2.46]
+          #fix_params: ['n', 'f_peak']
+          components:
+            # sig:
+            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
+            bkg:
+              fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+            model:
+              fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
+        - range: [2.1, 2.46]
+          #fix_params: ['n', 'f_peak']
+          components:
+            # sig:
+            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
+            bkg:
+              fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
 
@@ -569,7 +685,7 @@ LcpKpi:
       useperiod: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] #period from where to define prob cuts
       ncutvar: 10 #number of looser and tighter variations
       maxperccutvar: 0.25 #max diff in efficiency for loosest/tightest var
-      cutvarminrange: [[0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Min starting point for scan
-      cutvarmaxrange: [[0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Max starting point for scan
+      cutvarminrange: [[0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Min starting point for scan
+      cutvarmaxrange: [[0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Max starting point for scan
       fixedmean: True #Fix mean cutvar histo to central fit
       fixedsigma: True #Fix sigma cutvar histo to central fit
