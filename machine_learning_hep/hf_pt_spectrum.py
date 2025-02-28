@@ -101,7 +101,7 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
         "DplustoKpipi": "hDpluskpipi",
         "DstoKKpi": "hDsPhipitoKkpi",
         "DstartoD0pi": "hDstarD0pi",
-        "LctopKpi": "NonPrompt/Lc/hFonllNonPromptLc",
+        "LctopKpi": "hLcpkpi",
         "LctopK0S": "hLcK0sp",
     }
 
@@ -118,12 +118,12 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
             histos["FONLL"] = {"prompt": {}, "nonprompt": {}}
             for pred in ("central", "min", "max"):
                 histos["FONLL"]["nonprompt"][pred] = infile_pred.Get(
-                    f"{fonll_hist_name[channel]}{pred.capitalize()}"
+                    f"{fonll_hist_name[channel]}fromBpred_{pred}_corr"
                 )
                 histos["FONLL"]["nonprompt"][pred].SetDirectory(0)
                 if frac_method == "fc":
                     histos["FONLL"]["prompt"][pred] = infile_pred.Get(
-                        f"{fonll_hist_name[channel]}{pred.capitalize()}"
+                        f"{fonll_hist_name[channel]}pred_{pred}"
                     )
                     histos["FONLL"]["prompt"][pred].SetDirectory(0)
 
@@ -226,6 +226,7 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
                 / (ptmax - ptmin)
                 for pred in histos["FONLL"]["nonprompt"]
             ]
+            print(f"ptmin fonll: {ptmin_fonll}, max: {ptmax_fonll}, crosssec: {crosssec_nonprompt_fonll}")
 
         # compute prompt fraction
         frac = [0,0,0]
