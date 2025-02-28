@@ -101,7 +101,7 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
         "DplustoKpipi": "hDpluskpipi",
         "DstoKKpi": "hDsPhipitoKkpi",
         "DstartoD0pi": "hDstarD0pi",
-        "LctopKpi": "hLcpkpi",
+        "LctopKpi": "NonPrompt/Lc/hFonllNonPromptLc",
         "LctopK0S": "hLcK0sp",
     }
 
@@ -118,12 +118,12 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
             histos["FONLL"] = {"prompt": {}, "nonprompt": {}}
             for pred in ("central", "min", "max"):
                 histos["FONLL"]["nonprompt"][pred] = infile_pred.Get(
-                    f"{fonll_hist_name[channel]}fromBpred_{pred}_corr"
+                    f"{fonll_hist_name[channel]}{pred.capitalize()}"
                 )
                 histos["FONLL"]["nonprompt"][pred].SetDirectory(0)
                 if frac_method == "fc":
                     histos["FONLL"]["prompt"][pred] = infile_pred.Get(
-                        f"{fonll_hist_name[channel]}pred_{pred}"
+                        f"{fonll_hist_name[channel]}{pred.capitalize()}"
                     )
                     histos["FONLL"]["prompt"][pred].SetDirectory(0)
 
@@ -169,6 +169,11 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
             print("\033[91mERROR: histo binning not consistent. Exit\033[0m")
             sys.exit(10)
 
+    print(f"ptlims: {ptlims}")
+    #for ptlim in ptlims:
+    #    ptlims[ptlim] = ptlims[ptlim][1:]
+    #print(f"fixed ptlims: {ptlims}")
+
     # compute cross section
     axistit_cross = "d#sigma/d#it{p}_{T} (pb GeV^{-1} #it{c})"
     axistit_cross_times_br = "d#sigma/d#it{p}_{T} #times BR (pb GeV^{-1} #it{c})"
@@ -196,16 +201,17 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
         0,
         1
     )
-
     for i_pt, (ptmin, ptmax) in enumerate(
         zip(ptlims["rawyields"][:-1], ptlims["rawyields"][1:])
     ):
+        print(f"Processing pt {i_pt} {ptmin}, {ptmax}")
         pt_cent = (ptmax + ptmin) / 2
         pt_delta = ptmax - ptmin
         rawy = histos["rawyields"].GetBinContent(i_pt + 1)
         rawy_unc = histos["rawyields"].GetBinError(i_pt + 1)
         eff_times_acc_prompt = histos["acceffp"].GetBinContent(i_pt + 1)
         eff_times_acc_nonprompt = histos["acceffnp"].GetBinContent(i_pt + 1)
+        print(f'raw yields bins: {histos["rawyields"].GetNbinsX()} bin i_pt + 1 min: {histos["rawyields"].GetBinLowEdge(i_pt + 1)}')
         if frac_method not in ("dd", "dd_N"):
             ptmin_fonll = (
                 histos["FONLL"]["nonprompt"]["central"].GetXaxis().FindBin(ptmin * 1.0001)
