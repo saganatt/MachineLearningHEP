@@ -6,10 +6,10 @@ WORKDIR="${HOME}/MachineLearningHEP/machine_learning_hep/"
 DATABASE="database_ml_parameters_LcToPKPi_multiclass_fdd"
 DATABASE_EXT="${DATABASE}.yml"
 DATABASE_PATH="${WORKDIR}/data/data_run3/${DATABASE_EXT}"
-RESDIR_PATTERN="results-24012025-hyp-ml-luigi-cuts_"
+RESDIR_PATTERN="results-24022025-newtrain-multiopt_"
 
 bkg=0.00
-for fd in $(seq 0.00 0.005 0.605) ; do
+for fd in $(seq 0.000 0.010 0.000) ; do
   echo "fd ${fd}"
 
   suffix="fd_${fd}"
@@ -22,6 +22,7 @@ for fd in $(seq 0.00 0.005 0.605) ; do
   cp "${DATABASE_PATH}" "${CUR_DB}" || ErrExit "Could not copy database"
 
   sed -i "s/%resdir%/${RESDIR}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%bkg01%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%bkg12%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%bkg23%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%bkg34%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
@@ -33,6 +34,7 @@ for fd in $(seq 0.00 0.005 0.605) ; do
   sed -i "s/%bkg1012%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%bkg1216%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%bkg1624%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd01%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd12%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd23%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd34%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
@@ -45,7 +47,7 @@ for fd in $(seq 0.00 0.005 0.605) ; do
   sed -i "s/%fd1216%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd1624%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
 
-  yes | mlhep --log-file "logfile_${suffix}.log" \
+  mlhep --log-file "logfile_${suffix}.log" \
       -a Run3analysis \
       --run-config submission/analyzer.yml \
       --database-analysis "${CUR_DB}" \
