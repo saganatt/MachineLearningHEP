@@ -128,6 +128,7 @@ def do_entire_analysis(data_config: dict, data_param: dict, data_param_overwrite
     binmaxarray = data_param[case]["ml"]["binmax"]
     multbkg = data_param[case]["ml"]["mult_bkg"]
     raahp = data_param[case]["ml"]["opt"]["raahp"]
+    threshold_args = data_param[case]["ml"]["opt"]["signif_thresholds"]
     mltype = data_param[case]["ml"]["mltype"]
     training_vars = data_param[case]["variables"]["var_training"]
 
@@ -333,7 +334,7 @@ def do_entire_analysis(data_config: dict, data_param: dict, data_param_overwrite
         for index, (binmin, binmax) in enumerate(zip(binminarray, binmaxarray)):
             myopt = Optimiser(data_param[case], case, typean,
                               data_model[mltype], binmin, binmax, multbkg[index],
-                              raahp[index], training_vars[index], index)
+                              raahp[index], training_vars[index], threshold_args[index], index)
             if docorrelation:
                 myopt.do_corr()
             if dotraining:

@@ -55,7 +55,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
     species = "optimiser"
 
     def __init__(self, data_param, case, typean, model_config, binmin,
-                 binmax, multbkg, raahp, training_var, index):
+                 binmax, multbkg, raahp, training_var, threshold_args, index):
 
         self.logger = get_logger()
 
@@ -189,7 +189,8 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.p_br = data_param["ml"]["opt"]["BR"]
         self.p_fprompt = data_param["ml"]["opt"]["f_prompt"]
         self.p_bkgfracopt = data_param["ml"]["opt"]["bkg_data_fraction"]
-        self.p_nstepsign = data_param["ml"]["opt"]["num_steps"]
+        self.p_num_steps = data_param["ml"]["opt"]["num_steps"]
+        self.p_threshold_args = threshold_args
         self.p_bkg_func = data_param["ml"]["opt"]["bkg_function"]
         self.p_savefit = data_param["ml"]["opt"]["save_fit"]
         self.p_nevtml = None
@@ -621,39 +622,30 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.do_test()
 
         self.logger.info("Doing efficiency estimation")
-        fig_eff = optz.prepare_eff_signif_figure("Model efficiency", self.p_mltype)
-        # FIXME: Different future signal selection?
-        # NOTE: df with ismcprompt == 1 and ismcsignal == 0 is empty
-        df_sig = self.df_mltest_applied[(self.df_mltest_applied["ismcprompt"] == 1) & \
-                                        (self.df_mltest_applied["ismcsignal"] == 1)]
-        for name in self.p_classname:
-            eff_array, eff_err_array, x_axis = optz.calc_sigeff_steps(self.p_nstepsign, df_sig,
-                                                                      name, self.p_mltype)
-            plt.errorbar(x_axis, eff_array, yerr=eff_err_array, c="b", alpha=0.3,
-                         label=f"{name}", elinewidth=2.5, linewidth=4.0)
-        plt.legend(loc="upper left", fontsize=25)
-        plt.savefig(f"{self.dirmlplot}/Efficiency_{self.s_suffix}.png", bbox_inches='tight')
-        with open(f"{self.dirmlplot}/Efficiency_{self.s_suffix}.pickle", 'wb') as out:
-            pickle.dump(fig_eff, out)
 
-    # TODO: Refactor calc_bkg and calc_signif to have 2D thresholds passed as arguments:
-    #       1) basically everything that is not plotting figures
-    #       2) do_significance works only in 1D! Can we have both 1D and 2D after the refactor? Or: will do_significance be only for BinaryClassification?
-    # TODO: In Fabio's thesis, there are equal steps (get_x_axis), but only in specific regions
-    # TODO: Factor out common parts out of do_significance
-    # TODO: Double loop over bkg and prompt/non-prompt cut, get significance, S/B
-    # TODO: Make 2D plots for significance and S/B
+        labels = ["prompt", "non-prompt"] if self.p_mltype == "MultiClassification" else ["prompt"]
+        mc_labels = ["prompt", "fd"] if self.p_mltype == "MultiClassification" else ["prompt"]
+
+        for label, mclabel in zip(labels, mc_labels):
+            fig_eff = optz.prepare_eff_signif_figure("Model efficiency", self.p_mltype, label)
+            df_sig = self.df_mltest_applied[(self.df_mltest_applied[f"ismc{mclabel}"] == 1) & \
+                                            (self.df_mltest_applied["ismcsignal"] == 1)]
+            for name in self.p_classname:
+                eff_array, eff_err_array, x_axis, y_axis = optz.calc_sigeff_steps(self.p_threshold_args,
+                                                                                  self.p_num_steps, df_sig,
+                                                                                  name, self.p_mltype, label)
+                if self.p_mltype == "MultiClassification":
+                    eff_array_np = np.reshape(eff_array, (len(x_axis), len(y_axis)))
+                    optz.plot_heatmap(eff_array_np, "Model efficiency", self.p_threshold_args[label])
+                else:
+                    plt.errorbar(x_axis, eff_array, yerr=eff_err_array, c="b", alpha=0.3,
+                                 label=f"{name}", elinewidth=2.5, linewidth=4.0)
+            plt.legend(loc="upper left", fontsize=25)
+            plt.savefig(f"{self.dirmlplot}/Efficiency_{label}_{self.s_suffix}.png", bbox_inches='tight')
+            with open(f"{self.dirmlplot}/Efficiency_{label}_{self.s_suffix}.pickle", 'wb') as out:
+                pickle.dump(fig_eff, out)
+
     # TODO: Add calculation of prompt/non-prompt fraction
-    def do_cut_optimization(self):
-        if self.step_done("cut_optimization"):
-            return
-
-        self.do_significance()
-
-        self.logger.info("Doing BDT cut optimization")
-
-        signif_db = pd.read_parquet(f"{self.dirmlplot}/Significance.parquet")
-
     #pylint: disable=too-many-locals
     def do_significance(self):
         if self.step_done("significance"):
@@ -750,63 +742,87 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         self.logger.debug("Sigma of the gaussian: %.3e", sigma)
         sig_region = [self.p_mass - 3 * sigma, self.p_mass + 3 * sigma]
 
-        fig_signif_pevt = optz.prepare_eff_signif_figure(r"Significance per event ($3 \sigma$) a.u.",
-                                                         self.p_mltype)
-        plt.yticks([])
-        fig_signif = optz.prepare_eff_signif_figure(r"Significance ($3 \sigma$) a.u.",
-                                                    self.p_mltype)
-        plt.yticks([])
+        labels = ["prompt", "non-prompt"] if self.p_mltype == "MultiClassification" else ["prompt"]
+        mc_labels = ["prompt", "fd"] if self.p_mltype == "MultiClassification" else ["prompt"]
 
-        df_sig = self.df_mltest_applied[(self.df_mltest_applied["ismcprompt"] == 1) & \
-                                        (self.df_mltest_applied["ismcsignal"] == 1)]
+        for label, mclabel in zip(labels, mc_labels):
+            y_label_pevt = r"Significance per event ($3 \sigma$) a.u."
+            y_label = r"Significance ($3 \sigma$) a.u."
+            y_label_sb = "S/B"
+            fig_signif_pevt = optz.prepare_eff_signif_figure(y_label_pevt, self.p_mltype, label)
+            fig_signif = optz.prepare_eff_signif_figure(y_label, self.p_mltype, label)
+            fig_sb = optz.prepare_eff_signif_figure(y_label_sb, self.p_mltype, label)
 
-        for name in self.p_classname:
-            eff_array, eff_err_array, x_axis = optz.calc_sigeff_steps(self.p_nstepsign, df_sig,
-                                                                      name, self.p_mltype)
-            bkg_array, bkg_err_array, _ = optz.calc_bkg(df_data_sideband, name, self.p_nstepsign,
-                                                        self.p_mass_fit_lim, self.p_bkg_func,
-                                                        self.p_bin_width, sig_region, self.p_savefit,
-                                                        self.dirmlplot, [self.p_binmin, self.p_binmax],
-                                                        self.v_invmass, self.p_mltype)
-            sig_array = [eff * signal_yield for eff in eff_array]
-            sig_err_array = [eff_err * signal_yield for eff_err in eff_err_array]
-            bkg_array = [bkg / (self.p_bkgfracopt * self.p_nevtml) for bkg in bkg_array]
-            bkg_err_array = [bkg_err / (self.p_bkgfracopt * self.p_nevtml) \
-                             for bkg_err in bkg_err_array]
-            signif_array, signif_err_array = optz.calc_signif(sig_array, sig_err_array,
-                                                              bkg_array, bkg_err_array)
+            df_sig = self.df_mltest_applied[(self.df_mltest_applied[f"ismc{mclabel}"] == 1) & \
+                                            (self.df_mltest_applied["ismcsignal"] == 1)]
 
-            signif_array_ml = [sig * sqrt(self.p_nevtml) for sig in signif_array]
-            signif_err_array_ml = [sig_err * sqrt(self.p_nevtml) for sig_err in signif_err_array]
+            for name in self.p_classname:
+                eff_array, eff_err_array, x_axis, y_axis = optz.calc_sigeff_steps(self.p_threshold_args,
+                                                                                  self.p_num_steps, df_sig,
+                                                                                  name, self.p_mltype, label)
+                bkg_array, bkg_err_array, _, _ = optz.calc_bkg(df_data_sideband, name, self.p_threshold_args,
+                                                               self.p_num_steps,
+                                                               self.p_mass_fit_lim, self.p_bkg_func,
+                                                               self.p_bin_width, sig_region, self.p_savefit,
+                                                               self.dirmlplot, [self.p_binmin, self.p_binmax],
+                                                               self.v_invmass, self.p_mltype, label)
+                sig_array = [eff * signal_yield for eff in eff_array]
+                sig_err_array = [eff_err * signal_yield for eff_err in eff_err_array]
+                bkg_array = [bkg / (self.p_bkgfracopt * self.p_nevtml) for bkg in bkg_array]
+                bkg_err_array = [bkg_err / (self.p_bkgfracopt * self.p_nevtml) \
+                                 for bkg_err in bkg_err_array]
+                signif_array, signif_err_array = optz.calc_signif(sig_array, sig_err_array,
+                                                                  bkg_array, bkg_err_array)
 
+                signif_array_ml = [sig * sqrt(self.p_nevtml) for sig in signif_array]
+                signif_err_array_ml = [sig_err * sqrt(self.p_nevtml) for sig_err in signif_err_array]
+
+                plt.figure(fig_signif_pevt.number)
+                if self.p_mltype == "MultiClassification":
+                    signif_array_np = np.reshape(signif_array, (len(x_axis), len(y_axis)))
+                    signif_array_ml_np = np.reshape(signif_array_ml, (len(x_axis), len(y_axis)))
+                    sb_array = [0.0 if bkg == 0. else sig / bkg for sig, bkg in zip(sig_array, bkg_array)]
+                    sb_array_np = np.reshape(sb_array, (len(x_axis), len(y_axis)))
+                    optz.plot_heatmap(signif_array_np, y_label_pevt, self.p_threshold_args[label])
+                    plt.figure(fig_sb.number)
+                    optz.plot_heatmap(sb_array_np, y_label_sb, self.p_threshold_args[label])
+                    plt.figure(fig_signif.number)
+                    optz.plot_heatmap(signif_array_ml_np, y_label, self.p_threshold_args[label])
+                else:
+                    plt.errorbar(x_axis, signif_array, yerr=signif_err_array,
+                                 fmt=".", c="b", label=name, elinewidth=2.5, linewidth=5.0)
+                    plt.figure(fig_signif.number)
+                    plt.errorbar(x_axis,  signif_array_ml, yerr=signif_err_array_ml,
+                                 c="b", label=name, elinewidth=2.5, linewidth=5.0)
+                plt.text(0.7, 0.95,
+                         f" ${self.p_binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {self.p_binmax}$",
+                         verticalalignment="center", transform=fig_signif.gca().transAxes, fontsize=30)
+                #signif_array_tot = [sig * sqrt(self.p_nevttot) for sig in signif_array]
+                #signif_err_array_tot = [sig_err * sqrt(self.p_nevttot) for sig_err in signif_err_array]
+                #plt.figure(fig_signif.number)
+                #plt.errorbar(x_axis, signif_array_tot, yerr=signif_err_array_tot,
+                #             label=f'{name}_Tot', elinewidth=2.5, linewidth=5.0)
             plt.figure(fig_signif_pevt.number)
-            plt.errorbar(x_axis, signif_array, yerr=signif_err_array,
-                         fmt=".", c="b", label=name, elinewidth=2.5, linewidth=5.0)
+            if self.p_mltype == "BinaryClassification":
+                plt.legend(loc="lower left", fontsize=25)
+            plt.savefig(f"{self.dirmlplot}/Significance_PerEvent_{label}_{self.s_suffix}.png", bbox_inches='tight')
             plt.figure(fig_signif.number)
-            plt.errorbar(x_axis,  signif_array_ml, yerr=signif_err_array_ml,
-                         c="b", label=name, elinewidth=2.5, linewidth=5.0)
-            plt.text(0.7, 0.95,
-                     f" ${self.p_binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {self.p_binmax}$",
-                     verticalalignment="center", transform=fig_signif.gca().transAxes, fontsize=30)
-            #signif_array_tot = [sig * sqrt(self.p_nevttot) for sig in signif_array]
-            #signif_err_array_tot = [sig_err * sqrt(self.p_nevttot) for sig_err in signif_err_array]
-            #plt.figure(fig_signif.number)
-            #plt.errorbar(x_axis, signif_array_tot, yerr=signif_err_array_tot,
-            #             label=f'{name}_Tot', elinewidth=2.5, linewidth=5.0)
-        plt.figure(fig_signif_pevt.number)
-        plt.legend(loc="lower left", fontsize=25)
-        plt.savefig(f"{self.dirmlplot}/Significance_PerEvent_{self.s_suffix}.png", bbox_inches='tight')
-        plt.figure(fig_signif.number)
-        mpl.rcParams.update({"text.usetex": True})
-        plt.legend(loc="lower left", fontsize=25)
-        plt.savefig(f"{self.dirmlplot}/Significance_{self.s_suffix}.png", bbox_inches='tight')
-        mpl.rcParams.update({"text.usetex": False})
+            mpl.rcParams.update({"text.usetex": True})
+            if self.p_mltype == "BinaryClassification":
+                plt.legend(loc="lower left", fontsize=25)
+            plt.savefig(f"{self.dirmlplot}/Significance_{label}_{self.s_suffix}.png", bbox_inches='tight')
+            mpl.rcParams.update({"text.usetex": False})
 
-        with open(f"{self.dirmlplot}/Significance_{self.s_suffix}.pickle", "wb") as out:
-            pickle.dump(fig_signif, out)
+            with open(f"{self.dirmlplot}/Significance_{label}_{self.s_suffix}.pickle", "wb") as out:
+                pickle.dump(fig_signif, out)
+            plt.figure(fig_sb.number)
+            if self.p_mltype == "BinaryClassification":
+                plt.legend(loc="lower left", fontsize=25)
+            plt.savefig(f"{self.dirmlplot}/SB_{label}_{self.s_suffix}.png", bbox_inches='tight')
 
-        plt.close(fig_signif_pevt)
-        plt.close(fig_signif)
+            plt.close(fig_signif_pevt)
+            plt.close(fig_signif)
+            plt.close(fig_sb)
 
     def do_scancuts(self):
         if self.step_done("scancuts"):

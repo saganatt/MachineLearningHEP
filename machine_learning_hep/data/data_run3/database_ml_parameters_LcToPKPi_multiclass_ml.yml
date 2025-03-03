@@ -392,7 +392,108 @@ LcpKpi:
       BR: 6.23e-2 # branching ratio of the decay Lc -> p K- pi+
       f_prompt: 0.9 # estimated fraction of prompt candidates
       bkg_data_fraction: 0.05 # fraction of real data used in the estimation
-      num_steps: 111 # number of steps used in efficiency and signif. estimation
+      num_steps: 50 # number of steps used in efficiency and signif. estimation
+      signif_thresholds:
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
+        - prompt:
+            y_min: 0.0
+            y_max: 0.45
+            x_min: 0.0
+            x_max: 0.2
+          non-prompt:
+            y_min: 0.6
+            y_max: 1.0
+            x_min: 0.0
+            x_max: 0.1
       bkg_function: pol2 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
       raahp: [1,1,1,1,1,1,1,1,1,1] # sel_skim_binmin bins
