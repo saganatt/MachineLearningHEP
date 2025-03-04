@@ -107,7 +107,6 @@ def calc_bkg(df_bkg, name, threshold_args, num_steps, fit_region, bkg_func, bin_
             bkg, bkg_err = bkg_for_threshold(sel_mass_array)
             bkg_array.append(bkg)
             bkg_err_array.append(bkg_err)
-        print(f"Current bkg_array: {bkg_array}")
 
     out_file.Close()
     return bkg_array, bkg_err_array, x_axis, y_axis
@@ -129,6 +128,9 @@ def calc_signif(sig_array, sig_err_array, bkg_array, bkg_err_array):
             signif = sig / np.sqrt(sig + bkg)
             signif_err = signif * np.sqrt((sig_err**2 + bkg_err**2) / (4 * (sig + bkg)**2) + \
                          (bkg / (sig + bkg)) * sig_err**2 / sig**2)
+            print(f"significance > 0: {signif}")
+        else:
+            print(f"significance 0")
 
         signif_array.append(signif)
         signif_err_array.append(signif_err)
@@ -190,6 +192,7 @@ def prepare_eff_signif_figure(var_label, mltype, class_label):
     return fig
 
 def plot_heatmap(data, y_label, threshold_args):
+    print(f"Plotting heatmap for data:\n{data}")
     ax = plt.gca()
     im = ax.imshow(data, cmap="cividis", interpolation="none", origin="lower",
                    extent=(threshold_args["x_min"], threshold_args["x_max"],
