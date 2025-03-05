@@ -12,5 +12,4 @@ LOGFILE=$3
 mlhep --log-file ${LOGFILE} \
   -a Run3analysis \
   --run-config ${CONFIG} \
-  --database-analysis ${DB} \
-  --delete
+  --database-analysis ${DB}
