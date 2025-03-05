@@ -636,7 +636,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                                                                                   name, self.p_mltype, label)
                 if self.p_mltype == "MultiClassification":
                     eff_array_np = np.reshape(eff_array, (len(x_axis), len(y_axis))).T
-                    optz.plot_heatmap(eff_array_np, "Model efficiency", self.p_threshold_args[label], log_scale=True)
+                    optz.plot_heatmap(eff_array_np, "Model efficiency", self.p_threshold_args[label], log_scale=False)
                 else:
                     plt.errorbar(x_axis, eff_array, yerr=eff_err_array, c="b", alpha=0.3,
                                  label=f"{name}", elinewidth=2.5, linewidth=4.0)
