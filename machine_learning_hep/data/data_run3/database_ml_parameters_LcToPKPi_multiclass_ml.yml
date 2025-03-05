@@ -392,7 +392,7 @@ LcpKpi:
       BR: 6.23e-2 # branching ratio of the decay Lc -> p K- pi+
       f_prompt: 0.9 # estimated fraction of prompt candidates
       bkg_data_fraction: 0.05 # fraction of real data used in the estimation
-      num_steps: 10 # number of steps used in efficiency and signif. estimation
+      num_steps: 100 # number of steps used in efficiency and signif. estimation
       signif_thresholds:
         - prompt:
             y_min: 0.0
