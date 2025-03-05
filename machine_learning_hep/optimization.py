@@ -18,6 +18,7 @@ Methods to: utility methods to conpute efficiency and study expected significanc
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
+from matplotlib.colors import LogNorm
 from ROOT import TH1F, TFile  # pylint: disable=import-error,no-name-in-module
 from machine_learning_hep.logger import get_logger
 
@@ -191,12 +192,13 @@ def prepare_eff_signif_figure(var_label, mltype, class_label):
         ax.tick_params(labelsize=20)
     return fig
 
-def plot_heatmap(data, y_label, threshold_args):
+def plot_heatmap(data, y_label, threshold_args, log_scale=False):
     print(f"Plotting heatmap for data:\n{data}")
     ax = plt.gca()
     im = ax.imshow(data, cmap="cividis", interpolation="none", origin="lower",
                    extent=(threshold_args["x_min"], threshold_args["x_max"],
-                           threshold_args["y_min"], threshold_args["y_max"]))
+                           threshold_args["y_min"], threshold_args["y_max"]),
+                   norm=LogNorm())
     ax.set_aspect((threshold_args["x_max"] - threshold_args["x_min"]) /\
                   (threshold_args["y_max"] - threshold_args["y_min"]))
     cbar = ax.figure.colorbar(im, ax=ax)

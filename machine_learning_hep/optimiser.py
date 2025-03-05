@@ -636,7 +636,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
                                                                                   name, self.p_mltype, label)
                 if self.p_mltype == "MultiClassification":
                     eff_array_np = np.reshape(eff_array, (len(x_axis), len(y_axis))).T
-                    optz.plot_heatmap(eff_array_np, "Model efficiency", self.p_threshold_args[label])
+                    optz.plot_heatmap(eff_array_np, "Model efficiency", self.p_threshold_args[label], log_scale=True)
                 else:
                     plt.errorbar(x_axis, eff_array, yerr=eff_err_array, c="b", alpha=0.3,
                                  label=f"{name}", elinewidth=2.5, linewidth=4.0)
@@ -738,9 +738,9 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         acc = {}
         acc_err = {}
         for label, mclabel in zip(labels, mc_labels):
-            denacc = len(self.df_mcgen[(self.df_mcgen["ismc{mclabel}"] == 1) & \
+            denacc = len(self.df_mcgen[(self.df_mcgen[f"ismc{mclabel}"] == 1) & \
                                        (self.df_mcgen["ismcsignal"] == 1)])
-            numacc = len(self.df_mc[(self.df_mc["ismc{mclabel}"] == 1) & \
+            numacc = len(self.df_mc[(self.df_mc[f"ismc{mclabel}"] == 1) & \
                                     (self.df_mc["ismcsignal"] == 1)])
             acc_val, acc_err_val = optz.calc_eff(numacc, denacc)
             acc[label] = acc_val
