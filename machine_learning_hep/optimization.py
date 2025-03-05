@@ -71,8 +71,8 @@ def calc_bkg(df_bkg, name, threshold_args, num_steps, fit_region, bkg_func, bin_
         out_file = TFile(f'{out_dir}/bkg_fits_{name}_pt{pt_min:.1f}_{pt_max:.1f}.root', 'recreate')
         out_file.cd()
 
-    def bkg_for_threshold(sel_mass_array):
-        hmass = TH1F(f'hmass_{thr:.5f}', '', num_bins, fit_region[0], fit_region[1])
+    def bkg_for_threshold(sel_mass_array, thr, thr2):
+        hmass = TH1F(f'hmass_{thr:.5f}_{thr2:.5f}', '', num_bins, fit_region[0], fit_region[1])
         bkg = 0.
         bkg_err = 0.
         if len(sel_mass_array) > 5:
@@ -100,7 +100,7 @@ def calc_bkg(df_bkg, name, threshold_args, num_steps, fit_region, bkg_func, bin_
             for thr2 in y_axis:
                 df_bkg_sel2 = select_by_threshold(df_bkg_sel, label, thr2, name)
                 sel_mass_array = df_bkg_sel2[invmassvar].values
-                bkg, bkg_err = bkg_for_threshold(sel_mass_array)
+                bkg, bkg_err = bkg_for_threshold(sel_mass_array, thr, thr2)
                 bkg_array.append(bkg)
                 bkg_err_array.append(bkg_err)
         else:
@@ -195,10 +195,11 @@ def prepare_eff_signif_figure(var_label, mltype, class_label):
 def plot_heatmap(data, y_label, threshold_args, log_scale=False):
     print(f"Plotting heatmap for data:\n{data}")
     ax = plt.gca()
+    norm = LogNorm() if log_scale else None
     im = ax.imshow(data, cmap="cividis", interpolation="none", origin="lower",
                    extent=(threshold_args["x_min"], threshold_args["x_max"],
                            threshold_args["y_min"], threshold_args["y_max"]),
-                   norm=LogNorm())
+                   norm=norm)
     ax.set_aspect((threshold_args["x_max"] - threshold_args["x_min"]) /\
                   (threshold_args["y_max"] - threshold_args["y_min"]))
     cbar = ax.figure.colorbar(im, ax=ax)
