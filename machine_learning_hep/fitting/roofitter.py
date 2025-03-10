@@ -33,8 +33,11 @@ class RooFitter:
         ws = roows or ROOT.RooWorkspace("ws")
         var_m = fit_spec.get('var', 'm')
 
-        n_signal = RooRealVar("n_signal", "Number of signal events", 100, 0, 100000000)
-        n_background = RooRealVar("n_background", "Number of background events", 100, 0, 100000000)
+        hist_integral = hist.Integral(*(hist.FindBin(mmass) for mmass in fit_spec.get("range")))
+        if "data" in level:
+            print(f"hist integral: {hist_integral}")
+        n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * hist_integral, 0., 1.2 * hist_integral)
+        n_background = RooRealVar("n_background", "Number of background events", 0.3 * hist_integral, 0., 1.2 * hist_integral)
 
         for comp, spec in fit_spec.get('components', {}).items():
             fn = ws.factory(spec['fn'])
@@ -56,6 +59,7 @@ class RooFitter:
             background_pdf = ws.pdf(pdfnames["pdf_bkg"])
             if not background_pdf:
                 raise ValueError("bkg pdf not found")
+
             model = RooAddPdf("model",
                               "Total model",
                               RooArgList(signal_pdf, background_pdf),
@@ -65,6 +69,18 @@ class RooFitter:
         #     m.setRange(range_m[0], range_m[1])
         dh = ROOT.RooDataHist("dh", "dh", [m], Import=hist)
         if range_m := fit_spec.get('range'):
+            #if level == "data":
+                #m.setRange("SBL", fit_spec["range"][0], fit_spec["mass_mean"] - fit_spec["n_sigma"] * fit_spec["sigma_signal"])
+                #m.setRange("SBR", fit_spec["mass_mean"] + fit_spec["n_sigma"] * fit_spec["sigma_signal"], fit_spec["range"][1])
+                #m.setRange("bkg", fit_spec["mass_mean"] - 4 * fit_spec["sigma_signal"], fit_spec["mass_mean"] + 4 * fit_spec["sigma_signal"])
+                #res = background_pdf.fitTo(dh, RooFit.Range("SBL,SBR"), Save=True, PrintLevel=-1)
+                #bkg_integral = background_pdf.createIntegral(m, RooFit.NormSet(m), RooFit.Range("bkg")).getValV()
+                #est_signal = estimate_signal(ws, hist, fit_spec, n_background, bkg_integral)
+                #n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * est_signal, 0., 1.2 * est_signal)
+                #model = RooAddPdf("model",
+                #                  "Total model",
+                #                  RooArgList(signal_pdf, background_pdf),
+                #                  RooArgList(n_signal, n_background))
             m.setRange('fit', *range_m)
             # print(f'using fit range: {range_m}, var range: {m.getRange("fit")}')
             res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
@@ -151,8 +167,20 @@ class RooFitter:
         return (res, ws, frame)
 
 
-def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
+def estimate_signal(roows, hist, fit_spec, n_bkg, bkg_integral):
+    bin_min = hist.FindBin(fit_spec["mass_mean"] - 4 * fit_spec["sigma_signal"])
+    bin_max = hist.FindBin(fit_spec["mass_mean"] + 4 * fit_spec["sigma_signal"])
+    msum = 0.
+    for ind in range(bin_min, bin_max + 1):
+        msum += hist.GetBinContent(ind)
+    bkg = calculate_background(n_bkg, bkg_integral)
+    return msum - bkg
 
+
+def calculate_background(n_bkg, bkg_integral):
+    return n_bkg.getVal() * bkg_integral
+
+def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
     f_sig = roows.pdf(pdfnames["pdf_sig"])
     n_signal = res.floatParsFinal().find("n_signal").getVal()
     sigma_n_signal = res.floatParsFinal().find("n_signal").getError()
@@ -168,8 +196,8 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
 
     massvar = roows.var(param_names["mass"])
     massvar.setRange("signal",
-                     mean_sgn.getVal() - 3 * sigma_sgn.getVal(),
-                     mean_sgn.getVal() + 3 * sigma_sgn.getVal())
+                     mean_sgn.getVal() - 4 * sigma_sgn.getVal(),
+                     mean_sgn.getVal() + 4 * sigma_sgn.getVal())
 
     massvar_set = RooArgSet(massvar)
     norm_set = RooFit.NormSet(massvar_set)
@@ -180,7 +208,12 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
     n_signal_signal = signal_integral.getVal() * n_signal
     n_bkg_signal = bkg_integral.getVal() * n_bkg
 
-    significance = n_signal_signal / sqrt(n_signal_signal + n_bkg_signal)
+    print(f"n signal signal: {n_signal_signal} n bkg signal: {n_bkg_signal}")
+
+    if n_signal_signal + n_bkg_signal == 0.:
+        significance = 0.0
+    else:
+        significance = n_signal_signal / sqrt(n_signal_signal + n_bkg_signal)
 
     # Calculate the error on the signal and bkg integrals using the covariance matrix
     sigma_signal_integral = signal_integral.getPropagatedError(res)
@@ -191,18 +224,29 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
     sigma_n_bkg_signal = sqrt((bkg_integral.getVal() * sigma_n_bkg) ** 2 +
                               (n_bkg * sigma_bkg_integral) ** 2)
 
-    dS_dS = (1 / sqrt(n_signal_signal + n_bkg_signal) -
-             (n_signal_signal / (2 * (n_signal_signal + n_bkg_signal)**(3/2))))
-    dS_dB = -n_signal_signal / (2 * (n_signal_signal + n_bkg_signal)**(3/2))
+    if n_signal_signal + n_bkg_signal == 0.:
+        dS_dS = 0.0
+        dS_dB = 0.0
+    else:
+        dS_dS = (1 / sqrt(n_signal_signal + n_bkg_signal) -
+                 (n_signal_signal / (2 * (n_signal_signal + n_bkg_signal)**(3/2))))
+        dS_dB = -n_signal_signal / (2 * (n_signal_signal + n_bkg_signal)**(3/2))
     significance_err = sqrt(
             (dS_dS * sigma_n_signal_signal) ** 2 +
             (dS_dB * sigma_n_bkg_signal) ** 2)
 
     #Signal to bkg ratio
-    s_over_b = n_signal_signal / n_bkg_signal
-    s_over_b_err = (
-    s_over_b * sqrt((sigma_n_signal_signal / n_signal_signal) ** 2 +
-                    (sigma_n_bkg_signal / n_bkg_signal) ** 2 ))
+    if n_bkg_signal == 0.:
+        s_over_b = 0.0
+        s_over_b_err = 0.0 # as S/B is ill-defined
+    elif n_signal_signal == 0.:
+        s_over_b = 0.0
+        s_over_b_err = s_over_b * sqrt((sigma_n_bkg_signal / n_bkg_signal) ** 2)
+    else:
+        s_over_b = n_signal_signal / n_bkg_signal
+        s_over_b_err = (
+                s_over_b * sqrt((sigma_n_signal_signal / n_signal_signal) ** 2 +
+                                (sigma_n_bkg_signal / n_bkg_signal) ** 2))
 
     return (n_signal_signal, sigma_n_signal_signal,
             n_bkg_signal, sigma_n_bkg_signal,

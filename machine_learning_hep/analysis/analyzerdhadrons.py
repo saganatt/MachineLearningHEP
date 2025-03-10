@@ -178,6 +178,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         if level == "data":
             mean_sgn = ws.var(self.p_param_names["gauss_mean"])
             sigma_sgn = ws.var(self.p_param_names["gauss_sigma"])
+            print(f"Significance for pt: {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]}")
             (sig, sig_err, bkg, bkg_err,
             signif, signif_err, s_over_b, s_over_b_err
             ) = calc_signif(ws, res, pdfnames, param_names, mean_sgn, sigma_sgn)
@@ -300,6 +301,8 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                     if h_invmass.GetEntries() < 100: # TODO: reconsider criterion
                         self.logger.error('Not enough entries to fit for %s bin %d', level, ipt)
                         continue
+                    if "data" in level:
+                        self.logger.info("hist entries: %d, class: %s", h_invmass.GetEntries(), h_invmass.ClassName())
                     ptrange = (self.bins_candpt[ipt], self.bins_candpt[ipt+1])
 
                     if self.cfg('mass_fit'):
@@ -338,6 +341,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                             self.p_fixed_sigma[ipt], self.p_fixed_sigma_val[ipt],
                             roows,
                             f'roofit/h_mass_fitted_pthf-{ptrange[0]}-{ptrange[1]}_{level}.png')
+                        roo_res.Print()
                         self.roo_ws[level][ipt] = roo_ws
                         self.roows[ipt] = roo_ws
                         if roo_res.status() == 0:
@@ -512,13 +516,13 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         yield_filename = self.make_file_path(self.d_resultsallpdata, self.yields_filename, "root",
                                              None, [self.case, self.typean])
-        yield_filename = "/data8/majak/crosssec/202502/yieldsLcpKpiRun3analysis_fd_0.000_roofit.root"
+        #yield_filename = "/data8/majak/crosssec/202502/yieldsLcpKpiRun3analysis_fd_0.000_roofit.root"
         if not os.path.exists(yield_filename):
             self.logger.fatal(
                 "Yield file %s could not be found", yield_filename)
 
         fileouteff = f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root"
-        fileouteff = "/data8/majak/crosssec/202502/efficienciesLcpKpiRun3analysis_fd_0.000.root"
+        #fileouteff = "/data8/majak/crosssec/202502/efficienciesLcpKpiRun3analysis_fd_0.000.root"
         if not os.path.exists(fileouteff):
             self.logger.fatal(
                 "Efficiency file %s could not be found", fileouteff)
