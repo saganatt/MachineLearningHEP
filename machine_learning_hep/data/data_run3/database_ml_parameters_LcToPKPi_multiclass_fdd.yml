@@ -531,16 +531,16 @@ LcpKpi:
     probcutpresel:
       data: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
       mc: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.01, 0.0, %fd01%], [0.02, 0.0, %fd12%], [0.03, 0.0, %fd23%], [0.04, 0.0, %fd34%], [0.07, 0.0, %fd45%], [0.09, 0.0, %fd56%], [0.11, 0.0, %fd67%], [0.15, 0.0, %fd78%], [0.18, 0.0, %fd810%], [0.25, 0.0, %fd1012%], [0.35, 0.0, %fd1216%], [0.35, 0.0, %fd1624%]] #list of nbins
+    probcutoptimal: [[0.01, 0.00, 0.55], [0.02, 0.00, 0.55], [0.03, 0.00, 0.50], [0.04, 0.00, 0.35], [0.07, 0.00, 0.35], [0.10, 0.00, 0.35], [0.11, 0.00, 0.35], [0.15, 0.00, 0.35], [0.18, 0.00, 0.35], [0.25, 0.00, 0.35], [0.35, 0.00, 0.35], [0.35, 0.00, 0.35]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "Nb" # fc, Nb, dd, dd_N
-    crosssec_prompt: True # True for prompt, False for non-prompt
+    crosssec_prompt: False # True for prompt, False for non-prompt
     cctype: "pp"
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
-    #inputfonllpred: /data8/majak/crosssec/202502/fractions/CutVarLc_pp13TeV_LHC23_pass4_default.root
+    inputfonllpred: /data8/majak/crosssec/202502/fractions/CutVarLc_pp13TeV_LHC23_pass4_default.root
     #inputfonllpred: data/fonll/fonll_pythia_beautyFFLHCb_charmhadrons_13dot6tev_y0dot5_highStatistics.root
-    inputfonllpred: data/fonll/DmesonLcPredictions_13TeV_y05_FFptDepLHCb_BRpythia8_PDG2020.root
+    #inputfonllpred: data/fonll/DmesonLcPredictions_13TeV_y05_FFptDepLHCb_BRpythia8_PDG2020.root
     dir_general_plots: analysis_plots
 
     Run3analysis:
@@ -595,7 +595,7 @@ LcpKpi:
       bin_width: 0.001 # bin width of the invariant mass histogram
       n_rebin: [4,2,2,2,2,3,3,3,4,5,6,6]  # number of mass bins to merge
       fixed_sigma: [False,False, False, False, False, False, False, False, False, False, False, False]
-      fixed_sigma_val: [0.0080, 0.0088, 0.0092, 0.0090, 0.0117, 0.0138, 0.0148, 0.0160, 0.0174, 0.0207, 0.0259, 0.0260]
+      fixed_sigma_val: [0.0097, 0.0082, 0.0092, 0.0104, 0.0116, 0.0134, 0.0145, 0.0162, 0.0182, 0.0204, 0.0230, 0.0263]
 
       pdf_names:
         pdf_sig: "sig"
@@ -615,7 +615,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.2832,2.289], sigma_g1[.007,.007,.012])'
+              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -625,7 +625,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.283,2.289], sigma_g1[.012,.01,.016])'
+              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
             #wide:
              # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
             #model:
@@ -639,7 +639,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.013,.013,.020])'
+              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
             #wide:
               #fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
             #model:
@@ -653,7 +653,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.013,.020,.029])'
+              fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0290])'
             #wide:
               # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
             #model:
@@ -664,121 +664,157 @@ LcpKpi:
               fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
         - ptrange: [0., 1.]
           range: [2.216, 2.36] #2.21, 2.36
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[-1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [1., 2.]
           range: [2.216, 2.36] #2.21, 2.36
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[-1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [2., 3.]
-          range: [2.21, 2.36]
+          range: [2.20, 2.37]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[-1e8, 1e8], a1[-1e8, 1e8], a2[-1e8, 1e8]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [3., 4.]
-          range: [2.20, 2.37]
+          range: [2.19, 2.38]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             #sig:
               #fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[-1e8, 1e8], a1[-1e8, 1e8], a2[-1e8, 1e8]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0., 0., 0.8]*sig, bkg)'
         - ptrange: [4., 5.]
-          range: [2.19, 2.38]
+          range: [2.18, 2.40]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [5., 6.]
           range: [2.18, 2.40]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[0, -1e10, 1e10], a1[0, -1e10, 1e10], a2[0, -1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [6., 7.]
           range: [2.16, 2.42]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [7., 8.]
           range: [2.16, 2.42]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [8., 10.]
           range: [2.1, 2.46]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [10., 12.]
           range: [2.1, 2.46]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[10000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [12., 16.]
           range: [2.1, 2.46]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - range: [2.1, 2.46]
+          mass_mean: 2.286
+          n_sigma: 3
+          sigma_signal: 0.012
           #fix_params: ['n', 'f_peak']
           components:
             # sig:
             #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
-              fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
+              fn: 'Chebychev::bkg(m, {a0[0.5, -5.0, 5.0], a1[0.2, -5.0, 5.0], a2[0.2, -5.0, 5.0]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
 
