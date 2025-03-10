@@ -6,17 +6,18 @@ WORKDIR="${HOME}/MachineLearningHEP/machine_learning_hep/"
 DATABASE="database_ml_parameters_LcToPKPi_multiclass_fdd"
 DATABASE_EXT="${DATABASE}.yml"
 DATABASE_PATH="${WORKDIR}/data/data_run3/${DATABASE_EXT}"
-RESDIR_PATTERN="results-24022025-newtrain-multiopt_"
+RESDIR_PATTERN="results-24022025-nonprompt"
 
 bkg=0.00
-for fd in $(seq 0.000 0.010 0.000) ; do
+for fd in $(seq 0.0 0.01 0.0) ; do
   echo "fd ${fd}"
 
-  suffix="fd_${fd}"
+  #suffix="fd_${fd}"
+  suffix=""
   RESDIR="${RESDIR_PATTERN}${suffix}"
   RESPATH="/data8/majak/MLHEP/${RESDIR}/"
 
-  rm -rf "${RESPATH}"
+  #rm -rf "${RESPATH}"
 
   CUR_DB="${DATABASE}_edit_fd${fd}.yml"
   cp "${DATABASE_PATH}" "${CUR_DB}" || ErrExit "Could not copy database"
@@ -47,7 +48,7 @@ for fd in $(seq 0.000 0.010 0.000) ; do
   sed -i "s/%fd1216%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd1624%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
 
-  mlhep --log-file "logfile_${suffix}.log" \
+  yes | mlhep --log-file "logfile_${suffix}.log" \
       -a Run3analysis \
       --run-config submission/analyzer.yml \
       --database-analysis "${CUR_DB}" \
