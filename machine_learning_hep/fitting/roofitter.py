@@ -25,6 +25,32 @@ class RooFitter:
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.ERROR)
 
+    def find_best_a0(self, ws, m, dh, model, range_m):
+        tmp_frame = m.frame()
+        dh.plotOn(tmp_frame, ROOT.RooFit.Name("data"))
+        model.plotOn(tmp_frame)
+        chi2 = tmp_frame.chiSquare()
+        a0_var = ws.var("a0")  # Get the a0 parameter
+        attempt = 0
+        a0_values = [10, 20, 30, 40, 50, 80, 100, 120, 150, 200, 250, 300, 350, 400, 450, 500, 700, 1000, 1500, 2000, 2500, 3000, 5000, 10000]
+
+        if level == "data":
+            chi_threshold = 6.
+            while (chi2 > chi_threshold or isnan(chi2)) and attempt < len(a0_values):
+                print(f"Attempt {attempt+1}: Setting a0 to {a0_values[attempt]}")
+                a0_var.setVal(a0_values[attempt])  # Change a0 value
+                attempt += 1
+
+                res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
+                tmp_frame = m.frame()
+                dh.plotOn(tmp_frame)
+                model.plotOn(tmp_frame)
+                chi2 = tmp_frame.chiSquare()
+
+                if chi2 <= chi_threshold:
+                    print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
+                    break`
+
     # pylint: disable=too-many-branches
     def fit_mass_new(self, hist, pdfnames, param_names, fit_spec, level, fixed_sigma, fixed_sigma_val,
                      roows = None, plot = False):
@@ -44,6 +70,7 @@ class RooFitter:
             if comp == 'model':
                 model = fn
         m = ws.var(var_m)
+        print(f"m var: {m}")
 
         if level == "mc":
             print(f"fit spec\n{fit_spec}")
@@ -53,6 +80,7 @@ class RooFitter:
                 sigma_sgn.setConstant(True)
 
         if level == "data":
+            print(f"fit spec\n{fit_spec}")
             signal_pdf = ws.pdf(pdfnames["pdf_sig"])
             if not signal_pdf:
                 raise ValueError("sig PDF not found")
@@ -84,9 +112,13 @@ class RooFitter:
             m.setRange('fit', *range_m)
             # print(f'using fit range: {range_m}, var range: {m.getRange("fit")}')
             res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
+            if level == "data":
+                self.find_best_a0(ws, m, dh, model, range_m)
             # model.Print('v')
         else:
             res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=2)
+            if level == "data":
+                self.find_best_a0(ws, m, dh, model, range_m)
         frame = None
         residual_frame = None
         if plot:
