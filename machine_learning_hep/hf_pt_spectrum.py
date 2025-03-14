@@ -170,9 +170,9 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
             sys.exit(10)
 
     print(f"ptlims: {ptlims}")
-    #for ptlim in ptlims:
-    #    ptlims[ptlim] = ptlims[ptlim][1:]
-    #print(f"fixed ptlims: {ptlims}")
+    for ptlim in ptlims:
+        ptlims[ptlim] = ptlims[ptlim][1:]
+    print(f"fixed ptlims: {ptlims}")
 
     # compute cross section
     axistit_cross = "d#sigma/d#it{p}_{T} (pb GeV^{-1} #it{c})"
@@ -207,11 +207,11 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
         print(f"Processing pt {i_pt} {ptmin}, {ptmax}")
         pt_cent = (ptmax + ptmin) / 2
         pt_delta = ptmax - ptmin
-        rawy = histos["rawyields"].GetBinContent(i_pt + 1)
-        rawy_unc = histos["rawyields"].GetBinError(i_pt + 1)
-        eff_times_acc_prompt = histos["acceffp"].GetBinContent(i_pt + 1)
-        eff_times_acc_nonprompt = histos["acceffnp"].GetBinContent(i_pt + 1)
-        print(f'raw yields bins: {histos["rawyields"].GetNbinsX()} bin i_pt + 1 min: {histos["rawyields"].GetBinLowEdge(i_pt + 1)}')
+        rawy = histos["rawyields"].GetBinContent(i_pt + 2)
+        rawy_unc = histos["rawyields"].GetBinError(i_pt + 2)
+        eff_times_acc_prompt = histos["acceffp"].GetBinContent(i_pt + 2)
+        eff_times_acc_nonprompt = histos["acceffnp"].GetBinContent(i_pt + 2)
+        print(f'raw yields bins: {histos["rawyields"].GetNbinsX()} bin {i_pt + 2} min: {histos["rawyields"].GetBinLowEdge(i_pt + 2)}')
         if frac_method not in ("dd", "dd_N"):
             ptmin_fonll = (
                 histos["FONLL"]["nonprompt"]["central"].GetXaxis().FindBin(ptmin * 1.0001)
