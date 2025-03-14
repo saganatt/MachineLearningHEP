@@ -166,8 +166,12 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                      roows = None, filename = None):
         if fitcfg is None:
             return None, None
-        res, ws, frame, residual_frame = self.fitter.fit_mass_new(hist, pdfnames, param_names, fitcfg, level,
-                                                                  fixed_sigma, fixed_sigma_val, roows, True)
+        try:
+            res, ws, frame, residual_frame = self.fitter.fit_mass_new(hist, pdfnames, param_names, fitcfg, level,
+                                                                      fixed_sigma, fixed_sigma_val, roows, True)
+        except ValueError:
+            self.logger.error(f"Could not do fitting on {level} for pt {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]}")
+            return None, None
         frame.SetTitle(f'inv. mass for p_{{T}} {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]} GeV/c')
         c = TCanvas()
 
@@ -341,10 +345,11 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                             self.p_fixed_sigma[ipt], self.p_fixed_sigma_val[ipt],
                             roows,
                             f'roofit/h_mass_fitted_pthf-{ptrange[0]}-{ptrange[1]}_{level}.png')
-                        roo_res.Print()
+                        if roo_res:
+                            roo_res.Print()
                         self.roo_ws[level][ipt] = roo_ws
                         self.roows[ipt] = roo_ws
-                        if roo_res.status() == 0:
+                        if roo_res and roo_res.status() == 0:
                             if level in ('data', 'mc_sig'):
                                 self.fit_mean[level][ipt] = roo_ws.var(self.p_param_names["gauss_mean"]).getValV()
                                 self.fit_sigma[level][ipt] = roo_ws.var(self.p_param_names["gauss_sigma"]).getValV()
@@ -354,26 +359,26 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                                 self.fit_func_bkg[level][ipt] = pdf_bkg.asTF(roo_ws.var(var_m))
                             self.fit_range[level][ipt] = (roo_ws.var(var_m).getMin('fit'), \
                                                           roo_ws.var(var_m).getMax('fit'))
+
+                            if level == "data":
+                                mean_sgn = roo_ws.var(self.p_param_names["gauss_mean"])
+                                sigma_sgn = roo_ws.var(self.p_param_names["gauss_sigma"])
+                                (sig, sig_err, _, _,
+                                    signif, signif_err, s_over_b, s_over_b_err
+                                ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, self.p_param_names, mean_sgn, sigma_sgn)
+
+                                yieldshistos.SetBinContent(ipt + 1, sig)
+                                yieldshistos.SetBinError(ipt + 1, sig_err)
+                                meanhistos.SetBinContent(ipt + 1, mean_sgn.getVal())
+                                meanhistos.SetBinError(ipt + 1, mean_sgn.getError())
+                                sigmahistos.SetBinContent(ipt + 1, sigma_sgn.getVal())
+                                sigmahistos.SetBinError(ipt + 1, sigma_sgn.getError())
+                                signifhistos.SetBinContent(ipt + 1, signif)
+                                signifhistos.SetBinError(ipt + 1, signif_err)
+                                soverbhistos.SetBinContent(ipt + 1, s_over_b)
+                                soverbhistos.SetBinError(ipt + 1, s_over_b_err)
                         else:
                             self.logger.error('RooFit failed for %s bin %d', level, ipt)
-
-                        if level == "data":
-                            mean_sgn = roo_ws.var(self.p_param_names["gauss_mean"])
-                            sigma_sgn = roo_ws.var(self.p_param_names["gauss_sigma"])
-                            (sig, sig_err, _, _,
-                                signif, signif_err, s_over_b, s_over_b_err
-                            ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, self.p_param_names, mean_sgn, sigma_sgn)
-
-                            yieldshistos.SetBinContent(ipt + 1, sig)
-                            yieldshistos.SetBinError(ipt + 1, sig_err)
-                            meanhistos.SetBinContent(ipt + 1, mean_sgn.getVal())
-                            meanhistos.SetBinError(ipt + 1, mean_sgn.getError())
-                            sigmahistos.SetBinContent(ipt + 1, sigma_sgn.getVal())
-                            sigmahistos.SetBinError(ipt + 1, sigma_sgn.getError())
-                            signifhistos.SetBinContent(ipt + 1, signif)
-                            signifhistos.SetBinError(ipt + 1, signif_err)
-                            soverbhistos.SetBinContent(ipt + 1, s_over_b)
-                            soverbhistos.SetBinError(ipt + 1, s_over_b_err)
                 fileout.cd()
                 yieldshistos.Write()
                 meanhistos.Write()
@@ -514,15 +519,17 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         gROOT.SetBatch(True)
         self.loadstyle()
 
-        yield_filename = self.make_file_path(self.d_resultsallpdata, self.yields_filename, "root",
-                                             None, [self.case, self.typean])
+        #yield_filename = self.make_file_path(self.d_resultsallpdata, self.yields_filename, "root",
+        #                                     None, [self.case, self.typean])
         #yield_filename = "/data8/majak/crosssec/202502/yieldsLcpKpiRun3analysis_fd_0.000_roofit.root"
+        yield_filename = "/data8/majak/crosssec/202503-nonprompt/yieldsLcpKpiRun3analysis.root"
         if not os.path.exists(yield_filename):
             self.logger.fatal(
                 "Yield file %s could not be found", yield_filename)
 
-        fileouteff = f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root"
+        #fileouteff = f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root"
         #fileouteff = "/data8/majak/crosssec/202502/efficienciesLcpKpiRun3analysis_fd_0.000.root"
+        fileouteff = "/data8/majak/crosssec/202503-nonprompt/efficienciesLcpKpiRun3analysis.root"
         if not os.path.exists(fileouteff):
             self.logger.fatal(
                 "Efficiency file %s could not be found", fileouteff)
@@ -533,7 +540,8 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         namehistoeffprompt = "eff"
         namehistoefffeed = "eff_fd"
-        nameyield = "hyields0"
+        #nameyield = "hyields0"
+        nameyield = "hRawYields"
 
         histonorm = TH1F("histonorm", "histonorm", 1, 0, 1)
 
