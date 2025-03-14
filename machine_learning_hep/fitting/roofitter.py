@@ -12,7 +12,7 @@
 ##   along with this program. if not, see <https://www.gnu.org/licenses/>. ##
 #############################################################################
 
-from math import sqrt
+from math import sqrt, isnan
 import ROOT
 from ROOT import RooFit, RooArgSet, RooRealVar, RooAddPdf, RooArgList, TPaveText
 
@@ -32,24 +32,24 @@ class RooFitter:
         chi2 = tmp_frame.chiSquare()
         a0_var = ws.var("a0")  # Get the a0 parameter
         attempt = 0
-        a0_values = [10, 20, 30, 40, 50, 80, 100, 120, 150, 200, 250, 300, 350, 400, 450, 500, 700, 1000, 1500, 2000, 2500, 3000, 5000, 10000]
+        a0_values = [10, 20, 30, 40, 50, 80, 100, 120, 150, 200, 250, 300, 350, 400, 450, 500,
+                     700, 1000, 1500, 2000, 2500, 3000, 5000, 10000]
 
-        if level == "data":
-            chi_threshold = 6.
-            while (chi2 > chi_threshold or isnan(chi2)) and attempt < len(a0_values):
-                print(f"Attempt {attempt+1}: Setting a0 to {a0_values[attempt]}")
-                a0_var.setVal(a0_values[attempt])  # Change a0 value
-                attempt += 1
+        chi_threshold = 6.
+        while (chi2 > chi_threshold or isnan(chi2)) and attempt < len(a0_values):
+            print(f"Attempt {attempt+1}: Setting a0 to {a0_values[attempt]}")
+            a0_var.setVal(a0_values[attempt])  # Change a0 value
+            attempt += 1
 
-                res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
-                tmp_frame = m.frame()
-                dh.plotOn(tmp_frame)
-                model.plotOn(tmp_frame)
-                chi2 = tmp_frame.chiSquare()
+            model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
+            tmp_frame = m.frame()
+            dh.plotOn(tmp_frame)
+            model.plotOn(tmp_frame)
+            chi2 = tmp_frame.chiSquare()
 
-                if chi2 <= chi_threshold:
-                    print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
-                    break`
+            if chi2 <= chi_threshold:
+                print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
+                break
 
     # pylint: disable=too-many-branches
     def fit_mass_new(self, hist, pdfnames, param_names, fit_spec, level, fixed_sigma, fixed_sigma_val,
@@ -62,8 +62,11 @@ class RooFitter:
         hist_integral = hist.Integral(*(hist.FindBin(mmass) for mmass in fit_spec.get("range")))
         if "data" in level:
             print(f"hist integral: {hist_integral}")
-        n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * hist_integral, 0., 1.2 * hist_integral)
-        n_background = RooRealVar("n_background", "Number of background events", 0.3 * hist_integral, 0., 1.2 * hist_integral)
+        #n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * hist_integral, 0., 1.2 * hist_integral)
+        #n_background = RooRealVar("n_background", "Number of background events",
+                                   #0.3 * hist_integral, 0., 1.2 * hist_integral)
+        n_signal = RooRealVar("n_signal", "Number of signal events", 1000, 100, 100000000)
+        n_background = RooRealVar("n_background", "Number of background events", 1000, 100, 100000000)
 
         for comp, spec in fit_spec.get('components', {}).items():
             fn = ws.factory(spec['fn'])
@@ -98,12 +101,16 @@ class RooFitter:
         dh = ROOT.RooDataHist("dh", "dh", [m], Import=hist)
         if range_m := fit_spec.get('range'):
             #if level == "data":
-                #m.setRange("SBL", fit_spec["range"][0], fit_spec["mass_mean"] - fit_spec["n_sigma"] * fit_spec["sigma_signal"])
-                #m.setRange("SBR", fit_spec["mass_mean"] + fit_spec["n_sigma"] * fit_spec["sigma_signal"], fit_spec["range"][1])
-                #m.setRange("bkg", fit_spec["mass_mean"] - 4 * fit_spec["sigma_signal"], fit_spec["mass_mean"] + 4 * fit_spec["sigma_signal"])
+                #m.setRange("SBL", fit_spec["range"][0],
+                            #fit_spec["mass_mean"] - fit_spec["n_sigma"] * fit_spec["sigma_signal"])
+                #m.setRange("SBR",
+                            #fit_spec["mass_mean"] + fit_spec["n_sigma"] * fit_spec["sigma_signal"],
+                            #fit_spec["range"][1])
+                #m.setRange("bkg", fit_spec["mass_mean"] - 4 * fit_spec["sigma_signal"],
+                            #fit_spec["mass_mean"] + 4 * fit_spec["sigma_signal"])
                 #res = background_pdf.fitTo(dh, RooFit.Range("SBL,SBR"), Save=True, PrintLevel=-1)
                 #bkg_integral = background_pdf.createIntegral(m, RooFit.NormSet(m), RooFit.Range("bkg")).getValV()
-                #est_signal = estimate_signal(ws, hist, fit_spec, n_background, bkg_integral)
+                #est_signal = estimate_signal(hist, fit_spec, n_background, bkg_integral)
                 #n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * est_signal, 0., 1.2 * est_signal)
                 #model = RooAddPdf("model",
                 #                  "Total model",
@@ -199,9 +206,9 @@ class RooFitter:
         return (res, ws, frame)
 
 
-def estimate_signal(roows, hist, fit_spec, n_bkg, bkg_integral):
-    bin_min = hist.FindBin(fit_spec["mass_mean"] - 4 * fit_spec["sigma_signal"])
-    bin_max = hist.FindBin(fit_spec["mass_mean"] + 4 * fit_spec["sigma_signal"])
+def estimate_signal(hist, fit_spec, n_bkg, bkg_integral):
+    bin_min = hist.FindBin(fit_spec["mass_mean"] - 3 * fit_spec["sigma_signal"])
+    bin_max = hist.FindBin(fit_spec["mass_mean"] + 3 * fit_spec["sigma_signal"])
     msum = 0.
     for ind in range(bin_min, bin_max + 1):
         msum += hist.GetBinContent(ind)
@@ -228,8 +235,8 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
 
     massvar = roows.var(param_names["mass"])
     massvar.setRange("signal",
-                     mean_sgn.getVal() - 4 * sigma_sgn.getVal(),
-                     mean_sgn.getVal() + 4 * sigma_sgn.getVal())
+                     mean_sgn.getVal() - 3 * sigma_sgn.getVal(),
+                     mean_sgn.getVal() + 3 * sigma_sgn.getVal())
 
     massvar_set = RooArgSet(massvar)
     norm_set = RooFit.NormSet(massvar_set)
@@ -306,11 +313,11 @@ def add_text_info_fit(text_info, frame, roows, param_names):
     refl_frac = roows.var(param_names["fraction_refl"])
     text_info.AddText(f"#chi^{{2}}/ndf = {chi2:.2f}")
     text_info.AddText(f"#mu = {mean_sgn.getVal():.3f} #pm {mean_sgn.getError():.3f}")
-    text_info.AddText(f"#sigma = {sigma_sgn.getVal():.3f} #pm {sigma_sgn.getError():.3f}")
+    text_info.AddText(f"#sigma = {sigma_sgn.getVal():.4f} #pm {sigma_sgn.getError():.4f}")
     if sigmawide_sgn:
-        text_info.AddText(f"#sigma wide = {sigmawide_sgn.getVal():.3f} #pm {sigmawide_sgn.getError():.3f}")
+        text_info.AddText(f"#sigma wide = {sigmawide_sgn.getVal():.4f} #pm {sigmawide_sgn.getError():.4f}")
     if refl_frac:
-        text_info.AddText(f"refl.frac. = {refl_frac.getVal():.3f} #pm {refl_frac.getError():.3f}")
+        text_info.AddText(f"refl.frac. = {refl_frac.getVal():.4f} #pm {refl_frac.getError():.4f}")
 
 
 def add_text_info_perf(text_info, sig, sig_err, bkg, bkg_err, s_over_b, s_over_b_err, signif, signif_err):
