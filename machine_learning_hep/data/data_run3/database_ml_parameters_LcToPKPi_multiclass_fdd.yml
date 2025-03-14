@@ -531,15 +531,16 @@ LcpKpi:
     probcutpresel:
       data: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
       mc: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.01, 0.40, 0.00], [0.02, 0.40, 0.00], [0.03, 0.25, 0.00], [0.04, 0.25, 0.00], [0.07, 0.25, 0.00], [0.10, 0.25, 0.00], [0.11, 0.25, 0.00], [0.15, 0.25, 0.00], [0.18, 0.25, 0.00], [0.25, 0.25, 0.00], [0.35, 0.25, 0.00], [0.35, 0.25, 0.00]] #list of nbins
-    #probcutoptimal: [[0.01, 0.00, 0.55], [0.02, 0.00, 0.55], [0.03, 0.00, 0.50], [0.04, 0.00, 0.35], [0.07, 0.00, 0.35], [0.10, 0.00, 0.35], [0.11, 0.00, 0.35], [0.15, 0.00, 0.35], [0.18, 0.00, 0.35], [0.25, 0.00, 0.35], [0.35, 0.00, 0.35], [0.35, 0.00, 0.35]] #list of nbins
+    #probcutoptimal: [[0.01, 0.40, 0.00], [0.02, 0.40, 0.00], [0.03, 0.25, 0.00], [0.04, 0.25, 0.00], [0.07, 0.25, 0.00], [0.10, 0.25, 0.00], [0.11, 0.25, 0.00], [0.15, 0.25, 0.00], [0.18, 0.25, 0.00], [0.25, 0.25, 0.00], [0.35, 0.25, 0.00], [0.35, 0.25, 0.00]] #list of nbins
+    probcutoptimal: [[0.01, 0.00, 0.55], [0.02, 0.00, 0.55], [0.03, 0.00, 0.55], [0.04, 0.00, 0.50], [0.07, 0.00, 0.35], [0.10, 0.00, 0.35], [0.11, 0.00, 0.35], [0.15, 0.00, 0.35], [0.18, 0.00, 0.35], [0.25, 0.00, 0.35], [0.35, 0.00, 0.35], [0.35, 0.00, 0.35]] #list of nbins
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
-    fd_method: "Nb" # fc, Nb, dd, dd_N
+    fd_method: "dd" # fc, Nb, dd, dd_N
     crosssec_prompt: False # True for prompt, False for non-prompt
     cctype: "pp"
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
-    inputfonllpred: /data8/majak/crosssec/202502/fractions/CutVarLc_pp13TeV_LHC23_pass4_default.root
+    inputfonllpred: /data8/majak/crosssec/202502/fractions/CutVarLc_pp13TeV_LHC23_pass4_wide.root
+    #inputfonllpred: /data8/majak/crosssec/202502/fractions/CutVarLc_pp13TeV_LHC23_pass4_default.root
     #inputfonllpred: data/fonll/fonll_pythia_beautyFFLHCb_charmhadrons_13dot6tev_y0dot5_highStatistics.root
     #inputfonllpred: data/fonll/DmesonLcPredictions_13TeV_y05_FFptDepLHCb_BRpythia8_PDG2020.root
     dir_general_plots: analysis_plots
