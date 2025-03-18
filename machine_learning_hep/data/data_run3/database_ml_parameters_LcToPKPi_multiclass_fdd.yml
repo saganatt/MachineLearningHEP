@@ -19,10 +19,10 @@ LcpKpi:
   sel_gen_unp: "fPt>0"
   sel_cen_unp: null
   sel_good_evt_unp: null
-  sel_reco_skim: [null,null,null,null,null,null,null,null,null,null,null]
-  sel_gen_skim: [null,null,null,null,null,null,null,null,null,null,null]
-  sel_skim_binmin: [0,1,2,3,4,5,6,7,8,10,12] #list of nbins
-  sel_skim_binmax: [1,2,3,4,5,6,7,8,10,12,24] #list of nbins
+  sel_reco_skim: [null,null,null,null,null,null,null,null,null,null]
+  sel_gen_skim: [null,null,null,null,null,null,null,null,null,null]
+  sel_skim_binmin: [1,2,3,4,5,6,7,8,10,12] #list of nbins
+  sel_skim_binmax: [2,3,4,5,6,7,8,10,12,24] #list of nbins
   apply_yptacccut: false
   var_binning: fPt
   do_ptshape: true
@@ -529,9 +529,9 @@ LcpKpi:
                      xgboost_classifierLcpKpi_dfselection_fPt_10.0_12.0.sav,
                      xgboost_classifierLcpKpi_dfselection_fPt_12.0_24.0.sav]
     probcutpresel:
-      data: [[0.02, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
-      mc: [[0.01, 0.0, 0.0], [0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
-    probcutoptimal: [[0.01, 0.40, 0.00], [0.02, 0.40, 0.00], [0.03, 0.25, 0.00], [0.04, 0.25, 0.00], [0.07, 0.25, 0.00], [0.10, 0.25, 0.00], [0.11, 0.25, 0.00], [0.15, 0.25, 0.00], [0.18, 0.25, 0.00], [0.25, 0.25, 0.00], [0.35, 0.25, 0.00], [0.35, 0.25, 0.00]] #list of nbins
+      data: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
+      mc: [[0.02, 0.0, 0.0], [0.03, 0.0, 0.0], [0.05, 0.0, 0.0], [0.15, 0.0, 0.0], [0.15, 0.0, 0.0], [0.2, 0.0, 0.0], [0.5, 0.0, 0.0], [0.5, 0.0, 0.0], [0.8, 0.0, 0.0], [0.8, 0.0, 0.0]] #list of nbins
+    probcutoptimal: [[0.02, 0.40, 0.00], [0.03, 0.25, 0.00], [0.04, 0.25, 0.00], [0.07, 0.25, 0.00], [0.10, 0.25, 0.00], [0.11, 0.25, 0.00], [0.15, 0.25, 0.00], [0.18, 0.25, 0.00], [0.25, 0.25, 0.00], [0.35, 0.25, 0.00], [0.35, 0.25, 0.00]] #list of nbins
     #probcutoptimal: [[0.01, 0.00, 0.55], [0.02, 0.00, 0.55], [0.03, 0.00, 0.55], [0.04, 0.00, 0.50], [0.07, 0.00, 0.35], [0.10, 0.00, 0.35], [0.11, 0.00, 0.35], [0.15, 0.00, 0.35], [0.18, 0.00, 0.35], [0.25, 0.00, 0.35], [0.35, 0.00, 0.35], [0.35, 0.00, 0.35]] #list of nbins
     #probcutoptimal: [[0.01, 0.00, %fd%], [0.02, 0.00, %fd%], [0.03, 0.00, %fd%], [0.04, 0.00, %fd%], [0.07, 0.00, %fd%], [0.10, 0.00, %fd%], [0.11, 0.00, %fd%], [0.15, 0.00, %fd%], [0.18, 0.00, %fd%], [0.25, 0.00, %fd%], [0.35, 0.00, %fd%], [0.35, 0.00, %fd%]] #list of nbins
   analysis:
@@ -568,12 +568,11 @@ LcpKpi:
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
         - "fDecayLength > 0.02"
-        - "fDecayLength > 0.02"
 
 
-      sel_an_binmin: [0,1,2,3,4,5,6,7,8,10,12,16]
-      sel_an_binmax: [1,2,3,4,5,6,7,8,10,12,16,24]
-      binning_matching: [0,1,2,3,4,5,6,7,8,9,10,10]
+      sel_an_binmin: [1,2,3,4,5,6,7,8,10,12,16]
+      sel_an_binmax: [2,3,4,5,6,7,8,10,12,16,24]
+      binning_matching: [0,1,2,3,4,5,6,7,8,9,9]
       presel_gen_eff: "abs(fY) < 0.5"
       evtsel: null
       triggersel:
@@ -597,9 +596,9 @@ LcpKpi:
       latexnamehadron: "#Lambda_{c}^{pK#pi}"
       mass_fit_lim: [2.10, 2.47] # region for the fit of the invariant mass distribution [GeV/c^2]
       bin_width: 0.001 # bin width of the invariant mass histogram
-      n_rebin: [4,2,2,2,2,2,3,3,4,5,6,6]  # number of mass bins to merge
-      fixed_sigma: [False,False, False, False, False, False, False, False, False, False, False, False]
-      fixed_sigma_val: [0.0097, 0.0082, 0.0092, 0.0104, 0.0116, 0.0134, 0.0145, 0.0162, 0.0182, 0.0204, 0.0230, 0.0263]
+      n_rebin: [2,2,2,2,2,3,3,4,5,6,6]  # number of mass bins to merge
+      fixed_sigma: [False, False, False, False, False, False, False, False, False, False, False]
+      fixed_sigma_val: [0.0082, 0.0092, 0.0104, 0.0116, 0.0134, 0.0145, 0.0162, 0.0182, 0.0204, 0.0230, 0.0263]
 
       pdf_names:
         pdf_sig: "sig"
@@ -623,7 +622,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.2832,2.289], sigma_g1[.007,.007,.012])
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.013], alpha1[1.0, 1.0, 2.0], n1[40., 40., 100.], alpha1[1.0, 1.0, 2.0], n1[40., 40., 100.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -638,7 +637,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.2832,2.289], sigma_g1[.007,.007,.012])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.013], alpha1[1.0, 0.8, 2.0], n1[30., 30., 100.], alpha1[1.0, 0.8, 2.0], n1[30., 30., 100.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -653,7 +652,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.2832,2.289], sigma_g1[.007,.007,.012])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.012], alpha1[1.0, 0.8, 2.0], n1[20., 20., 100.], alpha1[1.0, 0.8, 2.0], n1[20., 20., 100.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -668,7 +667,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.2832,2.289], sigma_g1[.007,.007,.012])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.008, 0.008, 0.016], alpha1[1.0, 0.0, 2.0], n1[15., 15., 100.], alpha1[1.0, 0.0, 2.0], n1[15., 15., 100.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -683,7 +682,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.283,2.289], sigma_g1[.012,.01,.016])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.01, 0.01, 0.016], alpha1[1.0, 0.8, 2.0], n1[15., 15., 100.], alpha1[1.0, 0.8, 2.0], n1[15., 15., 100.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -698,7 +697,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.283,2.289], sigma_g1[.012,.01,.016])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.008, 0.008, 0.017], alpha1[1.0, 0.5, 2.0], n1[15., 15., 100.], alpha1[1.0, 0.5, 2.0], n1[15., 15., 100.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -713,7 +712,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.013,.013,.020])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.012, 0.012, 0.018], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -728,7 +727,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.013,.013,.020])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.015, 0.012, 0.018], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.0], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.0])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -743,9 +742,8 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.013,.013,.020])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0290])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.010, 0.010, 0.022], alpha1[1.0, 0.8, 2.0], n1[5.0, 5.0, 100.0], alpha1[1.0, 0.8, 2.0], n1[5.0, 5.0, 100.0])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.010, 0.010, 0.022], alpha1[1.0, 0.8, 2.0], n1[5.0, 5.0, 100.0], alpha2[1.0, 0.8, 2.0], n2[5.0, 5.0, 100.0])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
             #model:
@@ -759,7 +757,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.2865, 2.283,2.289], sigma_g1[.020,.020,.029])'
+              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0290])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.016, 0.016, 0.029], alpha1[1.0, 0.8, 2.0], n1[6., 6., 100.0], alpha1[1.0, 0.8, 2.0], n1[6., 6., 100.0])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
@@ -770,6 +768,7 @@ LcpKpi:
             model:
               fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
         - ptrange: [0., 2.]
+          #range: [2.216, 2.36] #2.216, 2.36
           range: [2.21, 2.36] #2.216, 2.36
           #fix_params: ['n', 'f_peak']
           components:
@@ -864,7 +863,7 @@ LcpKpi:
       useperiod: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] #period from where to define prob cuts
       ncutvar: 10 #number of looser and tighter variations
       maxperccutvar: 0.25 #max diff in efficiency for loosest/tightest var
-      cutvarminrange: [[0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Min starting point for scan
-      cutvarmaxrange: [[0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Max starting point for scan
+      cutvarminrange: [[0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Min starting point for scan
+      cutvarmaxrange: [[0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.7, 0.9], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3], [0.1, 0.3]] #Max starting point for scan
       fixedmean: True #Fix mean cutvar histo to central fit
       fixedsigma: True #Fix sigma cutvar histo to central fit
