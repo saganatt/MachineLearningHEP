@@ -6,10 +6,11 @@ WORKDIR="${HOME}/MachineLearningHEP/machine_learning_hep/"
 DATABASE="database_ml_parameters_LcToPKPi_multiclass_fdd"
 DATABASE_EXT="${DATABASE}.yml"
 DATABASE_PATH="${WORKDIR}/data/data_run3/${DATABASE_EXT}"
-RESDIR_PATTERN="results-24022025-nonprompt"
+#RESDIR_PATTERN="results-24022025-prompt"
+RESDIR_PATTERN="results-24022025-newtrain-ptshape-prompt"
 
 bkg=0.00
-for fd in $(seq 0.0 0.01 0.0) ; do
+for fd in $(seq 0.000 0.005 0.000) ; do
   echo "fd ${fd}"
 
   #suffix="fd_${fd}"
@@ -36,17 +37,17 @@ for fd in $(seq 0.0 0.01 0.0) ; do
   sed -i "s/%bkg1216%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%bkg1624%/${bkg}/g" "${CUR_DB}" || ErrExit "Could not edit database"
   sed -i "s/%fd01%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd12%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd23%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd34%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd45%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd56%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd67%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd78%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd810%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd1012%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd1216%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
-  sed -i "s/%fd1624%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
+  sed -i "s/%fd%/${fd}/g" "${CUR_DB}" || ErrExit "Could not edit database"
 
   yes | mlhep --log-file "logfile_${suffix}.log" \
       -a Run3analysis \
