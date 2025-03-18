@@ -228,6 +228,7 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
             ]
             print(f"ptmin fonll: {ptmin_fonll}, max: {ptmax_fonll}, crosssec: {crosssec_nonprompt_fonll}")
 
+        eff_crosssec = eff_times_acc_prompt
         # compute prompt fraction
         frac = [0,0,0]
         if frac_method == "Nb":
@@ -273,6 +274,7 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
                     histos["covariances"][pnp_ind].GetBinContent(i_pt + 1),
                     histos["covariances"][1 - pnp_ind].GetBinContent(i_pt + 1),
                     histos["covariances"][2].GetBinContent(i_pt + 1))
+            eff_crosssec = eff_times_acc_own
         elif frac_method == "dd_N":
             pnp_ind = 0 if crosssec_prompt else 1
             frac = [histos["corryields_fdd"][pnp_ind].GetBinContent(i_pt + 1)] * 3
@@ -283,7 +285,7 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
             rawy,
             rawy_unc,
             frac[0],
-            eff_times_acc_prompt,
+            eff_crosssec,
             ptmax - ptmin,
             1.0,
             sigmamb,
