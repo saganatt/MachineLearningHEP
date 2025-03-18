@@ -624,7 +624,7 @@ LcpKpi:
             sig:
               #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.013], alpha1[1.0, 1.0, 2.0], n1[40., 40., 100.], alpha1[1.0, 1.0, 2.0], n1[40., 40., 100.])'
-              fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0085, 0.0085], alpha1[1.3506, 1.3506], n1[40.0972, 40.0972], alpha1[1.3506, 1.3506], n1[40.0972, 40.0972])'
+              fn: 'RooCrystalBall::sig(m[1., 10], mean[2.288, 2.283, 2.289], sigma_g1[0.0085, 0.0085], alpha1[1.3506, 1.3506], n1[40.0972, 40.0972], alpha1[1.3506, 1.3506], n1[40.0972, 40.0972])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
             #model:
@@ -635,12 +635,12 @@ LcpKpi:
               fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
         - level: mc
           ptrange: [2., 3.]
-          range: [2.18, 2.39]
+          range: [2.18, 2.40]
           components:
             sig:
               #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
               #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.013], alpha1[1.0, 0.8, 2.0], n1[30., 30., 100.], alpha1[1.0, 0.8, 2.0], n1[30., 30., 100.])'
-              fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0088, 0.0088], alpha1[1.64, 1.64], n1[30., 30.], alpha1[1.64, 1.64], n1[30., 30.])'
+              fn: 'RooCrystalBall::sig(m[1., 10], mean[2.288, 2.283, 2.289], sigma_g1[0.0088, 0.0088], alpha1[1.64, 1.64], n1[30., 30.], alpha1[1.64, 1.64], n1[30., 30.])'
               #wide:
             # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
             #model:
