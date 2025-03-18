@@ -537,7 +537,7 @@ LcpKpi:
   analysis:
     anahptspectrum: "LctopKpi" #D0Kpi, DplusKpipi, DstarD0pi, DsKKpi, LctopKpi, LcK0Sp
     fd_method: "dd" # fc, Nb, dd, dd_N
-    crosssec_prompt: False # True for prompt, False for non-prompt
+    crosssec_prompt: True # True for prompt, False for non-prompt
     cctype: "pp"
     sigmamb: 59.4e+9 # 50.87e+9 pp5TeV, 57.8e+9 pp13TeV, 59.4e+9 pp Run3, pb
     inputfonllpred: /data8/majak/crosssec/202502/fractions/CutVarLc_pp13TeV_LHC23_pass4_wide.root
@@ -622,13 +622,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.013], alpha1[1.0, 1.0, 2.0], n1[40., 40., 100.], alpha1[1.0, 1.0, 2.0], n1[40., 40., 100.])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.288, 2.283, 2.289], sigma_g1[0.0085, 0.0085], alpha1[1.3506, 1.3506], n1[40.0972, 40.0972], alpha1[1.3506, 1.3506], n1[40.0972, 40.0972])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -638,13 +632,7 @@ LcpKpi:
           range: [2.18, 2.40]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.013], alpha1[1.0, 0.8, 2.0], n1[30., 30., 100.], alpha1[1.0, 0.8, 2.0], n1[30., 30., 100.])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.288, 2.283, 2.289], sigma_g1[0.0088, 0.0088], alpha1[1.64, 1.64], n1[30., 30.], alpha1[1.64, 1.64], n1[30., 30.])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -654,13 +642,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.007, 0.007, 0.012], alpha1[1.0, 0.8, 2.0], n1[20., 20., 100.], alpha1[1.0, 0.8, 2.0], n1[20., 20., 100.])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0102, 0.0102], alpha1[1.53, 1.53], n1[67.37, 67.37], alpha1[1.53, 1.53], n1[67.37, 67.37])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -670,13 +652,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.008, 0.008, 0.016], alpha1[1.0, 0.0, 2.0], n1[15., 15., 100.], alpha1[1.0, 0.0, 2.0], n1[15., 15., 100.])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0112, 0.0112], alpha1[1.21, 1.21], n1[94.58, 94.58], alpha1[1.21, 1.21], n1[94.58, 94.58])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -686,13 +662,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.01, 0.01, 0.016], alpha1[1.0, 0.8, 2.0], n1[15., 15., 100.], alpha1[1.0, 0.8, 2.0], n1[15., 15., 100.])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0127, 0.0127], alpha1[1.147, 1.147], n1[77.2867, 77.2867], alpha1[1.147, 1.147], n1[77.2867, 77.2867])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -702,13 +672,7 @@ LcpKpi:
           range: [2.18, 2.39]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.008, 0.008, 0.017], alpha1[1.0, 0.5, 2.0], n1[15., 15., 100.], alpha1[1.0, 0.5, 2.0], n1[15., 15., 100.])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0131, 0.0131], alpha1[1.026, 1.026], n1[90.26, 90.26], alpha1[1.026, 1.026], n1[90.26, 90.26])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -718,13 +682,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.012, 0.012, 0.018], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0151, 0.0151], alpha1[1.249, 1.249], n1[99.955, 99.955], alpha1[1.249, 1.249], n1[99.955, 99.955])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -734,13 +692,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0220])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.015, 0.012, 0.018], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.0], alpha1[1.0, 0.8, 2.0], n1[4., 4., 100.0])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0174, 0.0174], alpha1[1.315, 1.315], n1[4., 4.], alpha1[1.315, 1.315], n1[4., 4.])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -750,13 +702,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0290])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.010, 0.010, 0.022], alpha1[1.0, 0.8, 2.0], n1[5.0, 5.0, 100.0], alpha1[1.0, 0.8, 2.0], n1[5.0, 5.0, 100.0])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0187, 0.0187], alpha1[1.013, 1.013], n1[5.0, 5.0], alpha1[1.013, 1.013], n1[5.0, 5.0])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -766,13 +712,7 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0290])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.016, 0.016, 0.029], alpha1[1.0, 0.8, 2.0], n1[6., 6., 100.0], alpha1[1.0, 0.8, 2.0], n1[6., 6., 100.0])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0205, 0.0205], alpha1[0.8, 0.8], n1[19.30, 19.30], alpha1[0.8, 0.8], n1[19.30, 19.30])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
@@ -782,103 +722,69 @@ LcpKpi:
           range: [2.10, 2.45]
           components:
             sig:
-              #fn: 'Gaussian::sig(m[1., 10], mean[2.286, 2.26, 2.30], sigma_g1[.012,.002,.0290])'
-              #fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.016, 0.016, 0.029], alpha1[1.0, 0.8, 2.0], n1[6., 6., 100.0], alpha1[1.0, 0.8, 2.0], n1[6., 6., 100.0])'
               fn: 'RooCrystalBall::sig(m[1., 10], mean[2.286, 2.283, 2.289], sigma_g1[0.0205, 0.0205], alpha1[0.8, 0.8], n1[19.30, 19.30], alpha1[0.8, 0.8], n1[19.30, 19.30])'
-              #wide:
-            # fn: 'Gaussian::wide(m, mean, expr("n*sigma_g1", n[1.,5.], sigma_g1))'
-            #model:
-            #  fn: 'SUM::sig(f_peak[0.,1.]*peak, wide)'
             bkg:
               fn: 'Exponential::mcbkg(m, mcalpha[0.])'
             model:
               fn: 'SUM::mctot(mcfrac[0., 0., 1.0]*sig, mcbkg)'
         - ptrange: [0., 2.]
-          #range: [2.216, 2.36] #2.216, 2.36
           range: [2.21, 2.36] #2.216, 2.36
-          #fix_params: ['n', 'f_peak']
           components:
-            #sig:
-            #fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[-1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [2., 3.]
           range: [2.20, 2.368]
-          #fix_params: ['n', 'f_peak']
           components:
-            #sig:
-            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[-1e8, 1e8], a1[-1e8, 1e8], a2[-1e8, 1e8]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [3., 4.]
           range: [2.19, 2.38]
-          #fix_params: ['n', 'f_peak']
           components:
-            #sig:
-            #fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[-1e8, 1e8], a1[-1e8, 1e8], a2[-1e8, 1e8]})'
             model:
               fn: 'SUM::sum(f_sig[0., 0., 0.8]*sig, bkg)'
         - ptrange: [4., 5.]
           range: [2.19, 2.38]
-          #fix_params: ['n', 'f_peak']
           components:
-            # sig:
-            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [5., 6.]
           range: [2.18, 2.39]
-          #fix_params: ['n', 'f_peak']
           components:
-            # sig:
-            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.005,.015])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[5000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [6., 7.]
           range: [2.16, 2.40]
-          #fix_params: ['n', 'f_peak']
           components:
-            # sig:
-            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [7., 8.]
           range: [2.16, 2.40]
-          #fix_params: ['n', 'f_peak']
           components:
-            # sig:
-            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - ptrange: [8., 10.]
           range: [2.1, 2.46]
-          #fix_params: ['n', 'f_peak']
           components:
-            # sig:
-            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[1000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
               fn: 'SUM::sum(f_sig[0.,1.]*sig, bkg)'
         - range: [2.1, 2.46]
-          #fix_params: ['n', 'f_peak']
           components:
-            # sig:
-            #   fn: 'Gaussian::sig(m, mean[2.28,2.29], sigma_g1[.005,.03])'
             bkg:
               fn: 'Polynomial::bkg(m, {a0[2000, -1e10, 1e10], a1[-1e10, 1e10], a2[-1e10, 1e10]})'
             model:
