@@ -25,11 +25,11 @@ class RooFitter:
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.ERROR)
 
-    def find_best_a0(self, ws, m, dh, model, range_m = None):
+    def find_best_a0(self, ws, m, dh, model, old_res, range_m = None):
         kwargs = {"Save": True,
                   "PrintLevel": -1,
-                  "Strategy": 2,
-                  "Minimizer": "Minuit2"}
+                  "Strategy": 2}
+                  #"Minimizer": "Minuit2"}
         if range_m:
             kwargs["Range"] = (range_m[0], range_m[1])
         tmp_frame = m.frame()
@@ -41,21 +41,22 @@ class RooFitter:
         a0_values = [10, 20, 30, 40, 50, 80, 100, 120, 150, 200, 250, 300, 350, 400, 450, 500,
                      700, 1000, 1500, 2000, 2500, 3000, 5000, 10000]
 
+        res = old_res
         chi_threshold = 6.
         while (chi2 > chi_threshold or isnan(chi2)) and attempt < len(a0_values):
             print(f"Attempt {attempt+1}: Setting a0 to {a0_values[attempt]}")
             a0_var.setVal(a0_values[attempt])  # Change a0 value
             attempt += 1
 
-            model.fitTo(dh, **kwargs)
+            res = model.fitTo(dh, **kwargs)
             tmp_frame = m.frame()
             dh.plotOn(tmp_frame)
             model.plotOn(tmp_frame)
             chi2 = tmp_frame.chiSquare()
 
-            if chi2 <= chi_threshold:
-                print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
-                break
+        if chi2 <= chi_threshold:
+            print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
+            return res
 
     # pylint: disable=too-many-branches
     def fit_mass_new(self, hist, pdfnames, param_names, fit_spec, level, fixed_sigma, fixed_sigma_val,
@@ -126,12 +127,12 @@ class RooFitter:
             print(f'using fit range: {range_m}, var range: {m.getRange("fit")}')
             res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
             if level == "data":
-                self.find_best_a0(ws, m, dh, model, range_m)
+                res = self.find_best_a0(ws, m, dh, model, res, range_m)
             # model.Print('v')
         else:
             res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=2)
             if level == "data":
-                self.find_best_a0(ws, m, dh, model)
+                res = self.find_best_a0(ws, m, dh, model, res)
         frame = None
         residual_frame = None
         if plot:
