@@ -248,7 +248,6 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
     massvar_set = RooArgSet(massvar)
     norm_set = RooFit.NormSet(massvar_set)
     signal_range = RooFit.Range("signal")
-    print(f'signal range: {signal_range}, mass signal range: {massvar.getRange("signal")}')
     signal_integral = f_sig.createIntegral(massvar_set, norm_set, signal_range)
     bkg_integral = f_bkg.createIntegral(massvar_set, norm_set, signal_range)
 
@@ -263,23 +262,6 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
         significance = n_signal_signal / sqrt(n_signal_signal + n_bkg_signal)
 
     # Calculate the error on the signal and bkg integrals using the covariance matrix
-    print(f"signal integral: {signal_integral}")
-    print(f"fit result correlation matrix:\n{res.correlationMatrix().Print()}")
-    print(f"fit result:\n{res.Print()}")
-    nset = RooArgSet()
-    all_params = RooArgSet()
-    signal_integral.getParameters(nset, all_params)
-    print(f"signal integral parameters: {all_params}")
-    print(f"fit result parameters: {res.floatParsFinal()}")
-    for rvres in res.floatParsFinal():
-        print(f"Processing real value {rvres} value: {rvres.getVal()}")
-        rv_signal = all_params.find(rvres)
-        if rv_signal is None:
-            print(f"Value not found in signal set")
-        else:
-            print(f"Found signal val {rv_signal}") #value: {rv_signal.getVal()}")
-
-
     sigma_signal_integral = signal_integral.getPropagatedError(res)
     sigma_bkg_integral = bkg_integral.getPropagatedError(res)
 
