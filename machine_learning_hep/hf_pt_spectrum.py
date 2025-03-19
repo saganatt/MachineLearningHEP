@@ -162,6 +162,7 @@ def hf_pt_spectrum(channel, # pylint: disable=too-many-locals, too-many-argument
     ptlims = {}
     for histo in ["rawyields", "acceffp", "acceffnp"]:
         ptlims[histo] = get_hist_binlimits(histos[histo])
+        print(f"ptlims {histo}:\n{ptlims[histo]}")
         if (
             histo != "rawyields"
             and not np.equal(ptlims[histo], ptlims["rawyields"]).all()

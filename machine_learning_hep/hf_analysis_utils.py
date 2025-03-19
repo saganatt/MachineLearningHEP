@@ -62,6 +62,7 @@ def compute_crosssection(
     if rawy <= 0:
         crosssection = -9999
         crosssec_unc = -1
+        print(f"cross section: {crosssection} frac: {frac} eff times acc {eff_times_acc} n_events: {n_events} rawy {rawy}")
     elif method_frac == "dd_N":
         crosssection = (
             frac
@@ -78,6 +79,7 @@ def compute_crosssection(
             * sigma_mb
             / (2 * delta_pt * delta_y * eff_times_acc * n_events * b_ratio)
         )
+        print(f"cross section: {crosssection} frac: {frac} eff times acc {eff_times_acc} n_events: {n_events} rawy {rawy}")
         if method_frac in ("Nb","ext"):
             crosssec_unc = rawy_unc / (rawy * frac) * crosssection
         else:
