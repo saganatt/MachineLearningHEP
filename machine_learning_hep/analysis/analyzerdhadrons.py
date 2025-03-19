@@ -179,7 +179,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         add_text_info_fit(textInfoRight, frame, ws, param_names)
 
         textInfoLeft = create_text_info(0.12, 0.68, 0.6, 0.89)
-        if level == "data":
+        if res and level == "data":
             mean_sgn = ws.var(self.p_param_names["gauss_mean"])
             sigma_sgn = ws.var(self.p_param_names["gauss_sigma"])
             (sig, sig_err, bkg, bkg_err,
@@ -192,7 +192,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         textInfoRight.Draw()
         textInfoLeft.Draw()
 
-        if res.status() == 0:
+        if res and res.status() == 0:
             self._save_canvas(c, filename)
         else:
             self.logger.warning('Invalid fit result for %s', hist.GetName())
@@ -207,7 +207,9 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
             filename = filename.replace('.png', '_residual.png')
             self._save_canvas(cres, filename)
 
-        return res, ws
+        chi = frame.chiSquare()
+
+        return res, ws, chi
 
 
     def _fit_mass(self, hist, filename = None):
@@ -284,6 +286,8 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                                 len(self.lpt_finbinmin), array("d", self.bins_candpt))
             soverbhistos = TH1F("hSoverB0", "", \
                                 len(self.lpt_finbinmin), array("d", self.bins_candpt))
+            chihistos = TH1F("hchi0", "", \
+                                len(self.lpt_finbinmin), array("d", self.bins_candpt))
 
             with TFile(rfilename) as rfile:
                 for ipt in range(len(self.lpt_finbinmin)):
@@ -300,6 +304,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                           self.lpt_finbinmax[ipt], self.lpt_probcutfin[ipt])
                     h_invmass = rfile.Get('hmass' + suffix)
                     # Rebin
+                    self.logger.info("suffix: %s ipt %d", suffix, ipt)
                     h_invmass.Rebin(self.p_rebin[ipt])
                     if h_invmass.GetEntries() < 100: # TODO: reconsider criterion
                         self.logger.error('Not enough entries to fit for %s bin %d', level, ipt)
@@ -339,7 +344,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                                 roows.var(fixpar).setConstant(True)
                         if h_invmass.GetEntries() == 0:
                             continue
-                        roo_res, roo_ws = self._roofit_mass(
+                        roo_res, roo_ws, chi = self._roofit_mass(
                             level, h_invmass, ipt, self.p_pdfnames, self.p_param_names, fitcfg,
                             self.p_fixed_sigma[ipt], self.p_fixed_sigma_val[ipt],
                             roows,
@@ -358,32 +363,38 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                                 self.fit_func_bkg[level][ipt] = pdf_bkg.asTF(roo_ws.var(var_m))
                             self.fit_range[level][ipt] = (roo_ws.var(var_m).getMin('fit'), \
                                                           roo_ws.var(var_m).getMax('fit'))
+                        else:
+                            self.logger.error('RooFit failed for %s bin %d', level, ipt)
 
-                            if level == "data":
-                                mean_sgn = roo_ws.var(self.p_param_names["gauss_mean"])
-                                sigma_sgn = roo_ws.var(self.p_param_names["gauss_sigma"])
+                        if level == "data":
+                            mean_sgn = roo_ws.var(self.p_param_names["gauss_mean"])
+                            sigma_sgn = roo_ws.var(self.p_param_names["gauss_sigma"])
+                            if roo_res and roo_res.status() == 0:
                                 (sig, sig_err, _, _,
                                     signif, signif_err, s_over_b, s_over_b_err
                                 ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, self.p_param_names, mean_sgn, sigma_sgn)
+                            else:
+                                sig = sig_err = signif = signif_err = s_over_b = s_over_b_err = 0.0
 
-                                yieldshistos.SetBinContent(ipt + 1, sig)
-                                yieldshistos.SetBinError(ipt + 1, sig_err)
-                                meanhistos.SetBinContent(ipt + 1, mean_sgn.getVal())
-                                meanhistos.SetBinError(ipt + 1, mean_sgn.getError())
-                                sigmahistos.SetBinContent(ipt + 1, sigma_sgn.getVal())
-                                sigmahistos.SetBinError(ipt + 1, sigma_sgn.getError())
-                                signifhistos.SetBinContent(ipt + 1, signif)
-                                signifhistos.SetBinError(ipt + 1, signif_err)
-                                soverbhistos.SetBinContent(ipt + 1, s_over_b)
-                                soverbhistos.SetBinError(ipt + 1, s_over_b_err)
-                        else:
-                            self.logger.error('RooFit failed for %s bin %d', level, ipt)
+                            yieldshistos.SetBinContent(ipt + 1, sig)
+                            yieldshistos.SetBinError(ipt + 1, sig_err)
+                            meanhistos.SetBinContent(ipt + 1, mean_sgn.getVal())
+                            meanhistos.SetBinError(ipt + 1, mean_sgn.getError())
+                            sigmahistos.SetBinContent(ipt + 1, sigma_sgn.getVal())
+                            sigmahistos.SetBinError(ipt + 1, sigma_sgn.getError())
+                            signifhistos.SetBinContent(ipt + 1, signif)
+                            signifhistos.SetBinError(ipt + 1, signif_err)
+                            soverbhistos.SetBinContent(ipt + 1, s_over_b)
+                            soverbhistos.SetBinError(ipt + 1, s_over_b_err)
+                            chihistos.SetBinContent(ipt + 1, chi)
+                            chihistos.SetBinError(ipt + 1, 0)
                 fileout.cd()
                 yieldshistos.Write()
                 meanhistos.Write()
                 sigmahistos.Write()
                 signifhistos.Write()
                 soverbhistos.Write()
+                chihistos.Write()
             fileout.Close()
 
     def yield_syst(self):
