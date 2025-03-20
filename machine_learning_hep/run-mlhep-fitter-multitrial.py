@@ -12,17 +12,9 @@ import yaml
 
 PERM_PATTERN="prompt"
 
-CONFIG="database_ml_parameters_LcToPKPi_multiclass_fdd"
+CONFIG="LcMult"
 CONFIG_EXT=f"{CONFIG}.yml"
-CONFIG_PATH=f"data/data_run3/{CONFIG_EXT}"
-
-BASE_DIR="/data8/majak/MLHEP/results-24022025-newtrain-ptshape-prompt"
-FILES_COPY = [
-    "LHC23pp_pass4/Results/resultsdatatot/masshisto.root",
-    "LHC24pp_mc/Results/resultsmctot/masshisto.root",
-    "LHC24pp_mc/Results/resultsmctot/effhisto.root",
-    "LHC24pp_mc/Results/resultsmctot/efficienciesLcpKpiRun3analysis.root"
-]
+CONFIG_PATH=f"./{CONFIG_EXT}"
 
 SIGMA02="0.007, 0.007, 0.013"
 SIGMA23="0.007, 0.007, 0.013"
@@ -132,25 +124,22 @@ def main():
     for comb in combinations:
         print(comb)
 
-        cur_cfg = f"multitrial-db/{CONFIG}{comb}.yml"
+        cur_cfg = f"multitrial-mult-db/{CONFIG}{comb}.yml"
         shutil.copy2(CONFIG_PATH, cur_cfg)
 
         with open(cur_cfg, encoding="utf-8") as stream:
             cfg = yaml.safe_load(stream)
 
-        ana_cfg = cfg["LcpKpi"]["analysis"]["Run3analysis"]
+        ana_cfg = cfg["LcpKpi"]["analysis"]["Run3analysis_forward"]
         fit_cfg = ana_cfg["mass_roofit"]
         mc_cfg = [fit_params for fit_params in fit_cfg \
                     if "level" in fit_params and fit_params["level"] == "mc"]
         data_cfg = [fit_params for fit_params in fit_cfg if not "level" in fit_params]
 
-        resdir = f"results-24022025-newtrain-multitrial-{PERM_PATTERN}{comb}"
+        resdir = f"results-24022025-luigi-multitrial-mult-{PERM_PATTERN}{comb}"
         respath = f"/data8/majak/MLHEP/{resdir}/"
         ana_cfg["data"]["prefix_dir_res"] = respath
         ana_cfg["mc"]["prefix_dir_res"] = respath
-
-        for file in FILES_COPY:
-            shutil.copy2(f"{BASE_DIR}/{file}", f"{respath}/{file}")
 
         trials = comb.split("_")
 
