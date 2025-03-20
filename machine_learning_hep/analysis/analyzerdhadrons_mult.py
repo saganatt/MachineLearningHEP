@@ -291,6 +291,8 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
                                         len(self.lpt_finbinmin), array("d", self.bins_candpt))
                     soverbhistos = TH1F("hSoverB%d" % (ibin2), "", \
                                         len(self.lpt_finbinmin), array("d", self.bins_candpt))
+                    chihistos = TH1F("hchi0", "", \
+                                        len(self.lpt_finbinmin), array("d", self.bins_candpt))
 
                     for ipt in range(len(self.lpt_finbinmin)):
                         self.logger.debug('fitting %s - %i - %i', level, ipt, ibin2)
@@ -354,7 +356,7 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
                             # Create the directory if it doesn't exist
                             directory_path.mkdir(parents=True, exist_ok=True)
 
-                            roo_res, roo_ws = self._roofit_mass(
+                            roo_res, roo_ws, chi = self._roofit_mass(
                                 level, h_invmass, ipt, self.p_pdfnames, self.p_param_names, fitcfg, roows,
                                 f'roofit/mult_{multrange[0]}-{multrange[1]}/'
                                 f'h_mass_fitted_pthf-{ptrange[0]}-{ptrange[1]}'\
@@ -363,7 +365,7 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
                             #     roo_ws.Print()
                             self.roo_ws[level][ipt] = roo_ws
                             self.roows[ipt] = roo_ws
-                            if roo_res.status() == 0:
+                            if roo_res and roo_res.status() == 0:
                                 if level in ('data', 'mc_sig'):
                                     self.fit_mean[level][ipt] = roo_ws.var(self.p_param_names["gauss_mean"]).getValV()
                                     self.fit_sigma[level][ipt] = roo_ws.var(self.p_param_names["gauss_sigma"]).getValV()
@@ -379,10 +381,13 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
                             if level == "data":
                                 mean_sgn = roo_ws.var(self.p_param_names["gauss_mean"])
                                 sigma_sgn = roo_ws.var(self.p_param_names["gauss_sigma"])
-                                (sig, sig_err, _, _,
-                                    signif, signif_err, s_over_b, s_over_b_err
-                                ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, \
-                                                self.p_param_names, mean_sgn, sigma_sgn)
+                                if roo_res:
+                                    (sig, sig_err, _, _,
+                                        signif, signif_err, s_over_b, s_over_b_err
+                                    ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, \
+                                                    self.p_param_names, mean_sgn, sigma_sgn)
+                                else:
+                                    sig = sig_err = signif = signif_err = s_over_b = s_over_b_err = 0.0
 
                                 yieldshistos.SetBinContent(ipt+1, sig)
                                 yieldshistos.SetBinError(ipt+1, sig_err)
@@ -394,15 +399,16 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
                                 signifhistos.SetBinError(ipt+1, signif_err)
                                 soverbhistos.SetBinContent(ipt+1, s_over_b)
                                 soverbhistos.SetBinError(ipt+1, s_over_b_err)
+                                chihistos.SetBinContent(ipt + 1, chi)
+                                chihistos.SetBinError(ipt + 1, 0)
                     fileout.cd()
                     yieldshistos.Write()
                     meanhistos.Write()
                     sigmahistos.Write()
                     signifhistos.Write()
                     soverbhistos.Write()
+                    chihistos.Write()
                 fileout.Close()
-
-
 
     def get_efficiency(self, ibin1, ibin2):
         fileouteff = TFile.Open("%s/efficiencies%s%s.root" % (self.d_resultsallpmc, \
