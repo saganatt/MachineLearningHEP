@@ -369,7 +369,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                         if level == "data":
                             mean_sgn = roo_ws.var(self.p_param_names["gauss_mean"])
                             sigma_sgn = roo_ws.var(self.p_param_names["gauss_sigma"])
-                            if roo_res and roo_res.status() == 0:
+                            if roo_res:
                                 (sig, sig_err, _, _,
                                     signif, signif_err, s_over_b, s_over_b_err
                                 ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, self.p_param_names, mean_sgn, sigma_sgn)
