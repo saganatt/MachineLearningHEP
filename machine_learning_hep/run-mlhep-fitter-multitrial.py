@@ -98,24 +98,24 @@ def process_trial(trial, ana_cfg, data_cfg, mc_cfg):
             bkg_fn = pt_cfg["components"]["bkg"]["fn"]
             pt_cfg["components"]["bkg"]["fn"] = re.sub(r"a2\[(.*?)\]",
                                                        r"a2[\1], a3[-1e8, 1e8]", bkg_fn)
-    elif "narrow" in trial:
-        print("Processing narrow")
-        for pt_cfg in fit_cfg:
-            pt_cfg["range"] = [pt_cfg["range"][0] + 0.01, pt_cfg["range"][1] - 0.01]
     elif "narrow2" in trial:
         print("Processing narrow2")
         for pt_cfg in fit_cfg:
             pt_cfg["range"] = [pt_cfg["range"][0] + 0.02, pt_cfg["range"][1] - 0.02]
-    elif "wide" in trial:
-        print("Processing wide")
+    elif "narrow" in trial:
+        print("Processing narrow")
         for pt_cfg in fit_cfg:
-            pt_cfg["range"] = [max(2.10, pt_cfg["range"][0] - 0.01),
-                               min(2.47, pt_cfg["range"][1] + 0.01)]
+            pt_cfg["range"] = [pt_cfg["range"][0] + 0.01, pt_cfg["range"][1] - 0.01]
     elif "wide2" in trial:
         print("Processing wide2")
         for pt_cfg in fit_cfg:
             pt_cfg["range"] = [max(2.10, pt_cfg["range"][0] - 0.02),
-                               min(2.47, pt_cfg["range"][1] + 0.02)]
+                               min(2.465, pt_cfg["range"][1] + 0.02)]
+    elif "wide" in trial:
+        print("Processing wide")
+        for pt_cfg in fit_cfg:
+            pt_cfg["range"] = [max(2.10, pt_cfg["range"][0] - 0.01),
+                               min(2.465, pt_cfg["range"][1] + 0.01)]
 
 
 def main():
