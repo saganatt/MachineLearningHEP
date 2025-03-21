@@ -177,7 +177,11 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
     def _roofit_mass(self, level, hist, ipt, pdfnames, param_names, fitcfg, roows = None, filename = None):
         if fitcfg is None:
             return None, None
-        res, ws, frame, residual_frame = self.fitter.fit_mass_new(hist, pdfnames, fitcfg, level, roows, True)
+        try:
+            res, ws, frame, residual_frame = self.fitter.fit_mass_new(hist, pdfnames, param_names, fitcfg, level, roows=roows, plot=True)
+        except ValueError:
+            self.logger.error(f"Could not do fitting on {level} for pt {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]}")
+            return None, None
         frame.SetTitle(f'inv. mass for p_{{T}} {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]} GeV/c')
         c = TCanvas()
 
@@ -185,7 +189,7 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
         add_text_info_fit(textInfoRight, frame, ws, param_names)
 
         textInfoLeft = create_text_info(0.12, 0.68, 0.6, 0.89)
-        if level == "data":
+        if res and level == "data":
             mean_sgn = ws.var(self.p_param_names["gauss_mean"])
             sigma_sgn = ws.var(self.p_param_names["gauss_sigma"])
             (sig, sig_err, bkg, bkg_err,
@@ -198,7 +202,7 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
         textInfoRight.Draw()
         textInfoLeft.Draw()
 
-        if res.status() == 0:
+        if res and res.status() == 0:
             self._save_canvas(c, filename)
         else:
             self.logger.warning('Invalid fit result for %s', hist.GetName())
@@ -213,7 +217,9 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
             filename = filename.replace('.png', '_residual.png')
             self._save_canvas(cres, filename)
 
-        return res, ws
+        chi = frame.chiSquare()
+
+        return res, ws, chi
 
 
     def _fit_mass(self, hist, filename = None):
@@ -291,7 +297,7 @@ class AnalyzerDhadrons_mult(Analyzer): # pylint: disable=invalid-name
                                         len(self.lpt_finbinmin), array("d", self.bins_candpt))
                     soverbhistos = TH1F("hSoverB%d" % (ibin2), "", \
                                         len(self.lpt_finbinmin), array("d", self.bins_candpt))
-                    chihistos = TH1F("hchi0", "", \
+                    chihistos = TH1F("hchi%d" % (ibin2), "", \
                                         len(self.lpt_finbinmin), array("d", self.bins_candpt))
 
                     for ipt in range(len(self.lpt_finbinmin)):
