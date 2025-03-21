@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#python run-mlhep-fitter-multitrial.py || exit 1
+python run-mlhep-fitter-multitrial.py || exit 1
 
 DIR_PATH="/data8/majak/MLHEP"
 DB_PATTERN="LcMult"
@@ -9,8 +9,8 @@ MULTITRIAL_DIR="/data8/majak/MLHEP/multitrial-mult-prompt"
 ext=".yml"
 
 BASE_DIR="/data8/majak/MLHEP/results-24022025-luigi-mult"
-DATA_HIST="LHC23pp/Results/resultsdatatot/masshisto.root",
-MC_HIST="LHC23pp_mc_tuner_mult/Results/resultsmctot/masshisto.root",
+DATA_HIST="LHC23pp_forw/Results/resultsdatatot/masshisto.root"
+MC_HIST="LHC23pp_mc_forw/Results/resultsmctot/masshisto.root"
 #"LHC24pp_mc/Results/resultsmctot/effhisto.root",
 #"LHC24pp_mc/Results/resultsmctot/efficienciesLcpKpiRun3analysis.root"
 
@@ -25,12 +25,13 @@ for db in multitrial-mult-db/* ; do
 
   ./run-lc.sh ${db} submission/analyzer.yml logfile_${db_basename}.log
 
-  cp "${BASE_DIR}/${DATA_HIST}" "${RESPATH}/${DATA_HIST}"
-  cp "${BASE_DIR}/${MC_HIST}" "${RESPATH}/${MC_HIST}"
+  #cp "${BASE_DIR}/${DATA_HIST}" "${RESPATH}/${DATA_HIST}"
+  #cp "${BASE_DIR}/${MC_HIST}" "${RESPATH}/${MC_HIST}"
 
-  #rm -rf ${RESPATH}/fig/
-  #mv fig/ ${RESPATH}/fig/
+  rm -rf ${RESPATH}/fig/
+  mv fig/ ${RESPATH}/fig/
 
-  #cp -r "${RESPATH}/fig/LcpKpi/Run3analysis/roofit/" "${MULTITRIAL_DIR}/fig${suffix}"
+  rm -rf "${MULTITRIAL_DIR}/fig${suffix}"
+  cp -r "${RESPATH}/fig/LcpKpi/Run3analysis_forward/roofit/" "${MULTITRIAL_DIR}/fig${suffix}"
 done
 
