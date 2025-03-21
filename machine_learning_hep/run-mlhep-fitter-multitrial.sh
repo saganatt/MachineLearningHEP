@@ -1,20 +1,21 @@
 #!/bin/bash
 
-python run-mlhep-fitter-multitrial.py || exit 1
-
-DIR_PATH="/data8/majak/MLHEP"
-DB_PATTERN="LcMult"
-DIR_PATTERN="results-24022025-luigi-multitrial-mult-prompt"
-MULTITRIAL_DIR="/data8/majak/MLHEP/multitrial-mult-prompt"
+DB_PATTERN="database_ml_parameters_LcToPKPi_multiclass_fdd"
+DB_DIR="data/data_run3"
+OUT_DB_DIR="multitrial-db"
 ext=".yml"
 
-BASE_DIR="/data8/majak/MLHEP/results-24022025-luigi-mult"
-DATA_HIST="LHC23pp_forw/Results/resultsdatatot/masshisto.root"
-MC_HIST="LHC23pp_mc_forw/Results/resultsmctot/masshisto.root"
-#"LHC24pp_mc/Results/resultsmctot/effhisto.root",
-#"LHC24pp_mc/Results/resultsmctot/efficienciesLcpKpiRun3analysis.root"
+DIR_PATH="/data8/majak/MLHEP"
+DIR_PATTERN="results-24022025-newtrain-multitrial-prompt"
+MULTITRIAL_DIR="/data8/majak/MLHEP/multitrial-prompt"
 
-for db in multitrial-mult-db/* ; do
+BASE_DIR="/data8/majak/MLHEP/results-24022025-newtrain-ptshape-prompt"
+DATA_HIST="LHC23pp/Results/resultsdatatot/masshisto.root"
+MC_HIST="LHC24pp_mc/Results/resultsmctot/masshisto.root"
+
+python run-mlhep-fitter-multitrial.py "${DB_PATTERN}" "${DB_DIR}" "${OUT_DB_DIR}" "${DIR_PATTERN}" || exit 1
+
+for db in ${OUT_DB_DIR}/* ; do
   db_basename=`basename ${db}`
   db_basename_no_ext=${db_basename%%${ext}}
   echo ${db_basename_no_ext}
@@ -32,6 +33,6 @@ for db in multitrial-mult-db/* ; do
   mv fig/ ${RESPATH}/fig/
 
   rm -rf "${MULTITRIAL_DIR}/fig${suffix}"
-  cp -r "${RESPATH}/fig/LcpKpi/Run3analysis_forward/roofit/" "${MULTITRIAL_DIR}/fig${suffix}"
+  cp -r "${RESPATH}/fig/LcpKpi/Run3analysis/roofit/" "${MULTITRIAL_DIR}/fig${suffix}"
 done
 

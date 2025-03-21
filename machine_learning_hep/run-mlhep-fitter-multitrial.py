@@ -6,15 +6,10 @@ usage: python3 run-mlhep-fitter-multitrial.py
 author: Maja Karwowska <mkarwowska@cern.ch>, Warsaw University of Technology
 """
 
+import argparse
 import re
 import shutil
 import yaml
-
-PERM_PATTERN="prompt"
-
-CONFIG="LcMult"
-CONFIG_EXT=f"{CONFIG}.yml"
-CONFIG_PATH=f"./{CONFIG_EXT}"
 
 SIGMA02="0.007, 0.007, 0.013"
 SIGMA23="0.007, 0.007, 0.013"
@@ -110,33 +105,35 @@ def process_trial(trial, ana_cfg, data_cfg, mc_cfg):
         print("Processing wide2")
         for pt_cfg in fit_cfg:
             pt_cfg["range"] = [max(2.10, pt_cfg["range"][0] - 0.02),
-                               min(2.465, pt_cfg["range"][1] + 0.02)]
+                               min(2.47, pt_cfg["range"][1] + 0.02)]
     elif "wide" in trial:
         print("Processing wide")
         for pt_cfg in fit_cfg:
             pt_cfg["range"] = [max(2.10, pt_cfg["range"][0] - 0.01),
-                               min(2.465, pt_cfg["range"][1] + 0.01)]
+                               min(2.47, pt_cfg["range"][1] + 0.01)]
 
 
-def main():
+def main(db, db_dir, out_db_dir, resdir_pattern):
+    db_ext=f"{db}.yml"
+    db_path=f"{db_dir}/{db_ext}"
     combinations = generate_trials(BASE_TRIALS)
 
     for comb in combinations:
         print(comb)
 
-        cur_cfg = f"multitrial-mult-db/{CONFIG}{comb}.yml"
-        shutil.copy2(CONFIG_PATH, cur_cfg)
+        cur_cfg = f"{out_db_dir}/{db}{comb}.yml"
+        shutil.copy2(db_path, cur_cfg)
 
         with open(cur_cfg, encoding="utf-8") as stream:
             cfg = yaml.safe_load(stream)
 
-        ana_cfg = cfg["LcpKpi"]["analysis"]["Run3analysis_forward"]
+        ana_cfg = cfg["LcpKpi"]["analysis"]["Run3analysis"]
         fit_cfg = ana_cfg["mass_roofit"]
         mc_cfg = [fit_params for fit_params in fit_cfg \
                     if "level" in fit_params and fit_params["level"] == "mc"]
         data_cfg = [fit_params for fit_params in fit_cfg if not "level" in fit_params]
 
-        resdir = f"results-24022025-luigi-multitrial-mult-{PERM_PATTERN}{comb}"
+        resdir = f"{resdir_pattern}{comb}"
         respath = f"/data8/majak/MLHEP/{resdir}/"
         ana_cfg["data"]["prefix_dir_res"] = respath
         ana_cfg["mc"]["prefix_dir_res"] = respath
@@ -151,4 +148,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Arguments to pass")
+    parser.add_argument("db", help="MLHEP database without extension")
+    parser.add_argument("db_dir", help="path to directory with MLHEP database")
+    parser.add_argument("out_db_dir", help="path to output directory for generated MLHEP databases")
+    parser.add_argument("resdir", help="MLHEP resdir pattern")
+    args = parser.parse_args()
+
+    main(args.db, args.db_dir, args.out_db_dir, args.resdir)
