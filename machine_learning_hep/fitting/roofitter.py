@@ -59,7 +59,7 @@ class RooFitter:
             return res
 
     # pylint: disable=too-many-branches
-    def fit_mass_new(self, hist, pdfnames, param_names, fit_spec, level, fixed_sigma, fixed_sigma_val,
+    def fit_mass_new(self, hist, pdfnames, param_names, fit_spec, level, fixed_sigma = False, fixed_sigma_val = 0,
                      roows = None, plot = False):
         print(f"fit spec:\n{fit_spec}")
         print(f'fitting for level {level} pt: {fit_spec.get("ptrange", "")}')
