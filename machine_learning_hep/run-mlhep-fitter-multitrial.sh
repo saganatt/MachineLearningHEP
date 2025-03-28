@@ -13,9 +13,9 @@ BASE_DIR="/data8/majak/MLHEP/results-24022025-newtrain-ptshape-prompt"
 DATA_HIST="LHC23pp/Results/resultsdatatot/masshisto.root"
 MC_HIST="LHC24pp_mc/Results/resultsmctot/masshisto.root"
 
-python run-mlhep-fitter-multitrial.py "${DB_PATTERN}" "${DB_DIR}" "${OUT_DB_DIR}" "${DIR_PATTERN}" || exit 1
+#python run-mlhep-fitter-multitrial.py "${DB_PATTERN}" "${DB_DIR}" "${OUT_DB_DIR}" "${DIR_PATTERN}" || exit 1
 
-for db in ${OUT_DB_DIR}/* ; do
+for db in ${OUT_DB_DIR}/*fdd.yml ; do
   db_basename=`basename ${db}`
   db_basename_no_ext=${db_basename%%${ext}}
   echo ${db_basename_no_ext}
