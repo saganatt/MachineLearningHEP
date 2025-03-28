@@ -73,14 +73,9 @@ def compute_crosssection(
         # frac_unc / frac * crosssection?
         crosssec_unc = 0.
     else:
-        crosssection = (
-            rawy
-            * frac
-            * sigma_mb
-            / (2 * delta_pt * delta_y * eff_times_acc * n_events * b_ratio)
-        )
+        crosssection = rawy * frac * sigma_mb / (2 * delta_pt * delta_y * eff_times_acc * n_events * b_ratio)
         print(f"cross section: {crosssection} frac: {frac} eff times acc {eff_times_acc} n_events: {n_events} rawy {rawy}")
-        if method_frac in ("Nb","ext"):
+        if method_frac in ("Nb", "ext"):
             crosssec_unc = rawy_unc / (rawy * frac) * crosssection
         else:
             crosssec_unc = rawy_unc / rawy * crosssection
@@ -143,37 +138,11 @@ def compute_fraction_fc(
     for i_sigma, (sigma_p, sigma_f) in enumerate(zip(cross_sec_prompt, cross_sec_fd)):
         for i_raa, (raa_p, raa_f) in enumerate(zip(raa_prompt, raa_fd)):
             if i_sigma == 0 and i_raa == 0:
-                frac_prompt_cent = 1.0 / (
-                    1 + acc_eff_fd / acc_eff_prompt * sigma_f / sigma_p * raa_f / raa_p
-                )
-                frac_fd_cent = 1.0 / (
-                    1 + acc_eff_prompt / acc_eff_fd * sigma_p / sigma_f * raa_p / raa_f
-                )
+                frac_prompt_cent = 1.0 / (1 + acc_eff_fd / acc_eff_prompt * sigma_f / sigma_p * raa_f / raa_p)
+                frac_fd_cent = 1.0 / (1 + acc_eff_prompt / acc_eff_fd * sigma_p / sigma_f * raa_p / raa_f)
             else:
-                frac_prompt.append(
-                    1.0
-                    / (
-                        1
-                        + acc_eff_fd
-                        / acc_eff_prompt
-                        * sigma_f
-                        / sigma_p
-                        * raa_f
-                        / raa_p
-                    )
-                )
-                frac_fd.append(
-                    1.0
-                    / (
-                        1
-                        + acc_eff_prompt
-                        / acc_eff_fd
-                        * sigma_p
-                        / sigma_f
-                        * raa_p
-                        / raa_f
-                    )
-                )
+                frac_prompt.append(1.0 / (1 + acc_eff_fd / acc_eff_prompt * sigma_f / sigma_p * raa_f / raa_p))
+                frac_fd.append(1.0 / (1 + acc_eff_prompt / acc_eff_fd * sigma_p / sigma_f * raa_p / raa_f))
 
     if frac_prompt and frac_fd:
         frac_prompt.sort()
@@ -237,16 +206,7 @@ def compute_fraction_nb(
             if i_sigma == 0 and i_raa_ratio == 0:
                 if raa_rat == 1.0 and taa == 1.0:  # pp
                     frac_cent = (
-                        1
-                        - sigma
-                        * delta_pt
-                        * delta_y
-                        * acc_eff_other
-                        * b_ratio
-                        * n_events
-                        * 2
-                        / rawy
-                        / sigma_mb
+                        1 - sigma * delta_pt * delta_y * acc_eff_other * b_ratio * n_events * 2 / rawy / sigma_mb
                     )
                     print(f"Nb pp fraction {i_sigma} raa ratio {i_raa_ratio} sigma {sigma} "
                           f"delta_pt {delta_pt} delta_y {delta_y} " \
@@ -270,15 +230,7 @@ def compute_fraction_nb(
                         frac_cent = 1 - raw_fd / rawy
                         raa_other_old = raa_other
                         raa_other = (
-                            frac_cent
-                            * rawy
-                            * sigma_mb
-                            / 2
-                            / acc_eff_same
-                            / delta_pt
-                            / delta_y
-                            / b_ratio
-                            / n_events
+                            frac_cent * rawy * sigma_mb / 2 / acc_eff_same / delta_pt / delta_y / b_ratio / n_events
                         )
                         delta_raa = abs((raa_other - raa_other_old) / raa_other)
             else:
@@ -296,16 +248,7 @@ def compute_fraction_nb(
                         / sigma_mb
                     )
                     frac.append(
-                        1
-                        - sigma
-                        * delta_pt
-                        * delta_y
-                        * acc_eff_other
-                        * b_ratio
-                        * n_events
-                        * 2
-                        / rawy
-                        / sigma_mb
+                        1 - sigma * delta_pt * delta_y * acc_eff_other * b_ratio * n_events * 2 / rawy / sigma_mb
                     )
                     print(f"Nb pp fraction {i_sigma} raa ratio {i_raa_ratio} sigma {sigma} "
                           f"delta_pt {delta_pt} delta_y {delta_y} " \
@@ -330,15 +273,7 @@ def compute_fraction_nb(
                         frac_tmp = 1 - raw_fd / rawy
                         raa_other_old = raa_other
                         raa_other = (
-                            frac_tmp
-                            * rawy
-                            * sigma_mb
-                            / 2
-                            / acc_eff_same
-                            / delta_pt
-                            / delta_y
-                            / b_ratio
-                            / n_events
+                            frac_tmp * rawy * sigma_mb / 2 / acc_eff_same / delta_pt / delta_y / b_ratio / n_events
                         )
                         delta_raa = abs((raa_other - raa_other_old) / raa_other)
                     frac.append(frac_tmp)
@@ -420,8 +355,6 @@ def get_hist_binlimits(histo):
         n_limits = histo.GetNbinsX() + 1
         low_edge = histo.GetBinLowEdge(1)
         bin_width = histo.GetBinWidth(1)
-        bin_limits = np.array(
-            [low_edge + i_bin * bin_width for i_bin in range(n_limits)], "d"
-        )
+        bin_limits = np.array([low_edge + i_bin * bin_width for i_bin in range(n_limits)], "d")
 
     return bin_limits

@@ -12,13 +12,20 @@
 ##   along with this program. if not, see <https://www.gnu.org/licenses/>. ##
 #############################################################################
 
+"""Definition of the RooFitter class and helper functions"""
+
 from math import sqrt, isnan
+
 import ROOT
-from ROOT import RooFit, RooArgSet, RooAbsReal, RooRealVar, RooAddPdf, RooArgList, TPaveText
+from ROOT import RooAddPdf, RooArgList, RooArgSet, RooFit, RooRealVar, TPaveText
+
+USE_EXTMODEL = True
 
 # pylint: disable=too-few-public-methods, too-many-statements
 # (temporary until we add more functionality)
 class RooFitter:
+    """Fitter using Roofit for combined fits of invariant-mass distributions"""
+
     def __init__(self):
         ROOT.gErrorIgnoreLevel = ROOT.kError
         #ROOT.RooMsgService.instance().setSilentMode(True)
@@ -28,7 +35,8 @@ class RooFitter:
     def find_best_a0(self, ws, m, dh, model, old_res, range_m = None):
         kwargs = {"Save": True,
                   "PrintLevel": -1,
-                  "Strategy": 2}
+                  "Strategy": 2,
+                  "MaxCalls": 5000}
                   #"Minimizer": "Minuit2"}
         if range_m:
             kwargs["Range"] = (range_m[0], range_m[1])
@@ -56,17 +64,21 @@ class RooFitter:
 
         if chi2 <= chi_threshold:
             print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
-            return res
+
+        return res
 
     # pylint: disable=too-many-branches
-    def fit_mass_new(self, hist, pdfnames, param_names, fit_spec, level, fixed_sigma = False, fixed_sigma_val = 0,
-                     roows = None, plot = False):
+    def fit_mass_new(
+        self, hist, pdfnames: dict, param_names: dict, fit_spec: dict, level: str,
+        fixed_sigma: bool = False, fixed_sigma_val: float = 0., roows: ROOT.RooWorkspace = None, plot: bool = False
+    ):
+        """New fit method"""
         print(f"fit spec:\n{fit_spec}")
         print(f'fitting for level {level} pt: {fit_spec.get("ptrange", "")}')
         if hist.GetEntries() == 0:
-            raise UserWarning('Cannot fit histogram with no entries')
+            raise UserWarning("Cannot fit histogram with no entries")
         ws = roows or ROOT.RooWorkspace("ws")
-        var_m = fit_spec.get('var', 'm')
+        var_m = fit_spec.get("var", "m")
 
         hist_integral = hist.Integral(*(hist.FindBin(mmass) for mmass in fit_spec.get("range")))
         if "data" in level:
@@ -77,10 +89,14 @@ class RooFitter:
         n_signal = RooRealVar("n_signal", "Number of signal events", 1000, 100, 100000000)
         n_background = RooRealVar("n_background", "Number of background events", 1000, 100, 100000000)
 
-        for comp, spec in fit_spec.get('components', {}).items():
-            fn = ws.factory(spec['fn'])
-            if comp == 'model':
+        model = None
+        for comp, spec in fit_spec.get("components", {}).items():
+            fn = ws.factory(spec["fn"])
+            if comp == "model":
                 model = fn
+        if model is None:
+            raise ValueError("model not set")
+
         m = ws.var(var_m)
         print(f"m var: {m}")
 
@@ -90,49 +106,34 @@ class RooFitter:
                 sigma_sgn.setVal(fixed_sigma_val)
                 sigma_sgn.setConstant(True)
 
-        if level == "data":
+        if level == "data" and USE_EXTMODEL:
             signal_pdf = ws.pdf(pdfnames["pdf_sig"])
             if not signal_pdf:
                 raise ValueError("sig PDF not found")
             background_pdf = ws.pdf(pdfnames["pdf_bkg"])
             if not background_pdf:
                 raise ValueError("bkg pdf not found")
+            extmodel = RooAddPdf(
+                "model", "Total model", RooArgList(signal_pdf, background_pdf), RooArgList(n_signal, n_background)
+            )
 
-            model = RooAddPdf("model",
-                              "Total model",
-                              RooArgList(signal_pdf, background_pdf),
-                              RooArgList(n_signal, n_background))
-
-        # if range_m := fit_spec.get('range'):
-        #     m.setRange(range_m[0], range_m[1])
         dh = ROOT.RooDataHist("dh", "dh", [m], Import=hist)
-        if range_m := fit_spec.get('range'):
-            #if level == "data":
-                #m.setRange("SBL", fit_spec["range"][0],
-                            #fit_spec["mass_mean"] - fit_spec["n_sigma"] * fit_spec["sigma_signal"])
-                #m.setRange("SBR",
-                            #fit_spec["mass_mean"] + fit_spec["n_sigma"] * fit_spec["sigma_signal"],
-                            #fit_spec["range"][1])
-                #m.setRange("bkg", fit_spec["mass_mean"] - 4 * fit_spec["sigma_signal"],
-                            #fit_spec["mass_mean"] + 4 * fit_spec["sigma_signal"])
-                #res = background_pdf.fitTo(dh, RooFit.Range("SBL,SBR"), Save=True, PrintLevel=-1)
-                #bkg_integral = background_pdf.createIntegral(m, RooFit.NormSet(m), RooFit.Range("bkg")).getValV()
-                #est_signal = estimate_signal(hist, fit_spec, n_background, bkg_integral)
-                #n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * est_signal, 0., 1.2 * est_signal)
-                #model = RooAddPdf("model",
-                #                  "Total model",
-                #                  RooArgList(signal_pdf, background_pdf),
-                #                  RooArgList(n_signal, n_background))
-            m.setRange('fit', *range_m)
+        if range_m := fit_spec.get("range"):
+            m.setRange("fit", *range_m)
             print(f'using fit range: {range_m}, var range: {m.getRange("fit")}')
-            res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
-            if level == "data":
-                res = self.find_best_a0(ws, m, dh, model, res, range_m)
-            # model.Print('v')
+            res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2, MaxCalls=5000)
+            res = self.find_best_a0(ws, m, dh, model, res, range_m)
+            if level == 'data' and USE_EXTMODEL:
+                for v in ws.allVars():
+                    v.setConstant(True)
+                res = self.find_best_a0(ws, m, dh, extmodel, res, range_m)
         else:
-            res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=2)
-            if level == "data":
-                res = self.find_best_a0(ws, m, dh, model, res)
+            res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=1, MaxCalls=5000)
+            res = self.find_best_a0(ws, m, dh, model, res)
+            if level == 'data' and USE_EXTMODEL:
+                for v in ws.allVars():
+                    v.setConstant(True)
+                res = self.find_best_a0(ws, m, dh, extmodel, res)
         frame = None
         residual_frame = None
         if plot:
@@ -142,24 +143,27 @@ class RooFitter:
             frame = m.frame()
             dh.plotOn(frame, ROOT.RooFit.Name("data"))
             model.plotOn(frame)
-            model.paramOn(frame, Layout=(.65,1.,.9))
+            model.paramOn(frame, Layout=(0.65, 1.0, 0.9))
             frame.getAttText().SetTextFont(42)
-            frame.getAttText().SetTextSize(.001)
-            frame.SetAxisRange(range_m[0], range_m[1], "X")
-            frame.SetAxisRange(0., frame.GetMaximum()+(frame.GetMaximum()*0.3), "Y")
+            frame.getAttText().SetTextSize(0.001)
+            if range_m:
+                frame.SetAxisRange(range_m[0], range_m[1], "X")
+            frame.SetAxisRange(0.0, frame.GetMaximum() + (frame.GetMaximum() * 0.3), "Y")
 
             try:
                 for pdf in model.pdfList():
                     pdf_name = pdf.GetName()
-                    model.plotOn(frame, ROOT.RooFit.Components(pdf),
-                                 ROOT.RooFit.Name((f"pdf_{pdf_name}")),
-                                 ROOT.RooFit.LineStyle(ROOT.ELineStyle.kDashed),
-                                 ROOT.RooFit.LineColor(ROOT.kViolet),
-                                 ROOT.RooFit.LineWidth(1))
-                    #model.SetName("bkg")
+                    model.plotOn(
+                        frame,
+                        ROOT.RooFit.Components(pdf),
+                        ROOT.RooFit.Name(f"pdf_{pdf_name}"),
+                        ROOT.RooFit.LineStyle(ROOT.ELineStyle.kDashed),
+                        ROOT.RooFit.LineColor(ROOT.kViolet),
+                        ROOT.RooFit.LineWidth(1),
+                    )
+                    # model.SetName("bkg")
                 model.plotOn(frame, ROOT.RooFit.Name("model"))
-            # pylint: disable=bare-except
-            except:
+            except:  # pylint: disable=bare-except  # noqa: E722
                 pass
             # for comp in fit_spec.get('components', {}):
             #     if comp != 'model':
@@ -168,7 +172,7 @@ class RooFitter:
             # c.Modified()
             # c.Update()
 
-        if level == "data":
+        if level == "data" and USE_EXTMODEL and frame is not None:
             residuals = frame.residHist("data", "pdf_bkg")
             residual_frame = m.frame()
             residual_frame.addPlotable(residuals, "P")
@@ -179,23 +183,30 @@ class RooFitter:
             signal_pdf_ext.plotOn(
                 residual_frame,
                 ROOT.RooFit.LineColor(ROOT.kBlue),
-                ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected))
+                ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected),
+            )
 
-            residual_frame.SetAxisRange(range_m[0], range_m[1], "X")
+            if range_m:
+                residual_frame.SetAxisRange(range_m[0], range_m[1], "X")
             residual_frame.SetYTitle("Residuals")
 
         return (res, ws, frame, residual_frame, dh, model)
 
-
-    def fit_mass(self, hist, fit_spec, plot = False):
+    def fit_mass(self, hist, fit_spec, plot=False):
+        """Old fit method"""
         if hist.GetEntries() == 0:
-            raise UserWarning('Cannot fit histogram with no entries')
+            raise UserWarning("Cannot fit histogram with no entries")
         ws = ROOT.RooWorkspace("ws")
-        for comp, spec in fit_spec.get('components', {}).items():
-            ws.factory(spec['fn'])
-            if comp == 'sum':
+
+        model = None
+        for comp, spec in fit_spec.get("components", {}).items():
+            ws.factory(spec["fn"])
+            if comp == "sum":
                 model = ws.pdf(comp)
-        m = ws.var('m')
+        if model is None:
+            raise ValueError("model not set")
+
+        m = ws.var("m")
         # m.setRange('full', 0., 3.)
         dh = ROOT.RooDataHist("dh", "dh", [m], Import=hist)
         # model = ws.pdf('sum')
@@ -203,13 +214,12 @@ class RooFitter:
         res = model.fitTo(dh, Save=True, PrintLevel=-1)
         frame = m.frame() if plot else None
         if plot:
-            dh.plotOn(frame) #, ROOT.RooFit.Range(0., 3.))
+            dh.plotOn(frame)  # , ROOT.RooFit.Range(0., 3.))
             model.plotOn(frame)
             model.paramOn(frame)
-            for comp in fit_spec.get('components', {}):
-                if comp != 'sum':
-                    model.plotOn(frame, ROOT.RooFit.Components(comp),
-                                 ROOT.RooFit.LineStyle(ROOT.ELineStyle.kDashed))
+            for comp in fit_spec.get("components", {}):
+                if comp != "sum":
+                    model.plotOn(frame, ROOT.RooFit.Components(comp), ROOT.RooFit.LineStyle(ROOT.ELineStyle.kDashed))
         return (res, ws, frame)
 
 
@@ -227,6 +237,9 @@ def calculate_background(n_bkg, bkg_integral):
     return n_bkg.getVal() * bkg_integral
 
 def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
+    """Calculate significance, signal, background, signal/background ratio."""
+    if not USE_EXTMODEL:
+        return (0., 0., 0., 0., 0., 0, 0, 0.)
     f_sig = roows.pdf(pdfnames["pdf_sig"])
     n_signal = res.floatParsFinal().find("n_signal").getVal()
     sigma_n_signal = res.floatParsFinal().find("n_signal").getError()
@@ -241,9 +254,7 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
     sigma_n_bkg = res.floatParsFinal().find("n_background").getError()
 
     massvar = roows.var(param_names["mass"])
-    massvar.setRange("signal",
-                     mean_sgn.getVal() - 3 * sigma_sgn.getVal(),
-                     mean_sgn.getVal() + 3 * sigma_sgn.getVal())
+    massvar.setRange("signal", mean_sgn.getVal() - 3 * sigma_sgn.getVal(), mean_sgn.getVal() + 3 * sigma_sgn.getVal())
 
     massvar_set = RooArgSet(massvar)
     norm_set = RooFit.NormSet(massvar_set)
@@ -265,10 +276,10 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
     sigma_signal_integral = signal_integral.getPropagatedError(res)
     sigma_bkg_integral = bkg_integral.getPropagatedError(res)
 
-    sigma_n_signal_signal = sqrt((signal_integral.getVal() * sigma_n_signal) ** 2 +
-                                 (n_signal * sigma_signal_integral) ** 2)
-    sigma_n_bkg_signal = sqrt((bkg_integral.getVal() * sigma_n_bkg) ** 2 +
-                              (n_bkg * sigma_bkg_integral) ** 2)
+    sigma_n_signal_signal = sqrt(
+        (signal_integral.getVal() * sigma_n_signal) ** 2 + (n_signal * sigma_signal_integral) ** 2
+    )
+    sigma_n_bkg_signal = sqrt((bkg_integral.getVal() * sigma_n_bkg) ** 2 + (n_bkg * sigma_bkg_integral) ** 2)
 
     if n_signal_signal + n_bkg_signal == 0.:
         dS_dS = 0.0
@@ -294,13 +305,20 @@ def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
                 s_over_b * sqrt((sigma_n_signal_signal / n_signal_signal) ** 2 +
                                 (sigma_n_bkg_signal / n_bkg_signal) ** 2))
 
-    return (n_signal_signal, sigma_n_signal_signal,
-            n_bkg_signal, sigma_n_bkg_signal,
-            significance, significance_err,
-            s_over_b, s_over_b_err)
+    return (
+        n_signal_signal,
+        sigma_n_signal_signal,
+        n_bkg_signal,
+        sigma_n_bkg_signal,
+        significance,
+        significance_err,
+        s_over_b,
+        s_over_b_err,
+    )
 
 
 def create_text_info(x_1, y_1, x_2, y_2):
+    """Create an info box for fit plots and set its style."""
     text_info = TPaveText(x_1, y_1, x_2, y_2, "NDC")
     text_info.SetBorderSize(0)
     text_info.SetFillColor(0)  # Transparent fill
@@ -312,7 +330,9 @@ def create_text_info(x_1, y_1, x_2, y_2):
 
     return text_info
 
+
 def add_text_info_fit(text_info, frame, roows, param_names):
+    """Add fit info on the info box."""
     chi2 = frame.chiSquare()
     mean_sgn = roows.var(param_names["gauss_mean"])
     sigma_sgn = roows.var(param_names["gauss_sigma"])
@@ -325,10 +345,18 @@ def add_text_info_fit(text_info, frame, roows, param_names):
         text_info.AddText(f"#sigma wide = {sigmawide_sgn.getVal():.4f} #pm {sigmawide_sgn.getError():.4f}")
     if refl_frac:
         text_info.AddText(f"refl.frac. = {refl_frac.getVal():.4f} #pm {refl_frac.getError():.4f}")
+    if a0 := roows.var("a0"):
+        text_info.AddText(f"a0 = {a0.getVal():.3f} #pm {a0.getError():.3f}")
+    if a1 := roows.var("a1"):
+        text_info.AddText(f"a1 = {a1.getVal():.3f} #pm {a1.getError():.3f}")
+    if a2 := roows.var("a2"):
+        text_info.AddText(f"a2 = {a2.getVal():.3f} #pm {a2.getError():.3f}")
+    if offset := roows.var("offset"):
+        text_info.AddText(f"offset = {offset.getVal():.3f} #pm {offset.getError():.3f}")
 
 
 def add_text_info_perf(text_info, sig, sig_err, bkg, bkg_err, s_over_b, s_over_b_err, signif, signif_err):
-
+    """Add signal, background, signal/background and significance on the info box."""
     text_info.AddText(f"S(3#sigma) = {sig:.0f} #pm {sig_err:.0f}")
     text_info.AddText(f"B(3#sigma) = {bkg:.0f} #pm {bkg_err:.0f}")
     text_info.AddText(f"S/B(3#sigma) = {s_over_b:.3f} #pm {s_over_b_err:.3f}")

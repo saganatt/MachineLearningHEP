@@ -15,22 +15,26 @@
 """
 Methods to: utility methods to conpute efficiency and study expected significance
 """
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import LogNorm
 from ROOT import TH1F, TFile  # pylint: disable=import-error,no-name-in-module
+
 from machine_learning_hep.logger import get_logger
+
 
 def select_by_threshold(df_label, label, thr, name):
     # Changed from >= to > since we use that atm for the nominal selection
     # See processer.py self.l_selml
     label = label.replace("-", "_")
     if label == "bkg":
-        return df_label[df_label[f'y_test_prob{name}{label}'].values <= thr]
+        return df_label[df_label[f"y_test_prob{name}{label}"].values <= thr]
     if label == "":
-        return df_label[df_label[f'y_test_prob{name}{label}'].values > thr]
-    return df_label[df_label[f'y_test_prob{name}{label}'].values >= thr]
+        return df_label[df_label[f"y_test_prob{name}{label}"].values > thr]
+    return df_label[df_label[f"y_test_prob{name}{label}"].values >= thr]
+
 
 def get_x_axis(num_steps):
     ns_left = int(num_steps / 10) - 1
@@ -68,17 +72,17 @@ def calc_bkg(df_bkg, name, threshold_args, num_steps, fit_region, bkg_func, bin_
         logger.debug("Saving bkg fits to file")
         pt_min = pt_lims[0]
         pt_max = pt_lims[1]
-        out_file = TFile(f'{out_dir}/bkg_fits_{name}_pt{pt_min:.1f}_{pt_max:.1f}.root', 'recreate')
+        out_file = TFile(f"{out_dir}/bkg_fits_{name}_pt{pt_min:.1f}_{pt_max:.1f}.root", "recreate")
         out_file.cd()
 
-    def bkg_for_threshold(sel_mass_array, thr, thr2):
+    def bkg_for_threshold(sel_mass_array, thr, thr2 = ""):
         hmass = TH1F(f'hmass_{thr:.5f}_{thr2:.5f}', '', num_bins, fit_region[0], fit_region[1])
         bkg = 0.
         bkg_err = 0.
         if len(sel_mass_array) > 5:
             for mass_value in np.nditer(sel_mass_array):
                 hmass.Fill(mass_value)
-            fit = hmass.Fit(bkg_func, 'Q', '', fit_region[0], fit_region[1])
+            fit = hmass.Fit(bkg_func, "Q", "", fit_region[0], fit_region[1])
             if save_fit:
                 hmass.Write()
             if int(fit) == 0:
@@ -105,13 +109,12 @@ def calc_bkg(df_bkg, name, threshold_args, num_steps, fit_region, bkg_func, bin_
                 bkg_err_array.append(bkg_err)
         else:
             sel_mass_array = df_bkg_sel[invmassvar].values
-            bkg, bkg_err = bkg_for_threshold(sel_mass_array)
+            bkg, bkg_err = bkg_for_threshold(sel_mass_array, thr)
             bkg_array.append(bkg)
             bkg_err_array.append(bkg_err)
 
     out_file.Close()
     return bkg_array, bkg_err_array, x_axis, y_axis
-
 
 def calc_signif(sig_array, sig_err_array, bkg_array, bkg_err_array):
     """
@@ -122,8 +125,8 @@ def calc_signif(sig_array, sig_err_array, bkg_array, bkg_err_array):
     signif_err_array = []
 
     for sig, bkg, sig_err, bkg_err in zip(sig_array, bkg_array, sig_err_array, bkg_err_array):
-        signif = 0.
-        signif_err = 0.
+        signif = 0.0
+        signif_err = 0.0
 
         if sig > 0 and (sig + bkg) > 0:
             signif = sig / np.sqrt(sig + bkg)
@@ -131,7 +134,7 @@ def calc_signif(sig_array, sig_err_array, bkg_array, bkg_err_array):
                          (bkg / (sig + bkg)) * sig_err**2 / sig**2)
             print(f"significance > 0: {signif}")
         else:
-            print(f"significance 0")
+            print("significance 0")
 
         signif_array.append(signif)
         signif_err_array.append(signif_err)
