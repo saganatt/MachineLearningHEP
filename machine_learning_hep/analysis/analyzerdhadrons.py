@@ -224,7 +224,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
             filename = filename.replace(".png", "_invalid.png")
             self._save_canvas(c, filename)
 
-        if level == "data":
+        if level == "data" and residual_frame:
             residual_frame.SetTitle(
                 f"inv. mass for p_{{T}} {self.bins_candpt[ipt]} - {self.bins_candpt[ipt + 1]} GeV/c"
             )
@@ -315,7 +315,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                     self.logger.debug("fitting %s - %i", level, ipt)
                     roows = self.roows.get(ipt)
                     if self.mltype == "MultiClassification":
-                        suffix = "%s%d_%d_%.2f%.2f%.2f" % (
+                        suffix = "%s%d_%d_%.2f%.2f%.3f" % (
                             self.v_var_binning,
                             self.lpt_finbinmin[ipt],
                             self.lpt_finbinmax[ipt],
@@ -411,29 +411,28 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                                 (sig, sig_err, _, _,
                                     signif, signif_err, s_over_b, s_over_b_err
                                 ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, self.p_param_names, mean_sgn, sigma_sgn)
-                                if roo_res.status() == 0:
-                                    fileout.cd()
-                                    one = RooConstVar("one", "constant 1.0", 1.0)
-                                    bkg_pdf = roo_ws.pdf(self.p_pdfnames["pdf_bkg"])
-                                    sig_pdf = roo_ws.pdf(self.p_pdfnames["pdf_sig"])
-                                    if not model:
-                                        self.logger.info("Model is null")
-                                    for pdf, outlabel in zip((bkg_pdf, sig_pdf, model), ("bkg", "sgn", "total")):
-                                        if not pdf:
-                                            self.logger.info("Pdf null")
-                                            continue
-                                        self.logger.info("Pdf %s", pdf)
-                                        obs = pdf.getObservables(dh)
-                                        self.logger.info("Observables %s", obs)
-                                        params = pdf.getParameters(dh)
-                                        self.logger.info("Parameters %s", params)
-                                        fit_func = pdf.asTF(obs, params, RooArgSet(one))
-                                        self.logger.info("TF fit func %s", fit_func)
-                                        #fit_func.Write(f"{outlabel}TF_{ptrange[0]:.0f}_{ptrange[1]:.0f}")
-                                        self.logger.info("Wrote TF func")
+                                fileout.cd()
+                                one = RooConstVar("one", "constant 1.0", 1.0)
+                                bkg_pdf = roo_ws.pdf(self.p_pdfnames["pdf_bkg"])
+                                sig_pdf = roo_ws.pdf(self.p_pdfnames["pdf_sig"])
+                                if not model:
+                                    self.logger.info("Model is null")
+                                for pdf, outlabel in zip((bkg_pdf, sig_pdf, model), ("bkg", "sgn", "total")):
+                                    if not pdf:
+                                        self.logger.info("Pdf null")
+                                        continue
+                                    self.logger.info("Pdf %s", pdf)
+                                    obs = pdf.getObservables(dh)
+                                    self.logger.info("Observables %s", obs)
+                                    params = pdf.getParameters(dh)
+                                    self.logger.info("Parameters %s", params)
+                                    fit_func = pdf.asTF(obs, params, RooArgSet(one))
+                                    self.logger.info("TF fit func %s", fit_func)
+                                    fit_func.Write(f"{outlabel}TF_{ptrange[0]:.0f}_{ptrange[1]:.0f}")
+                                    self.logger.info("Wrote TF func")
 
-                                    #h_invmass.Write(f"hmass_{ipt}")
-                                    #self.logger.info("Wrote hist mass")
+                                h_invmass.Write(f"hmass_{ipt}")
+                                self.logger.info("Wrote hist mass")
                             else:
                                 sig = sig_err = signif = signif_err = s_over_b = s_over_b_err = 0.0
 

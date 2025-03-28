@@ -19,7 +19,7 @@ from math import sqrt, isnan
 import ROOT
 from ROOT import RooAddPdf, RooArgList, RooArgSet, RooFit, RooRealVar, TPaveText
 
-USE_EXTMODEL = True
+USE_EXTMODEL = False
 
 # pylint: disable=too-few-public-methods, too-many-statements
 # (temporary until we add more functionality)
@@ -35,8 +35,8 @@ class RooFitter:
     def find_best_a0(self, ws, m, dh, model, old_res, range_m = None):
         kwargs = {"Save": True,
                   "PrintLevel": -1,
-                  "Strategy": 2,
-                  "MaxCalls": 5000}
+                  "Strategy": 2}
+                  #"MaxCalls": 5000}
                   #"Minimizer": "Minuit2"}
         if range_m:
             kwargs["Range"] = (range_m[0], range_m[1])
@@ -65,7 +65,7 @@ class RooFitter:
         if chi2 <= chi_threshold:
             print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
 
-        return res
+        return res, model
 
     # pylint: disable=too-many-branches
     def fit_mass_new(
@@ -106,14 +106,14 @@ class RooFitter:
                 sigma_sgn.setVal(fixed_sigma_val)
                 sigma_sgn.setConstant(True)
 
-        if level == "data" and USE_EXTMODEL:
+        if level == "data":
             signal_pdf = ws.pdf(pdfnames["pdf_sig"])
             if not signal_pdf:
                 raise ValueError("sig PDF not found")
             background_pdf = ws.pdf(pdfnames["pdf_bkg"])
             if not background_pdf:
                 raise ValueError("bkg pdf not found")
-            extmodel = RooAddPdf(
+            model = RooAddPdf(
                 "model", "Total model", RooArgList(signal_pdf, background_pdf), RooArgList(n_signal, n_background)
             )
 
@@ -121,19 +121,25 @@ class RooFitter:
         if range_m := fit_spec.get("range"):
             m.setRange("fit", *range_m)
             print(f'using fit range: {range_m}, var range: {m.getRange("fit")}')
-            res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2, MaxCalls=5000)
-            res = self.find_best_a0(ws, m, dh, model, res, range_m)
-            if level == 'data' and USE_EXTMODEL:
-                for v in ws.allVars():
-                    v.setConstant(True)
-                res = self.find_best_a0(ws, m, dh, extmodel, res, range_m)
+            res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
+            ret_model = model
+            #if level == "data" and USE_EXTMODEL:
+            #    for v in ws.allVars():
+            #        v.setConstant(True)
+            #    res, ret_model = self.find_best_a0(ws, m, dh, extmodel, res, range_m)
+            #elif
+            if level == "data":
+                res, ret_model = self.find_best_a0(ws, m, dh, model, res, range_m)
         else:
-            res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=1, MaxCalls=5000)
-            res = self.find_best_a0(ws, m, dh, model, res)
-            if level == 'data' and USE_EXTMODEL:
-                for v in ws.allVars():
-                    v.setConstant(True)
-                res = self.find_best_a0(ws, m, dh, extmodel, res)
+            res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=2)
+            ret_model = model
+            #if level == "data" and USE_EXTMODEL:
+            #    for v in ws.allVars():
+            #        v.setConstant(True)
+            #    res, ret_model = self.find_best_a0(ws, m, dh, extmodel, res)
+            #elif
+            if level == "data":
+                res, ret_model = self.find_best_a0(ws, m, dh, model, res)
         frame = None
         residual_frame = None
         if plot:
@@ -142,8 +148,8 @@ class RooFitter:
             c.cd()
             frame = m.frame()
             dh.plotOn(frame, ROOT.RooFit.Name("data"))
-            model.plotOn(frame)
-            model.paramOn(frame, Layout=(0.65, 1.0, 0.9))
+            ret_model.plotOn(frame)
+            ret_model.paramOn(frame, Layout=(0.65, 1.0, 0.9))
             frame.getAttText().SetTextFont(42)
             frame.getAttText().SetTextSize(0.001)
             if range_m:
@@ -151,9 +157,9 @@ class RooFitter:
             frame.SetAxisRange(0.0, frame.GetMaximum() + (frame.GetMaximum() * 0.3), "Y")
 
             try:
-                for pdf in model.pdfList():
+                for pdf in ret_model.pdfList():
                     pdf_name = pdf.GetName()
-                    model.plotOn(
+                    ret_model.plotOn(
                         frame,
                         ROOT.RooFit.Components(pdf),
                         ROOT.RooFit.Name(f"pdf_{pdf_name}"),
@@ -162,7 +168,7 @@ class RooFitter:
                         ROOT.RooFit.LineWidth(1),
                     )
                     # model.SetName("bkg")
-                model.plotOn(frame, ROOT.RooFit.Name("model"))
+                ret_model.plotOn(frame, ROOT.RooFit.Name("model"))
             except:  # pylint: disable=bare-except  # noqa: E722
                 pass
             # for comp in fit_spec.get('components', {}):
@@ -172,7 +178,7 @@ class RooFitter:
             # c.Modified()
             # c.Update()
 
-        if level == "data" and USE_EXTMODEL and frame is not None:
+        if level == "data": #and USE_EXTMODEL and frame is not None:
             residuals = frame.residHist("data", "pdf_bkg")
             residual_frame = m.frame()
             residual_frame.addPlotable(residuals, "P")
@@ -190,7 +196,7 @@ class RooFitter:
                 residual_frame.SetAxisRange(range_m[0], range_m[1], "X")
             residual_frame.SetYTitle("Residuals")
 
-        return (res, ws, frame, residual_frame, dh, model)
+        return (res, ws, frame, residual_frame, dh, ret_model)
 
     def fit_mass(self, hist, fit_spec, plot=False):
         """Old fit method"""
@@ -238,8 +244,8 @@ def calculate_background(n_bkg, bkg_integral):
 
 def calc_signif(roows, res, pdfnames, param_names, mean_sgn, sigma_sgn):
     """Calculate significance, signal, background, signal/background ratio."""
-    if not USE_EXTMODEL:
-        return (0., 0., 0., 0., 0., 0, 0, 0.)
+    #if not USE_EXTMODEL:
+    #    return (0., 0., 0., 0., 0., 0, 0, 0.)
     f_sig = roows.pdf(pdfnames["pdf_sig"])
     n_signal = res.floatParsFinal().find("n_signal").getVal()
     sigma_n_signal = res.floatParsFinal().find("n_signal").getError()
