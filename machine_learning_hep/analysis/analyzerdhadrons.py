@@ -27,6 +27,7 @@ from ROOT import gStyle, TLegend, TLine, TText, TPaveText, TArrow
 from ROOT import gROOT, TDirectory, TPaveLabel
 from ROOT import gInterpreter, gPad
 from ROOT import kBlue, kCyan
+from ROOT import RooConstVar, RooArgSet
 from machine_learning_hep.fitting.roofitter import RooFitter, calc_signif
 from machine_learning_hep.fitting.roofitter import create_text_info, add_text_info_fit, add_text_info_perf
 # HF specific imports
@@ -165,12 +166,14 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
     def _roofit_mass(self, level, hist, ipt, pdfnames, param_names, fitcfg, fixed_sigma, fixed_sigma_val, # pylint: disable=too-many-arguments
                      roows = None, filename = None):
         if fitcfg is None:
-            return None, None
+            return None, None, None, None, None
         try:
-            res, ws, frame, residual_frame = self.fitter.fit_mass_new(hist, pdfnames, param_names, fitcfg, level,
-                                                                      fixed_sigma, fixed_sigma_val, roows, True)
+            res, ws, frame, residual_frame, data_hist, model = self.fitter.fit_mass_new(hist, pdfnames, param_names,
+                                                                                       fitcfg, level,
+                                                                                       fixed_sigma, fixed_sigma_val,
+                                                                                       roows, True)
         except ValueError:
-            self.logger.error(f"Could not do fitting on {level} for pt {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]}")
+            self.logger.error("Could not do fitting on %s {level} for pt %d - %d", level, self.bins_candpt[ipt], self.bins_candpt[ipt+1])
             return None, None
         frame.SetTitle(f'inv. mass for p_{{T}} {self.bins_candpt[ipt]} - {self.bins_candpt[ipt+1]} GeV/c')
         c = TCanvas()
@@ -209,7 +212,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         chi = frame.chiSquare()
 
-        return res, ws, chi
+        return res, ws, chi, data_hist, model
 
 
     def _fit_mass(self, hist, filename = None):
@@ -274,7 +277,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
             fileout_name = self.make_file_path(self.d_resultsallpdata, self.yields_filename, "root",
                                            None, [self.case, self.typean])
-            fileout = TFile(fileout_name, "RECREATE")
+            #fileout = TFile(fileout_name, "RECREATE")
 
             yieldshistos = TH1F("hyields0", "", \
                                 len(self.lpt_finbinmin), array("d", self.bins_candpt))
@@ -289,7 +292,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
             chihistos = TH1F("hchi0", "", \
                                 len(self.lpt_finbinmin), array("d", self.bins_candpt))
 
-            with TFile(rfilename) as rfile:
+            with TFile(rfilename) as rfile, TFile(fileout_name, "RECREATE") as fileout:
                 for ipt in range(len(self.lpt_finbinmin)):
                     self.logger.debug('fitting %s - %i', level, ipt)
                     roows = self.roows.get(ipt)
@@ -302,6 +305,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                         suffix = "%s%d_%d_%.2f" % \
                          (self.v_var_binning, self.lpt_finbinmin[ipt],
                           self.lpt_finbinmax[ipt], self.lpt_probcutfin[ipt])
+                    rfile.cd()
                     h_invmass = rfile.Get('hmass' + suffix)
                     # Rebin
                     self.logger.info("suffix: %s ipt %d", suffix, ipt)
@@ -344,7 +348,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                                 roows.var(fixpar).setConstant(True)
                         if h_invmass.GetEntries() == 0:
                             continue
-                        roo_res, roo_ws, chi = self._roofit_mass(
+                        roo_res, roo_ws, chi, dh, model = self._roofit_mass(
                             level, h_invmass, ipt, self.p_pdfnames, self.p_param_names, fitcfg,
                             self.p_fixed_sigma[ipt], self.p_fixed_sigma_val[ipt],
                             roows,
@@ -373,6 +377,29 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                                 (sig, sig_err, _, _,
                                     signif, signif_err, s_over_b, s_over_b_err
                                 ) = calc_signif(roo_ws, roo_res, self.p_pdfnames, self.p_param_names, mean_sgn, sigma_sgn)
+                                if roo_res.status() == 0:
+                                    fileout.cd()
+                                    one = RooConstVar("one", "constant 1.0", 1.0)
+                                    bkg_pdf = roo_ws.pdf(self.p_pdfnames["pdf_bkg"])
+                                    sig_pdf = roo_ws.pdf(self.p_pdfnames["pdf_sig"])
+                                    if not model:
+                                        self.logger.info("Model is null")
+                                    for pdf, outlabel in zip((bkg_pdf, sig_pdf, model), ("bkg", "sgn", "total")):
+                                        if not pdf:
+                                            self.logger.info("Pdf null")
+                                            continue
+                                        self.logger.info("Pdf %s", pdf)
+                                        obs = pdf.getObservables(dh)
+                                        self.logger.info("Observables %s", obs)
+                                        params = pdf.getParameters(dh)
+                                        self.logger.info("Parameters %s", params)
+                                        fit_func = pdf.asTF(obs, params, RooArgSet(one))
+                                        self.logger.info("TF fit func %s", fit_func)
+                                        #fit_func.Write(f"{outlabel}TF_{ptrange[0]:.0f}_{ptrange[1]:.0f}")
+                                        self.logger.info("Wrote TF func")
+
+                                    #h_invmass.Write(f"hmass_{ipt}")
+                                    #self.logger.info("Wrote hist mass")
                             else:
                                 sig = sig_err = signif = signif_err = s_over_b = s_over_b_err = 0.0
 
@@ -395,7 +422,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
                 signifhistos.Write()
                 soverbhistos.Write()
                 chihistos.Write()
-            fileout.Close()
+            #fileout.Close()
 
     def yield_syst(self):
         # Enable ROOT batch mode and reset in the end
