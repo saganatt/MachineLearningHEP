@@ -29,10 +29,10 @@ for db in ${OUT_DB_DIR}/*fdd.yml ; do
   #cp "${BASE_DIR}/${DATA_HIST}" "${RESPATH}/${DATA_HIST}"
   #cp "${BASE_DIR}/${MC_HIST}" "${RESPATH}/${MC_HIST}"
 
-  rm -rf ${RESPATH}/fig/
-  mv fig/ ${RESPATH}/fig/
+  #rm -rf ${RESPATH}/fig/
+  #mv fig/ ${RESPATH}/fig/
 
-  rm -rf "${MULTITRIAL_DIR}/fig${suffix}"
-  cp -r "${RESPATH}/fig/LcpKpi/Run3analysis/roofit/" "${MULTITRIAL_DIR}/fig${suffix}"
+  #rm -rf "${MULTITRIAL_DIR}/fig${suffix}"
+  #cp -r "${RESPATH}/fig/LcpKpi/Run3analysis/roofit/" "${MULTITRIAL_DIR}/fig${suffix}"
 done
 
