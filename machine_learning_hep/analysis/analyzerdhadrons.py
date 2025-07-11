@@ -29,18 +29,9 @@ from ROOT import (
     TF1,
     TH1,
     TH1F,
-    TH2F,
-    TArrow,
     TCanvas,
-    TDirectory,
     TFile,
     TLegend,
-    TLine,
-    TPad,
-    TPaveLabel,
-    TPaveText,
-    TText,
-    gInterpreter,
     gPad,
     gROOT,
     gStyle,
@@ -135,7 +126,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         self.fit_func_bkg = {}
         self.fit_range = {}
 
-        self.path_fig = Path(f'{os.path.expandvars(self.d_resultsallpdata)}/fig')
+        self.path_fig = Path(f"{os.path.expandvars(self.d_resultsallpdata)}/fig")
         for folder in ["qa", "fit", "roofit", "sideband", "signalextr", "fd", "uf"]:
             (self.path_fig / folder).mkdir(parents=True, exist_ok=True)
 
@@ -167,7 +158,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
     # region helpers
     def _save_canvas(self, canvas, filename):
         # folder = self.d_resultsallpmc if mcordata == 'mc' else self.d_resultsallpdata
-        canvas.SaveAs(f'{self.path_fig}/{filename}')
+        canvas.SaveAs(f"{self.path_fig}/{filename}")
 
     def _save_hist(self, hist, filename, option=""):
         if not hist:
@@ -355,12 +346,10 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
                     if self.cfg("mass_roofit"):
                         for entry in self.cfg("mass_roofit", []):
-                            if lvl := entry.get("level"):
-                                if lvl != level:
-                                    continue
-                            if ptspec := entry.get("ptrange"):
-                                if ptspec[0] > ptrange[0] or ptspec[1] < ptrange[1]:
-                                    continue
+                            if (lvl := entry.get("level")) and lvl != level:
+                                continue
+                            if (ptspec := entry.get("ptrange")) and (ptspec[0] > ptrange[0] or ptspec[1] < ptrange[1]):
+                                continue
                             fitcfg = entry
                             break
                         self.logger.debug("Using fit config for %i: %s", ipt, fitcfg)
@@ -645,9 +634,9 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
             nameyield,
             selnorm,
             self.p_sigmamb,
+            self.p_crosssec_prompt,
             output_prompt,
             fileoutcross,
-            self.p_crosssec_prompt,
         )
 
         fileoutcrosstot = TFile.Open(f"{self.d_resultsallpdata}/finalcross{self.case}{self.typean}tot{ptshape}.root", "recreate")

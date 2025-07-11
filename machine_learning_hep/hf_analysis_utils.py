@@ -16,7 +16,7 @@
 file: hf_analysis_utils.py
 brief: script with miscellanea utils methods for the HF analyses
 author: Fabrizio Grosa <fabrizio.grosa@cern.ch>, CERN
-Macro committed and manteined in O2Physics:
+Macro committed and mantained in O2Physics:
 https://github.com/AliceO2Group/O2Physics/tree/master/PWGHF/D2H/Macros
 """
 
@@ -62,19 +62,13 @@ def compute_crosssection(
     if rawy <= 0:
         crosssection = -9999
         crosssec_unc = -1
-        print(f"cross section: {crosssection} frac: {frac} eff times acc {eff_times_acc} n_events: {n_events} rawy {rawy}")
     elif method_frac == "dd_N":
-        crosssection = (
-            frac
-            * sigma_mb
-            / (2 * delta_pt * delta_y * n_events * b_ratio)
-        )
+        crosssection = frac * sigma_mb / (2 * delta_pt * delta_y * n_events * b_ratio)
         # TODO: How to calculate the uncertainty?
         # frac_unc / frac * crosssection?
-        crosssec_unc = 0.
+        crosssec_unc = 0.0
     else:
         crosssection = rawy * frac * sigma_mb / (2 * delta_pt * delta_y * eff_times_acc * n_events * b_ratio)
-        print(f"cross section: {crosssection} frac: {frac} eff times acc {eff_times_acc} n_events: {n_events} rawy {rawy}")
         if method_frac in ("Nb", "ext"):
             crosssec_unc = rawy_unc / (rawy * frac) * crosssection
         else:
@@ -135,8 +129,8 @@ def compute_fraction_fc(
         frac_fd = [frac_fd_cent, frac_fd_cent, frac_fd_cent]
         return frac_prompt, frac_fd
 
-    for i_sigma, (sigma_p, sigma_f) in enumerate(zip(cross_sec_prompt, cross_sec_fd)):
-        for i_raa, (raa_p, raa_f) in enumerate(zip(raa_prompt, raa_fd)):
+    for i_sigma, (sigma_p, sigma_f) in enumerate(zip(cross_sec_prompt, cross_sec_fd, strict=False)):
+        for i_raa, (raa_p, raa_f) in enumerate(zip(raa_prompt, raa_fd, strict=False)):
             if i_sigma == 0 and i_raa == 0:
                 frac_prompt_cent = 1.0 / (1 + acc_eff_fd / acc_eff_prompt * sigma_f / sigma_p * raa_f / raa_p)
                 frac_fd_cent = 1.0 / (1 + acc_eff_prompt / acc_eff_fd * sigma_p / sigma_f * raa_p / raa_f)
@@ -321,17 +315,15 @@ def compute_fraction_dd(
     yield_times_acceff_same = corryields_same * acc_eff_same
     yield_times_acceff_other = corryields_other * acc_eff_other
     frac_v = yield_times_acceff_same / (yield_times_acceff_same + yield_times_acceff_other)
-    print(f"same yield times acceff: {yield_times_acceff_same} " \
-          f"other {yield_times_acceff_other} final frac: {frac_v}")
 
     denom = (yield_times_acceff_same + yield_times_acceff_other) ** 2
-    der_same_same = (acc_eff_same * (yield_times_acceff_same + yield_times_acceff_other) - \
-                   acc_eff_same**2 * corryields_same) / denom
+    der_same_same = (
+        acc_eff_same * (yield_times_acceff_same + yield_times_acceff_other) - acc_eff_same**2 * corryields_same
+    ) / denom
     der_same_other = -acc_eff_same * acc_eff_other * corryields_same / denom
-    unc = np.sqrt(der_same_same**2 * cov_same + der_same_other**2 * cov_other + \
-                  2 * der_same_same * der_same_other * cov_comb)
-    print(f"denom {denom} der_same_same {der_same_same} der_same_other {der_same_other} " \
-          f"cov same {cov_same} cov other {cov_other} cov comb {cov_comb} final unc {unc}")
+    unc = np.sqrt(
+        der_same_same**2 * cov_same + der_same_other**2 * cov_other + 2 * der_same_same * der_same_other * cov_comb
+    )
 
     return [frac_v, frac_v - unc, frac_v + unc]
 
