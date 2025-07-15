@@ -24,7 +24,6 @@ import os
 import pickle
 import sys
 import time
-import uproot
 from array import array
 from datetime import datetime
 
