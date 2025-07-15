@@ -578,17 +578,15 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         histonorm = TH1F("histonorm", "histonorm", 1, 0, 1)
 
-        if self.p_nevents is None:
+        if self.p_nevents is not None:
+            selnorm = self.p_nevents
+        else:
             filemass = TFile.Open(self.n_filemass)
             hevents = filemass.Get("all_events")
             hselevents = filemass.Get("sel_events")
             norm, selnorm = self.calculate_norm(self.logger, hevents, hselevents)
             histonorm.SetBinContent(1, selnorm)
             self.logger.warning("Number of events %d", norm)
-            self.logger.warning("Number of events after event selection %d", selnorm)
-        else:
-            self.logger.warning("Number of events provided %d", self.p_nevents)
-            selnorm = self.p_nevents
 
         if self.p_dobkgfromsideband:
             fileoutbkg = TFile.Open(f"{self.d_resultsallpdata}/Background_fromsidebands_{self.case}_{self.typean}.root")

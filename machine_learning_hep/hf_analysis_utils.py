@@ -202,10 +202,6 @@ def compute_fraction_nb(
                     frac_cent = (
                         1 - sigma * delta_pt * delta_y * acc_eff_other * b_ratio * n_events * 2 / rawy / sigma_mb
                     )
-                    print(f"Nb pp fraction {i_sigma} raa ratio {i_raa_ratio} sigma {sigma} "
-                          f"delta_pt {delta_pt} delta_y {delta_y} " \
-                          f"acceff other {acc_eff_other} b_ratio {b_ratio} n_events {n_events} " \
-                          f"rawyields {rawy} sigmamb {sigma_mb} final frac {frac_cent}")
                 else:  # p-Pb or Pb-Pb: iterative evaluation of Raa needed
                     delta_raa = 1.0
                     while delta_raa > 1.0e-3:
@@ -227,75 +223,33 @@ def compute_fraction_nb(
                             frac_cent * rawy * sigma_mb / 2 / acc_eff_same / delta_pt / delta_y / b_ratio / n_events
                         )
                         delta_raa = abs((raa_other - raa_other_old) / raa_other)
-            else:
-                if raa_rat == 1.0 and taa == 1.0:  # pp
-                    frac_tmp = (
-                        1
-                        - sigma
-                        * delta_pt
-                        * delta_y
-                        * acc_eff_other
-                        * b_ratio
-                        * n_events
-                        * 2
-                        / rawy
-                        / sigma_mb
+            elif raa_rat == 1.0 and taa == 1.0:  # pp
+                frac.append(1 - sigma * delta_pt * delta_y * acc_eff_other * b_ratio * n_events * 2 / rawy / sigma_mb)
+            else:  # p-Pb or Pb-Pb: iterative evaluation of Raa needed
+                delta_raa = 1.0
+                frac_tmp = 1.0
+                while delta_raa > 1.0e-3:
+                    raw_fd = (
+                        taa * raa_rat * raa_other * sigma * delta_pt * delta_y * acc_eff_other * b_ratio * n_events * 2
                     )
-                    frac.append(
-                        1 - sigma * delta_pt * delta_y * acc_eff_other * b_ratio * n_events * 2 / rawy / sigma_mb
-                    )
-                    print(f"Nb pp fraction {i_sigma} raa ratio {i_raa_ratio} sigma {sigma} "
-                          f"delta_pt {delta_pt} delta_y {delta_y} " \
-                          f"acceff other {acc_eff_other} b_ratio {b_ratio} n_events {n_events} " \
-                          f"rawyields {rawy} sigmamb {sigma_mb} final frac {frac_tmp}")
-                else:  # p-Pb or Pb-Pb: iterative evaluation of Raa needed
-                    delta_raa = 1.0
-                    frac_tmp = 1.0
-                    while delta_raa > 1.0e-3:
-                        raw_fd = (
-                            taa
-                            * raa_rat
-                            * raa_other
-                            * sigma
-                            * delta_pt
-                            * delta_y
-                            * acc_eff_other
-                            * b_ratio
-                            * n_events
-                            * 2
-                        )
-                        frac_tmp = 1 - raw_fd / rawy
-                        raa_other_old = raa_other
-                        raa_other = (
-                            frac_tmp * rawy * sigma_mb / 2 / acc_eff_same / delta_pt / delta_y / b_ratio / n_events
-                        )
-                        delta_raa = abs((raa_other - raa_other_old) / raa_other)
-                    frac.append(frac_tmp)
+                    frac_tmp = 1 - raw_fd / rawy
+                    raa_other_old = raa_other
+                    raa_other = frac_tmp * rawy * sigma_mb / 2 / acc_eff_same / delta_pt / delta_y / b_ratio / n_events
+                    delta_raa = abs((raa_other - raa_other_old) / raa_other)
+                frac.append(frac_tmp)
 
     if frac:
         frac.sort()
         frac = [frac_cent, frac[0], frac[-1]]
-        print(f"Returning vector of frac: {frac}")
     else:
-        print(f"Returning only central value: {frac_cent}")
         frac = [frac_cent, frac_cent, frac_cent]
 
     return frac
 
 
-# pylint: disable=too-many-branches,too-many-arguments,too-many-locals,invalid-name
-def compute_fraction_dd(
-    acc_eff_same,
-    acc_eff_other,
-    corryields_same,
-    corryields_other,
-    cov_same,
-    cov_other,
-    cov_comb
-):
+def compute_fraction_dd(acc_eff_same, acc_eff_other, corryields_same, corryields_other, cov_same, cov_other, cov_comb):
     """
     Method to get fraction of prompt / FD fraction with data-driven method
-
     Parameters
     ----------
     - acc_eff_same: efficiency times acceptance of prompt (non-prompt) D
@@ -305,7 +259,6 @@ def compute_fraction_dd(
     - cov_same: covariance of prompt (non-prompt) D computed with cut variation
     - cov_other: covariance of non-prompt (prompt) D computed with cut variation
     - cov_comb: covariance of prompt and non-prompt D computed with cut variation
-
     Returns
     ----------
     - frac: list of fraction of prompt (non-prompt) D (central, min, max)

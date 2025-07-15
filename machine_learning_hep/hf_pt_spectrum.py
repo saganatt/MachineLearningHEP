@@ -46,6 +46,7 @@ from machine_learning_hep.hf_analysis_utils import (  # pylint: disable=import-e
     get_hist_binlimits,
 )
 
+
 def hf_pt_spectrum(
     channel,  # pylint: disable=too-many-locals, too-many-arguments, too-many-statements, too-many-branches
     b_ratio,
@@ -107,11 +108,12 @@ def hf_pt_spectrum(
 
     with TFile.Open(input_fonll_or_fdd_pred) as infile_pred:
         if frac_method in ("dd", "dd_N"):
-            histos["corryields_fdd"] = [infile_pred.Get("hCorrYieldsPrompt"),
-                                        infile_pred.Get("hCorrYieldsNonPrompt")]
-            histos["covariances"] = [infile_pred.Get("hCovPromptPrompt"),
-                                     infile_pred.Get("hCovNonPromptNonPrompt"),
-                                     infile_pred.Get("hCovPromptNonPrompt")]
+            histos["corryields_fdd"] = [infile_pred.Get("hCorrYieldsPrompt"), infile_pred.Get("hCorrYieldsNonPrompt")]
+            histos["covariances"] = [
+                infile_pred.Get("hCovPromptPrompt"),
+                infile_pred.Get("hCovNonPromptNonPrompt"),
+                infile_pred.Get("hCovPromptNonPrompt"),
+            ]
         else:
             histos["FONLL"] = {"prompt": {}, "nonprompt": {}}
             for pred in ("central", "min", "max"):
@@ -149,15 +151,9 @@ def hf_pt_spectrum(
     ptlims = {}
     for histo in ["rawyields", "acceffp", "acceffnp"]:
         ptlims[histo] = get_hist_binlimits(histos[histo])
-        print(f"ptlims {histo}:\n{ptlims[histo]}")
         if histo != "rawyields" and not np.equal(ptlims[histo], ptlims["rawyields"]).all():
             print("\033[91mERROR: histo binning not consistent. Exit\033[0m")
             sys.exit(10)
-
-    print(f"ptlims: {ptlims}")
-    #for ptlim in ptlims:
-    #    ptlims[ptlim] = ptlims[ptlim][1:]
-    #print(f"fixed ptlims: {ptlims}")
 
     # compute cross section
     axistit_cross = "d#sigma/d#it{p}_{T} (pb GeV^{-1} #it{c})"
@@ -264,7 +260,6 @@ def hf_pt_spectrum(
         if frac_method != "ext":
             output_prompt.append(frac[0])
             gfraction.SetPoint(i_pt, pt_cent, frac[0])
-            print(f"Errors in gfraction: {frac[0] - frac[1]}, {frac[2] - frac[0]}")
             gfraction.SetPointError(i_pt, pt_delta / 2, pt_delta / 2, frac[0] - frac[1], frac[2] - frac[0])
 
     c = TCanvas("c", "c", 600, 800)
