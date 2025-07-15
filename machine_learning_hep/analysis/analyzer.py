@@ -21,6 +21,7 @@ from machine_learning_hep.io_ml_utils import dump_yaml_from_dict
 # HF specific imports
 from machine_learning_hep.workflow.workflow_base import WorkflowBase
 
+
 class Analyzer(WorkflowBase):
     def __init__(self, datap, case, typean, period):
         super().__init__(datap, case, typean, period)
