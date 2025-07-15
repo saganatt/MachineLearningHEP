@@ -157,8 +157,8 @@ class Processer:  # pylint: disable=too-many-instance-attributes
         self.s_reco_skim = datap["sel_reco_skim"]
         self.s_gen_skim = datap["sel_gen_skim"]
 
-        #bitmap
-        self.b_mcrefl = datap["bitmap_sel"].get("ismcrefl", None)
+        # bitmap
+        # self.b_mcrefl = datap["bitmap_sel"].get("ismcrefl", None)
 
         # variables name
         self.v_train = datap["variables"]["var_training"]
@@ -291,9 +291,16 @@ class Processer:  # pylint: disable=too-many-instance-attributes
         self.lpt_gen_ml = [os.path.join(self.d_pkl_ml, self.lpt_gensk[ipt]) for ipt in range(self.p_nptbins)]
         self.f_evt_count_ml = os.path.join(self.d_pkl_ml, self.n_evt_count_ml)
 
-        self.lpt_gensk_sl = [self.n_gen_sl.replace(".p", "_%s%d_%d.p" %
-                             (self.v_var_binning, self.lpt_anbinmin[i], self.lpt_anbinmax[i]))
-                             for i in range(self.p_nptbins)] if self.n_gen_sl else None
+        self.lpt_gensk_sl = (
+            [
+                self.n_gen_sl.replace(
+                    ".p", "_%s%d_%d.p" % (self.v_var_binning, self.lpt_anbinmin[i], self.lpt_anbinmax[i])
+                )
+                for i in range(self.p_nptbins)
+            ]
+            if self.n_gen_sl
+            else None
+        )
 
         self.lpt_recodec = None
         if self.doml:
