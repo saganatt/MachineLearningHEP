@@ -6,9 +6,10 @@ if [ "$#" -ne 3 ]; then
 fi
 
 DB=$1
-LOGFILE=$2
+CONFIG=$2
+LOGFILE=$3
 
 mlhep --log-file ${LOGFILE} \
-  --run-config submission/default_complete.yml \
-  --database-analysis ${DB} \
-  --delete
+  -a Run3analysis \
+  --run-config ${CONFIG} \
+  --database-analysis ${DB}
