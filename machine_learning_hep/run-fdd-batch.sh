@@ -55,7 +55,4 @@ for fd in $(seq 0.000 0.005 0.000) ; do
       --database-analysis "${CUR_DB}" \
       --delete \
      > "debug_${suffix}.txt" 2>&1 || ErrExit "Analysis failed"
-
-  rm -rf ${RESPATH}/fig/
-  mv fig/ ${RESPATH}/
 done
