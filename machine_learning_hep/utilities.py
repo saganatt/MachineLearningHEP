@@ -173,7 +173,7 @@ def mask_df(df_to_mask, mask_config):
         df_to_mask.loc[mask_indices, [mc["column"]]] = conv_none(mc["mask_with"])
 
 
-def dfquery(df, selection, **kwargs):  # pylint: disable=invalid-name
+def dfquery(df, selection, **kwargs): # pylint: disable=invalid-name
     return df.query(selection, **kwargs) if selection is not None else df
 
 
@@ -188,13 +188,9 @@ def selectdfrunlist(dfr, runlist, runvar):
         dfr = dfr[issel]
     return dfr
 
-def reweight(filename, histoname, df, var, weighted_var):
-    file = uproot.open(filename)
-    weights_hist = file[histoname]
-
-    histogram_data = weights_hist.to_numpy()
-    weights = histogram_data[0]
-    bin_edges = histogram_data[1]
+def reweight(hist_weights, df, var, weighted_var): # pylint: disable=invalid-name
+    weights = hist_weights[0]
+    bin_edges = hist_weights[1]
 
     # Extract pT values from DataFrame
     var = df[var]
