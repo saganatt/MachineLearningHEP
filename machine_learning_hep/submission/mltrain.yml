@@ -28,17 +28,17 @@ ml_study: # mlout, mlplot
   activate: true
   dotraining: false
   dotesting: false
-  doplotdistr: false
-  doroc: false
-  doroctraintest: false
-  doimportance: false
-  doimportanceshap: false
-  docorrelation: false
-  dolearningcurve: false
+  doplotdistr: true
+  doroc: true
+  doroctraintest: true
+  doimportance: true
+  doimportanceshap: true
+  docorrelation: true
+  dolearningcurve: true
   doapplytodatamc: false
   doscancuts: false
-  doefficiency: true
-  dosignifopt: true
+  doefficiency: false
+  dosignifopt: false
   doboundary: false
   docrossvalidation: false
   dogridsearch: false
