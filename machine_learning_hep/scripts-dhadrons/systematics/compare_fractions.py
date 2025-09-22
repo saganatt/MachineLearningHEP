@@ -38,7 +38,7 @@ from ROOT import (  # pylint: disable=import-error,no-name-in-module
     kYellow,
 )
 
-COLORS=[kBlack, kRed-3, kAzure-7, kGreen+2, kOrange-3, kBlue, kMagenta+2,
+COLORS=[kRed-3, kAzure+4, kBlack, kAzure-7, kGreen+2, kOrange-3, kBlue, kMagenta+2,
         kTeal+3, kGreen, kAzure+8,
         kYellow+3, kOrange-5, kMagenta+2, kBlue-6, kCyan+1, kGreen-6]
 MODELS_COLORS=[kGray+1, kOrange-3, kCyan-2, kRed-9, kAzure-9, kBlue-6, kGreen-6, kOrange-5]
@@ -49,7 +49,7 @@ def get_alice_text(cfg):
     if "alice_text" not in cfg:
         return None
 
-    alice_text = TPaveText(0.17, 0.62, 0.50, 0.86, "brNDC")
+    alice_text = TPaveText(0.45, 0.30, 0.90, 0.50, "brNDC")
     alice_text.SetTextFont(42)
     alice_text.SetTextSize(0.04)
     alice_text.SetBorderSize(0)
@@ -57,7 +57,7 @@ def get_alice_text(cfg):
     alice_text.SetTextAlign(11)
 
     alice_text_config = cfg["alice_text"]
-    alice_text.AddText("#scale[1.35]{ALICE Preliminary}")
+    alice_text.AddText("#scale[1.35]{This Thesis}")
     alice_text.AddText("#scale[1.05]{pp,#kern[-0.05]{ #sqrt{#it{s}} = 13.6 TeV, |#it{y}| < 0.5}}")
     alice_text.AddText(f"#scale[1.20]{{{alice_text_config}}}")
 
@@ -244,15 +244,18 @@ def set_figs_limits(miny, maxy, hists, graphs, hists_models):
     miny = miny - margin * miny
     if miny <= 0:
         miny = 0.006
-    print(f"Recalculated hist maxy: {maxy + margin * maxy} miny: {miny}")
+    miny = 0.0001
+    maxy = maxy + margin * maxy
+    maxy = 1.0
+    print(f"Recalculated hist maxy: {maxy} miny: {miny}")
     if hists_models:
         for _, hist in hists_models.items():
-            hist.GetYaxis().SetRangeUser(miny, maxy + margin * maxy)
+            hist.GetYaxis().SetRangeUser(miny, maxy)
     for _, hist in hists.items():
-        hist.GetYaxis().SetRangeUser(miny, maxy + margin * maxy)
+        hist.GetYaxis().SetRangeUser(miny, maxy)
     if graphs:
         for graph_syst in graphs:
-            graph_syst.GetYaxis().SetRangeUser(miny, maxy + margin * maxy)
+            graph_syst.GetYaxis().SetRangeUser(miny, maxy)
     return hists, graphs, hists_models
 
 def plot_compare(cfg):
