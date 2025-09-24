@@ -490,7 +490,7 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         fileoutcross = f"{self.d_resultsallpdata}/finalcross{self.case}{self.typean}{ptshape}.root"
 
         namehistoeffprompt = "eff"
-        namehistoefffeed = "eff_fd{ptshape}"
+        namehistoefffeed = f"eff_fd{ptshape}"
         nameyield = "hyields0"
         self.logger.info("Using efficiency histos %s, %s", namehistoeffprompt, namehistoefffeed)
 
