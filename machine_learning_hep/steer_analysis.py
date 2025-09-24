@@ -337,9 +337,19 @@ def do_entire_analysis(  # pylint: disable=too-many-locals, too-many-statements,
         from machine_learning_hep.optimiser import Optimiser  # pylint: disable=import-outside-toplevel
 
         for index, (binmin, binmax) in enumerate(zip(binminarray, binmaxarray)):
-            myopt = Optimiser(data_param[case], case, typean,
-                              data_model[mltype], binmin, binmax, multbkg[index],
-                              raahp[index], training_vars[index], threshold_args[index], index)
+            myopt = Optimiser(
+                data_param[case],
+                case,
+                typean,
+                data_model[mltype],
+                binmin,
+                binmax,
+                multbkg[index],
+                raahp[index],
+                training_vars[index],
+                threshold_args[index],
+                index,
+            )
             if docorrelation:
                 myopt.do_corr()
             if dotraining:
