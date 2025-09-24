@@ -132,6 +132,7 @@ def do_entire_analysis(  # pylint: disable=too-many-locals, too-many-statements,
     binmaxarray = data_param[case]["ml"]["binmax"]
     multbkg = data_param[case]["ml"]["mult_bkg"]
     raahp = data_param[case]["ml"]["opt"]["raahp"]
+    threshold_args = data_param[case]["ml"]["opt"]["signif_thresholds"]
     mltype = data_param[case]["ml"]["mltype"]
     training_vars = data_param[case]["variables"]["var_training"]
 
@@ -346,6 +347,7 @@ def do_entire_analysis(  # pylint: disable=too-many-locals, too-many-statements,
                 multbkg[index],
                 raahp[index],
                 training_vars[index],
+                threshold_args[index],
                 index,
             )
             if docorrelation:
