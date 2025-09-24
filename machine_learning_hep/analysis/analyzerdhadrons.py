@@ -57,10 +57,13 @@ from machine_learning_hep.logger import get_logger
 from machine_learning_hep.utils.hist import get_dim, project_hist
 
 # pylint: disable=too-few-public-methods, too-many-instance-attributes, too-many-statements, fixme
-# pylint: disable=consider-using-enumerate fixme
+# pylint: disable=consider-using-enumerate, missing-function-docstring
 
 
 class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
+    """
+    An analyzer for D and L hadrons.
+    """
     species = "analyzer"
 
     def __init__(self, datap, case, typean, period):
@@ -100,12 +103,12 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
 
         self.n_fileff = datap["files_names"]["efffilename"]
         self.n_fileff = os.path.join(self.d_resultsallpmc, self.n_fileff)
-        self.p_bin_width = datap["analysis"][self.typean]['bin_width']
-        self.p_rebin = datap["analysis"][self.typean]['n_rebin']
-        self.p_fixed_sigma = datap["analysis"][self.typean]['fixed_sigma']
-        self.p_fixed_sigma_val = datap["analysis"][self.typean]['fixed_sigma_val']
-        self.p_pdfnames = datap["analysis"][self.typean]['pdf_names']
-        self.p_param_names = datap["analysis"][self.typean]['param_names']
+        self.p_bin_width = datap["analysis"][self.typean]["bin_width"]
+        self.p_rebin = datap["analysis"][self.typean]["n_rebin"]
+        self.p_fixed_sigma = datap["analysis"][self.typean]["fixed_sigma"]
+        self.p_fixed_sigma_val = datap["analysis"][self.typean]["fixed_sigma_val"]
+        self.p_pdfnames = datap["analysis"][self.typean]["pdf_names"]
+        self.p_param_names = datap["analysis"][self.typean]["param_names"]
 
         self.p_latexnhadron = datap["analysis"][self.typean]["latexnamehadron"]
         self.p_dobkgfromsideband = datap["analysis"][self.typean].get("dobkgfromsideband", None)
@@ -471,8 +474,9 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         print(self.n_fileff)
         lfileeff = TFile.Open(self.n_fileff)
         lfileeff.ls()
-        fileouteff = TFile.Open(f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root", "recreate")
-        
+        fileouteff = TFile.Open(f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root",
+                                "recreate")
+
         def do_eff(gen_hist, sel_hist, histname, outname, eff_case):
             cEff = TCanvas(f"c{outname}", "The Fit Canvas")
             cEff.SetCanvasSize(1900, 1500)
@@ -499,40 +503,11 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
             gPad.SetLogy()
             legeff.Draw()
             cEff.SaveAs(f"{self.d_resultsallpmc}/{outname}{self.case}{self.typean}.eps")
-        
+
         do_eff("h_gen_pr", "h_sel_pr", "eff", "Eff", "prompt")
         do_eff("h_gen_fd", "h_sel_fd", "eff_fd", "EffFD", "feed-down")
         if self.do_ptshape:
             do_eff("h_gen_fd_ptshape", "h_sel_fd_ptshape", "eff_fd_ptshape", "EffFDPtShape", "feed-down")
-
-        if self.do_ptshape:
-            cEffFDPtShape = TCanvas('cEffFDPtShape', 'The Fit Canvas')
-            cEffFDPtShape.SetCanvasSize(1900, 1500)
-            cEffFDPtShape.SetWindowSize(500, 500)
-
-            legeffFDPtShape = TLegend(.5, .65, .7, .85)
-            legeffFDPtShape.SetBorderSize(0)
-            legeffFDPtShape.SetFillColor(0)
-            legeffFDPtShape.SetFillStyle(0)
-            legeffFDPtShape.SetTextFont(42)
-            legeffFDPtShape.SetTextSize(0.035)
-
-            h_gen_fd = lfileeff.Get("h_gen_fd_ptshape")
-            h_sel_fd = lfileeff.Get("h_sel_fd_ptshape")
-            h_sel_fd.Divide(h_sel_fd, h_gen_fd, 1.0, 1.0, "B")
-            h_sel_fd.Draw("same")
-            fileouteff.cd()
-            h_sel_fd.SetName("eff_fd_ptshape")
-            h_sel_fd.Write()
-            h_sel_fd.GetXaxis().SetTitle("#it{p}_{T} (GeV/#it{c})")
-            h_sel_fd.GetYaxis().SetTitle("Acc x efficiency feed-down %s %s (1/GeV)"
-                                         % (self.p_latexnhadron, self.typean))
-            h_sel_fd.SetMinimum(0.001)
-            h_sel_fd.SetMaximum(1.)
-            gPad.SetLogy()
-            legeffFDPtShape.Draw()
-            cEffFDPtShape.SaveAs("%s/EffFDPtShape%s%s.eps" % (self.d_resultsallpmc,
-                                                              self.case, self.typean))
 
 
     @staticmethod
@@ -556,14 +531,10 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
         yield_filename = self.make_file_path(
             self.d_resultsallpdata, self.yields_filename, "root", None, [self.case, self.typean]
         )
-        #yield_filename = "/data8/majak/crosssec/202502/yieldsLcpKpiRun3analysis_fd_0.000_roofit.root"
-        #yield_filename = "/data8/majak/crosssec/202503-nonprompt/yieldsLcpKpiRun3analysis.root"
         if not os.path.exists(yield_filename):
             self.logger.fatal("Yield file %s could not be found", yield_filename)
 
         fileouteff = f"{self.d_resultsallpmc}/{self.efficiency_filename}{self.case}{self.typean}.root"
-        #fileouteff = "/data8/majak/crosssec/202502/efficienciesLcpKpiRun3analysis_fd_0.000.root"
-        #fileouteff = "/data8/majak/crosssec/202503-nonprompt/efficienciesLcpKpiRun3analysis.root"
         if not os.path.exists(fileouteff):
             self.logger.fatal("Efficiency file %s could not be found", fileouteff)
 
@@ -619,7 +590,8 @@ class AnalyzerDhadrons(Analyzer):  # pylint: disable=invalid-name
             fileoutcross,
         )
 
-        fileoutcrosstot = TFile.Open(f"{self.d_resultsallpdata}/finalcross{self.case}{self.typean}tot{ptshape}.root", "recreate")
+        fileoutcrosstot = TFile.Open(f"{self.d_resultsallpdata}/finalcross{self.case}{self.typean}tot{ptshape}.root",
+                                     "recreate")
 
         f_fileoutcross = TFile.Open(fileoutcross)
         if f_fileoutcross:
