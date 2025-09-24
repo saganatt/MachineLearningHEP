@@ -31,6 +31,9 @@ from machine_learning_hep.utils.hist import bin_array, create_hist, fill_hist
 
 
 class ProcesserDhadrons(Processer):  # pylint: disable=too-many-instance-attributes
+    """
+    The class for specializations of data processing, machine learning and analysis for D and L hadrons.
+    """
     # Class Attribute
     species = "processer"
 
@@ -104,6 +107,9 @@ class ProcesserDhadrons(Processer):  # pylint: disable=too-many-instance-attribu
 
     # pylint: disable=too-many-branches
     def process_histomass_single(self, index):
+        """
+        Generate invariant mass histograms for MC or real data.
+        """
         myfile = TFile.Open(self.l_histomass[index], "recreate")
         dfevtorig = read_df(self.l_evtorig[index])
         neventsorig = len(dfevtorig)
@@ -200,7 +206,10 @@ class ProcesserDhadrons(Processer):  # pylint: disable=too-many-instance-attribu
 
     # pylint: disable=line-too-long
     def process_efficiency_single(self, index):
-        # TODO: UPDATE TO DHADRON_MULT VERSION
+        """
+        Generate efficiency histograms for MC or real data.
+        """
+        # TODO: Unify this and the dhadrons_mult version
         out_file = TFile.Open(self.l_histoeff[index], "recreate")
         n_bins = len(self.lpt_finbinmin)
         analysis_bin_lims_temp = self.lpt_finbinmin.copy()
@@ -213,7 +222,7 @@ class ProcesserDhadrons(Processer):  # pylint: disable=too-many-instance-attribu
         h_gen_fd = TH1F("h_gen_fd", "FD Generated in acceptance |y|<0.5", n_bins, analysis_bin_lims)
         h_presel_fd = TH1F("h_presel_fd", "FD Reco in acc |#eta|<0.8 and sel", n_bins, analysis_bin_lims)
         h_sel_fd = TH1F("h_sel_fd", "FD Reco and sel in acc |#eta|<0.8 and sel", n_bins, analysis_bin_lims)
-        if self.do_ptshape:
+        if self.do_ptshape: # pylint: disable=no-member
             h_gen_fd_ptshape = TH1F("h_gen_fd_ptshape", "FD Generated in acceptance |y|<0.5", \
                                     n_bins, analysis_bin_lims)
             h_presel_fd_ptshape = TH1F("h_presel_fd_ptshape", "FD Reco in acc |#eta|<0.8 and sel", \
@@ -259,7 +268,7 @@ class ProcesserDhadrons(Processer):  # pylint: disable=too-many-instance-attribu
             do_eff_single(ipt, bin_id, df_mc_gen, df_mc_reco, "ismcprompt", bincounter_pr, (h_gen_pr, h_presel_pr, h_sel_pr))
             do_eff_single(ipt, bin_id, df_mc_gen, df_mc_reco, "ismcfd", bincounter_fd, (h_gen_fd, h_presel_fd, h_sel_fd))
 
-            if self.do_ptshape:
+            if self.do_ptshape: # pylint: disable=no-member
                 df_mc_gen_ptshape, df_mc_reco_ptshape = get_eff_dfs(ipt, bin_id, self.mptfiles_gensk_ptshape, self.mptfiles_recoskmldec_ptshape, self.v_var_binning_ptshape)
                 do_eff_single(ipt, bin_id, df_mc_gen_ptshape, df_mc_reco_ptshape, "ismcfd", bincounter_ptshape, (h_gen_fd_ptshape, h_presel_fd_ptshape, h_sel_fd_ptshape))
 
@@ -271,7 +280,7 @@ class ProcesserDhadrons(Processer):  # pylint: disable=too-many-instance-attribu
         h_presel_fd.Write()
         h_sel_fd.Write()
 
-        if self.do_ptshape:
+        if self.do_ptshape: # pylint: disable=no-member
             h_gen_fd_ptshape.Write()
             h_presel_fd_ptshape.Write()
             h_sel_fd_ptshape.Write()
