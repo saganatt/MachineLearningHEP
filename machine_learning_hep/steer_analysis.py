@@ -23,7 +23,7 @@ import sys
 
 # unclear why shap needs to be imported from here,
 # segfaults when imported from within other modules
-import shap  # pylint: disable=unused-import
+import shap
 import yaml
 
 from .analysis.analyzer_manager import AnalyzerManager
@@ -40,6 +40,9 @@ def do_entire_analysis(  # pylint: disable=too-many-locals, too-many-statements,
     run_param: dict,
     args,
 ):
+    """
+    The main function.
+    """
     logger = get_logger()
     logger.info("Do analysis chain")
 
@@ -336,7 +339,7 @@ def do_entire_analysis(  # pylint: disable=too-many-locals, too-many-statements,
     if doml:
         from machine_learning_hep.optimiser import Optimiser  # pylint: disable=import-outside-toplevel
 
-        for index, (binmin, binmax) in enumerate(zip(binminarray, binmaxarray)):
+        for index, (binmin, binmax) in enumerate(zip(binminarray, binmaxarray, strict=False)):
             myopt = Optimiser(
                 data_param[case],
                 case,
@@ -433,9 +436,8 @@ def do_entire_analysis(  # pylint: disable=too-many-locals, too-many-statements,
         print("Cleaning")
         if doanaperperiod:
             print("Per-period analysis enabled. Skipping.")
-        else:
-            if not delete_dirlist(dirresultsmc + dirresultsdata):
-                print("Error: Failed to complete cleaning.")
+        elif not delete_dirlist(dirresultsmc + dirresultsdata):
+            print("Error: Failed to complete cleaning.")
 
     logger.info("Done")
 

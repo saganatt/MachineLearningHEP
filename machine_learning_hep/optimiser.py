@@ -22,17 +22,17 @@ import pickle
 import time
 from math import sqrt
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
+import matplotlib as mpl # pylint: disable=import-error
+import matplotlib.pyplot as plt # pylint: disable=import-error
 import numpy as np
 import onnx  # pylint: disable=import-error
 import pandas as pd
 from onnxconverter_common.data_types import FloatTensorType  # pylint: disable=import-error
 from onnxmltools.convert import convert_xgboost  # pylint: disable=import-error
 from ROOT import TF1, TH1F, TCanvas, TFile, gROOT  # pylint: disable=import-error,no-name-in-module
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import label_binarize
-from sklearn.utils import shuffle
+from sklearn.model_selection import train_test_split # pylint: disable=import-error
+from sklearn.preprocessing import label_binarize # pylint: disable=import-error
+from sklearn.utils import shuffle # pylint: disable=import-error
 
 # from machine_learning_hep.root import write_tree
 import machine_learning_hep.mlperformance as mlhep_plot
@@ -74,11 +74,13 @@ HIST_COLORS = ['r', 'b', 'g']
 
 
 # pylint: disable=too-many-instance-attributes, too-many-statements, unbalanced-tuple-unpacking, fixme
+# pylint: disable=missing-function-docstring
 class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-string, unused-argument, too-many-arguments
     # Class Attribute
     species = "optimiser"
 
-    def __init__(self, data_param, case, typean, model_config, binmin, binmax, multbkg, raahp, training_var, threshold_args, index):
+    def __init__(self, data_param, case, typean, model_config, binmin, binmax, multbkg, raahp, training_var,
+                 threshold_args, index):
         self.logger = get_logger()
 
         dirprefixdata = data_param["multi"]["data"].get("prefix_dir", "")
@@ -304,7 +306,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
                     self.p_nclasses[ind] = min(min_class_count, self.p_nclasses[ind])
                     self.logger.info("Max possible number of equalized samples for %s: %d", label, self.p_nclasses[ind])
 
-            for ind, (label, nclass) in enumerate(zip(self.p_class_labels, self.p_nclasses)):
+            for ind, (label, nclass) in enumerate(zip(self.p_class_labels, self.p_nclasses, strict=False)):
                 self.dfs_input[label] = shuffle(self.dfs_input[label], random_state=self.rnd_shuffle)
                 if label == "bkg" and self.p_equalise_sig_bkg:
                     nclass = nclass * self.p_multbkg
@@ -339,10 +341,10 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
                 len(self.dfs_test[label]),
             )
 
-        for label, nclass in zip(self.p_class_labels, self.p_nclasses):
+        for label, nclass in zip(self.p_class_labels, self.p_nclasses, strict=False):
             self.logger.info("Aim for number of %s events: %d", label, nclass)
 
-        for label, nclass in zip(self.p_class_labels, self.p_nclasses):
+        for label, nclass in zip(self.p_class_labels, self.p_nclasses, strict=False):
             if nclass > len(self.dfs_train[label]) + len(self.dfs_test[label]):
                 self.logger.warning("There are not enough %s events", label)
 
@@ -418,7 +420,6 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
             self.logger.info("Read and use models from disk. Remove them if you don't want to use them")
             self.p_trainedmod = clfs
             self.p_class = clfs
-            return
 
     def do_train(self):
         if self.step_done("training"):
@@ -461,7 +462,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         self.do_train()
 
         self.logger.info("Application")
-        for df, filename in zip((self.df_data, self.df_mc), (self.f_reco_applieddata, self.f_reco_appliedmc)):
+        for df, filename in zip((self.df_data, self.df_mc), (self.f_reco_applieddata, self.f_reco_appliedmc), strict=False):
             df_res = apply(self.p_mltype, self.p_classname, self.p_trainedmod, df, self.v_train, self.p_class_labels)
             write_df(df_res, filename)
 
@@ -615,7 +616,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         clfs_all = bayes_opt_scikit + bayes_opt_xgboost + bayes_opt_keras
         clfs_names_all = names_scikit + names_xgboost + names_keras
 
-        clfs_names_all = [name for name, clf in zip(clfs_names_all, clfs_all) if clf]
+        clfs_names_all = [name for name, clf in zip(clfs_names_all, clfs_all, strict=False) if clf]
         clfs_all = [clf for clf in clfs_all if clf]
 
         out_dirs = [
@@ -624,7 +625,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         checkmakedirlist(out_dirs)
 
         # Now, do it
-        for opt, out_dir in zip(clfs_all, out_dirs):
+        for opt, out_dir in zip(clfs_all, out_dirs, strict=False):
             opt.x_train = self.df_xtrain
             opt.y_train = self.df_ytrain
 
@@ -643,8 +644,8 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         clfs_all = clfs_scikit + clfs_xgboost + clfs_keras
         clfs_names_all = names_scikit + names_xgboost + names_keras
 
-        clfs_all = [clf for clf, gps in zip(clfs_all, clfs_grid_params_all) if gps]
-        clfs_names_all = [name for name, gps in zip(clfs_names_all, clfs_grid_params_all) if gps]
+        clfs_all = [clf for clf, gps in zip(clfs_all, clfs_grid_params_all, strict=False) if gps]
+        clfs_names_all = [name for name, gps in zip(clfs_names_all, clfs_grid_params_all, strict=False) if gps]
         clfs_grid_params_all = [gps for gps in clfs_grid_params_all if gps]
 
         out_dirs = [
@@ -697,7 +698,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         labels = ["prompt", "non-prompt"] if self.p_mltype == "MultiClassification" else ["prompt"]
         mc_labels = ["prompt", "fd"] if self.p_mltype == "MultiClassification" else ["prompt"]
 
-        for label, mclabel in zip(labels, mc_labels):
+        for label, mclabel in zip(labels, mc_labels, strict=False):
             fig_eff = optz.prepare_eff_signif_figure("Model efficiency", self.p_mltype, label)
             df_sig = self.df_mltest_applied[(self.df_mltest_applied[f"ismc{mclabel}"] == 1) & \
                                             (self.df_mltest_applied["ismcsignal"] == 1)]
@@ -808,7 +809,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         #events used for training
         acc = {}
         acc_err = {}
-        for label, mclabel in zip(labels, mc_labels):
+        for label, mclabel in zip(labels, mc_labels, strict=False):
             denacc = len(self.df_mcgen[(self.df_mcgen[f"ismc{mclabel}"] == 1) & \
                                        (self.df_mcgen["ismcsignal"] == 1)])
             numacc = len(self.df_mc[(self.df_mc[f"ismc{mclabel}"] == 1) & \
@@ -845,7 +846,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         self.logger.debug("Sigma of the gaussian: %.3e", sigma)
         sig_region = [self.p_mass - 3 * sigma, self.p_mass + 3 * sigma]
 
-        for label, mclabel in zip(labels, mc_labels):
+        for label, mclabel in zip(labels, mc_labels, strict=False):
             y_label_pevt = r"Significance per event ($3 \sigma$) a.u."
             y_label = r"Significance ($3 \sigma$) a.u."
             y_label_sb = "S/B"
@@ -881,10 +882,11 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
                 if self.p_mltype == "MultiClassification":
                     signif_array_np = np.reshape(signif_array, (len(y_axis), len(x_axis))).T
                     signif_array_ml_np = np.reshape(signif_array_ml, (len(y_axis), len(x_axis))).T
-                    sb_array = [0.0 if bkg == 0. else sig / bkg for sig, bkg in zip(sig_array, bkg_array)]
+                    sb_array = [0.0 if bkg == 0. else sig / bkg for sig, bkg in zip(sig_array, bkg_array, strict=False)]
                     sb_array_np = np.reshape(sb_array, (len(y_axis), len(x_axis))).T
                     np.set_printoptions(threshold=np.inf)
-                    print(f"bkg array\n{bkg_array}\nsig\n{sig_array}\nsb\n{sb_array}\nsb np\n{sb_array_np}\nsignificance\n{signif_array_np}")
+                    print(f"bkg array\n{bkg_array}\nsig\n{sig_array}\nsb\n{sb_array}\nsb np\n{sb_array_np}\n" \
+                          f"significance\n{signif_array_np}")
                     optz.plot_heatmap(signif_array_np, y_label_pevt, self.p_threshold_args[label])
                     plt.figure(fig_sb.number)
                     optz.plot_heatmap(sb_array_np, y_label_sb, self.p_threshold_args[label])

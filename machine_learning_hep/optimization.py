@@ -16,14 +16,15 @@
 Methods to: utility methods to conpute efficiency and study expected significance
 """
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # pylint: disable=import-error
 import numpy as np
-from matplotlib.ticker import MultipleLocator
-from matplotlib.colors import LogNorm
+from matplotlib.colors import LogNorm # pylint: disable=import-error
+from matplotlib.ticker import MultipleLocator # pylint: disable=import-error
 from ROOT import TH1F, TFile  # pylint: disable=import-error,no-name-in-module
 
 from machine_learning_hep.logger import get_logger
 
+# pylint: disable=missing-function-docstring
 
 def select_by_threshold(df_label, label, thr, name):
     # Changed from >= to > since we use that atm for the nominal selection
@@ -124,7 +125,7 @@ def calc_signif(sig_array, sig_err_array, bkg_array, bkg_err_array):
     signif_array = []
     signif_err_array = []
 
-    for sig, bkg, sig_err, bkg_err in zip(sig_array, bkg_array, sig_err_array, bkg_err_array):
+    for sig, bkg, sig_err, bkg_err in zip(sig_array, bkg_array, sig_err_array, bkg_err_array, strict=False):
         signif = 0.0
         signif_err = 0.0
 
