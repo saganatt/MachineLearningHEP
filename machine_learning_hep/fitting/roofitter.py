@@ -78,9 +78,9 @@ class RooFitter:
         ws = roows or ROOT.RooWorkspace("ws")
         var_m = fit_spec.get("var", "m")
 
-        hist_integral = hist.Integral(*(hist.FindBin(mmass) for mmass in fit_spec.get("range")))
-        #n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * hist_integral, 0., 1.2 * hist_integral)
-        #n_background = RooRealVar("n_background", "Number of background events",
+        # hist_integral = hist.Integral(*(hist.FindBin(mmass) for mmass in fit_spec.get("range")))
+        # n_signal = RooRealVar("n_signal", "Number of signal events", 0.3 * hist_integral, 0., 1.2 * hist_integral)
+        # n_background = RooRealVar("n_background", "Number of background events",
                                    #0.3 * hist_integral, 0., 1.2 * hist_integral)
         n_signal = RooRealVar("n_signal", "Number of signal events", 1000, 100, 100000000)
         n_background = RooRealVar("n_background", "Number of background events", 1000, 100, 100000000)
