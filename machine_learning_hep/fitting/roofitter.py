@@ -32,6 +32,41 @@ class RooFitter:
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
         ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.ERROR)
 
+    def find_best_a0(self, ws, m, dh, model, old_res, range_m = None):
+        kwargs = {"Save": True,
+                  "PrintLevel": -1,
+                  "Strategy": 2}
+                  # "MaxCalls": 5000}
+                  # "Minimizer": "Minuit2"}
+        if range_m:
+            kwargs["Range"] = (range_m[0], range_m[1])
+        tmp_frame = m.frame()
+        dh.plotOn(tmp_frame, ROOT.RooFit.Name("data"))
+        model.plotOn(tmp_frame)
+        chi2 = tmp_frame.chiSquare()
+        a0_var = ws.var("a0")  # Get the a0 parameter
+        attempt = 0
+        a0_values = [10, 20, 30, 40, 50, 80, 100, 120, 150, 200, 250, 300, 350, 400, 450, 500,
+                     700, 1000, 1500, 2000, 2500, 3000, 5000, 10000]
+
+        res = old_res
+        chi_threshold = 6.
+        while (chi2 > chi_threshold or isnan(chi2)) and attempt < len(a0_values):
+            print(f"Attempt {attempt+1}: Setting a0 to {a0_values[attempt]}")
+            a0_var.setVal(a0_values[attempt])  # Change a0 value
+            attempt += 1
+
+            res = model.fitTo(dh, **kwargs)
+            tmp_frame = m.frame()
+            dh.plotOn(tmp_frame)
+            model.plotOn(tmp_frame)
+            chi2 = tmp_frame.chiSquare()
+
+        if chi2 <= chi_threshold:
+            print(f"Fit improved: chi2 = {chi2}, stopping adjustments.")
+
+        return res, model
+
     # pylint: disable=too-many-branches
     def fit_mass_new(
         self, hist, pdfnames: dict, param_names: dict, fit_spec: dict, level: str,
@@ -76,19 +111,18 @@ class RooFitter:
         if range_m := fit_spec.get("range"):
             m.setRange("fit", *range_m)
             # print(f'using fit range: {range_m}, var range: {m.getRange("fit")}')
-            res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=1, MaxCalls=5000)
+            res = model.fitTo(dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=2)
+            ret_model = model
             if level == "data" and USE_EXTMODEL:
                 for v in ws.allVars():
                     v.setConstant(True)
-                res = extmodel.fitTo(
-                    dh, Range=(range_m[0], range_m[1]), Save=True, PrintLevel=-1, Strategy=1, MaxCalls=5000
-                )
+                res, ret_model = self.find_best_a0(ws, m, dh, extmodel, res, range_m)
         else:
-            res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=1, MaxCalls=5000)
+            res = model.fitTo(dh, Save=True, PrintLevel=-1, Strategy=2)
             if level == "data" and USE_EXTMODEL:
                 for v in ws.allVars():
                     v.setConstant(True)
-                res = extmodel.fitTo(dh, Save=True, PrintLevel=-1, Strategy=1, MaxCalls=5000)
+                res, ret_model = self.find_best_a0(ws, m, dh, extmodel, res)
         frame = None
         residual_frame = None
         if plot:
@@ -97,8 +131,8 @@ class RooFitter:
             c.cd()
             frame = m.frame()
             dh.plotOn(frame, ROOT.RooFit.Name("data"))
-            model.plotOn(frame)
-            model.paramOn(frame, Layout=(0.65, 1.0, 0.9))
+            ret_model.plotOn(frame)
+            ret_model.paramOn(frame, Layout=(0.65, 1.0, 0.9))
             frame.getAttText().SetTextFont(42)
             frame.getAttText().SetTextSize(0.001)
             if range_m:
@@ -106,9 +140,9 @@ class RooFitter:
             frame.SetAxisRange(0.0, frame.GetMaximum() + (frame.GetMaximum() * 0.3), "Y")
 
             try:
-                for pdf in model.pdfList():
+                for pdf in ret_model.pdfList():
                     pdf_name = pdf.GetName()
-                    model.plotOn(
+                    ret_model.plotOn(
                         frame,
                         ROOT.RooFit.Components(pdf),
                         ROOT.RooFit.Name(f"pdf_{pdf_name}"),
@@ -117,7 +151,7 @@ class RooFitter:
                         ROOT.RooFit.LineWidth(1),
                     )
                     # model.SetName("bkg")
-                model.plotOn(frame, ROOT.RooFit.Name("model"))
+                ret_model.plotOn(frame, ROOT.RooFit.Name("model"))
             except:  # pylint: disable=bare-except  # noqa: E722
                 pass
             # for comp in fit_spec.get('components', {}):
@@ -145,7 +179,7 @@ class RooFitter:
                 residual_frame.SetAxisRange(range_m[0], range_m[1], "X")
             residual_frame.SetYTitle("Residuals")
 
-        return (res, ws, frame, residual_frame, dh, model)
+        return (res, ws, frame, residual_frame, dh, ret_model)
 
     def fit_mass(self, hist, fit_spec, plot=False):
         """Old fit method"""
