@@ -22,17 +22,17 @@ import pickle
 import time
 from math import sqrt
 
-import matplotlib as mpl # pylint: disable=import-error
-import matplotlib.pyplot as plt # pylint: disable=import-error
+import matplotlib as mpl  # pylint: disable=import-error
+import matplotlib.pyplot as plt  # pylint: disable=import-error
 import numpy as np
 import onnx  # pylint: disable=import-error
 import pandas as pd
 from onnxconverter_common.data_types import FloatTensorType  # pylint: disable=import-error
 from onnxmltools.convert import convert_xgboost  # pylint: disable=import-error
 from ROOT import TF1, TH1F, TCanvas, TFile, gROOT  # pylint: disable=import-error,no-name-in-module
-from sklearn.model_selection import train_test_split # pylint: disable=import-error
-from sklearn.preprocessing import label_binarize # pylint: disable=import-error
-from sklearn.utils import shuffle # pylint: disable=import-error
+from sklearn.model_selection import train_test_split  # pylint: disable=import-error
+from sklearn.preprocessing import label_binarize  # pylint: disable=import-error
+from sklearn.utils import shuffle  # pylint: disable=import-error
 
 # from machine_learning_hep.root import write_tree
 import machine_learning_hep.mlperformance as mlhep_plot
@@ -223,7 +223,7 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         self.p_mask_values = data_param["ml"].get("mask_values", None)
         self.p_mass_fit_lim = data_param["analysis"][self.p_typean]["mass_fit_lim"]
         self.p_bin_width = data_param["analysis"][self.p_typean]["bin_width"]
-        self.p_num_bins = int(round((self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]) / self.p_bin_width))
+        self.p_num_bins = round((self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]) / self.p_bin_width)
         self.p_mass = data_param["mass"]
         self.p_raahp = raahp
         self.create_suffix()
@@ -232,8 +232,8 @@ class Optimiser:  # pylint: disable=too-many-public-methods, consider-using-f-st
         self.df_evt_data = None
         self.df_evttotsample_data = None
 
-        self.f_reco_applieddata = self.f_reco_applieddata.replace(".p", "%s.p" % self.s_suffix)
-        self.f_reco_appliedmc = self.f_reco_appliedmc.replace(".p", "%s.p" % self.s_suffix)
+        self.f_reco_applieddata = self.f_reco_applieddata.replace(".p", f"{self.s_suffix}.p")
+        self.f_reco_appliedmc = self.f_reco_appliedmc.replace(".p", f"{self.s_suffix}.p")
         self.f_df_ml_test_to_df = f"{self.dirmlout}/testsample_{self.s_suffix}_mldecision.pkl"
         self.f_mltest_applied = f"{self.dirmlout}/testsample_{self.s_suffix}_mldecision.pkl"
         self.df_mltest_applied = None

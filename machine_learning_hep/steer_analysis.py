@@ -47,7 +47,7 @@ def do_entire_analysis(  # pylint: disable=too-many-locals, too-many-statements,
     logger.info("Do analysis chain")
 
     # If we are here we are interested in the very first key in the parameters database
-    case = list(data_param.keys())[0]
+    case = next(iter(data_param.keys()))
 
     # Update database accordingly if needed
     update_config(data_param, data_config, data_param_overwrite)

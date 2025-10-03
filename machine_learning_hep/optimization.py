@@ -16,10 +16,10 @@
 Methods to: utility methods to conpute efficiency and study expected significance
 """
 
-import matplotlib.pyplot as plt # pylint: disable=import-error
+import matplotlib.pyplot as plt  # pylint: disable=import-error
 import numpy as np
-from matplotlib.colors import LogNorm # pylint: disable=import-error
-from matplotlib.ticker import MultipleLocator # pylint: disable=import-error
+from matplotlib.colors import LogNorm  # pylint: disable=import-error
+from matplotlib.ticker import MultipleLocator  # pylint: disable=import-error
 from ROOT import TH1F, TFile  # pylint: disable=import-error,no-name-in-module
 
 from machine_learning_hep.logger import get_logger
@@ -65,7 +65,7 @@ def calc_bkg(df_bkg, name, threshold_args, num_steps, fit_region, bkg_func, bin_
     """
     logger = get_logger()
     num_bins = (fit_region[1] - fit_region[0]) / bin_width
-    num_bins = int(round(num_bins))
+    num_bins = round(num_bins)
     bin_width = (fit_region[1] - fit_region[0]) / num_bins
     x_axis, y_axis, class_label = get_axis_label_for_mltype(mltype, threshold_args[label], num_steps)
 
