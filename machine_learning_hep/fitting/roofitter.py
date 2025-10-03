@@ -14,7 +14,7 @@
 
 """Definition of the RooFitter class and helper functions"""
 
-from math import sqrt
+from math import sqrt, isnan
 
 import ROOT
 from ROOT import RooAddPdf, RooArgList, RooArgSet, RooFit, RooRealVar, TPaveText
@@ -108,6 +108,7 @@ class RooFitter:
             )
 
         dh = ROOT.RooDataHist("dh", "dh", [m], Import=hist)
+        ret_model = model
         if range_m := fit_spec.get("range"):
             m.setRange("fit", *range_m)
             # print(f'using fit range: {range_m}, var range: {m.getRange("fit")}')
