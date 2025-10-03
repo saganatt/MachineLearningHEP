@@ -14,7 +14,7 @@
 
 """Definition of the RooFitter class and helper functions"""
 
-from math import sqrt, isnan
+from math import isnan, sqrt
 
 import ROOT
 from ROOT import RooAddPdf, RooArgList, RooArgSet, RooFit, RooRealVar, TPaveText
