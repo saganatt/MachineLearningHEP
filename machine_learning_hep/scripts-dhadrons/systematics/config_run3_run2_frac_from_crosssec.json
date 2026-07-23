@@ -1,0 +1,45 @@
+{
+  "inputdir": "/data8/majak/crosssec/2026-fractions",
+  "histoname": "hCorrFracNonPrompt",
+  "default": "#splitline{#Lambda_{c}^{#plus}#rightarrowpK^{#minus}#pi^{#plus},}{#sqrt{#it{s}} = 13.6 TeV}",
+  "model_default": "Monash",
+  "hists": {
+    "#Lambda_{c}^{#plus}#rightarrowpK^{#minus}#pi^{#plus}, pK_{S}^{0}, #kern[-0.12]{#sqrt{#it{s}} = 13 TeV}": {
+      "file": [
+        "CutVarLcMerged_pp13TeV_0-25.root"
+      ],
+      "systematics": [
+        [0.0],
+        [0.08],
+        [0.08],
+        [0.08],
+        [0.08],
+        [0.13],
+        [0.0]
+      ]
+    },
+    "#splitline{#Lambda_{c}^{#plus}#rightarrowpK^{#minus}#pi^{#plus},}{#sqrt{#it{s}} = 13.6 TeV}": {
+      "file": [
+        "CutVarLc_pp13TeV_LHC23_pass4_default.root"
+      ]
+    }
+  },
+  "models": {
+    "Monash": {
+      "file": "NonPromptLcFraction_Monash_1B.root",
+      "histoname": "h_nonprompt_fraction"
+    }
+  },
+  "bin_min": [1,2,3,4,5,6,8,12,16],
+  "bin_max": [2,3,4,5,6,8,12,16,24],
+  "y_axis": "#it{f}_{non-prompt}",
+  "alice_text": "#Lambda_{c}^{#plus} and charge conj.",
+  "legend": [0.24, 0.46, 0.60, 0.68],
+  "legend_ratio": [0.60, 0.63, 0.90, 0.88],
+  "legend_models": [0.45, 0.03, 0.65, 0.11],
+  "legend_ratio_models": [0.18, 0.18, 0.40, 0.23],
+  "output": {
+    "outdir": "/data8/majak/crosssec/2026-fractions",
+    "file": "NP_Frac_pp13TeV_run3_run2_1-24"
+  }
+}
