@@ -164,7 +164,6 @@ def plot_roc_ovr(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folde
         class_labels = class_labels[:-1] if len(class_labels) <= 2 else class_labels
         for cls_hyp, (label_hyp, color) in enumerate(zip(class_labels, HIST_COLORS)):
             plot_roc(y_train == cls_hyp, y_score[:, cls_hyp], name, label_hyp, color)
-        ax.axline((0,0), slope=1, linestyle="--", color="k", alpha=0.5, linewidth=3.0)
         ax.set_xlabel("False Positive Rate", fontsize=40)
         ax.set_ylabel("True Positive Rate", fontsize=40)
         #ax.set_title(f"ROC one vs. rest {name}", fontsize=40)
@@ -245,7 +244,7 @@ def roc_train_test(
         raise ValueError("ROC type can be only OvR or OvO")
     names_ = ["XGBoost"]
     roc_fun = plot_roc_ovr if roc_type == "OvR" else plot_roc_ovo
-    class_labels = ["class 1", "class 2"]
+    class_labels = ["class 1", "class 2", "class 3"]
     fig_train = roc_fun(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folder, class_labels, save=False)
     fig_test = roc_fun(names_, classifiers_, suffix_, x_test, y_test, nkfolds, folder, class_labels, save=False)
 
