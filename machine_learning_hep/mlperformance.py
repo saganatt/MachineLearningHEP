@@ -154,23 +154,34 @@ def plot_roc_ovr(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folde
     def plot_roc(y_truth, y_score, name, label, color):
         fpr, tpr, _ = roc_curve(y_truth, y_score)
         roc_auc = auc(fpr, tpr)
-        plt.plot(fpr, tpr, f"{color}-", label=f"ROC {name} {label} vs rest, AUC = {roc_auc:.2f}", linewidth=5.0)
+        plt.plot(fpr, tpr, f"{color}-", label=f"ROC {label} vs rest, AUC = {roc_auc:.2f}", linewidth=5.0)
 
+    class_labels = ["class 1", "class 2"]
     figure, nrows, ncols = prepare_fig(len(names_))
     for ind, (name, clf) in enumerate(zip(names_, classifiers_), start=1):
         ax = plt.subplot(nrows, ncols, ind)
         y_score = cross_val_predict(clf, x_train, y_train, cv=nkfolds, method="predict_proba")
+        class_labels = class_labels[:-1] if len(class_labels) <= 2 else class_labels
         for cls_hyp, (label_hyp, color) in enumerate(zip(class_labels, HIST_COLORS)):
             plot_roc(y_train == cls_hyp, y_score[:, cls_hyp], name, label_hyp, color)
-        ax.set_xlabel("False Positive Rate", fontsize=30)
-        ax.set_ylabel("True Positive Rate", fontsize=30)
-        ax.set_title(f"ROC one vs. rest {name}", fontsize=30)
-        ax.legend(loc="lower right", frameon=False, fontsize=25)
+        ax.axline((0,0), slope=1, linestyle="--", color="k", alpha=0.5, linewidth=3.0)
+        ax.set_xlabel("False Positive Rate", fontsize=40)
+        ax.set_ylabel("True Positive Rate", fontsize=40)
+        #ax.set_title(f"ROC one vs. rest {name}", fontsize=40)
+        ax.legend(loc="lower right", frameon=False, fontsize=30)
         ax.set_xlim([-0.05, 1.05])
         ax.set_ylim([-0.05, 1.05])
-        ax.tick_params(labelsize=20)
+        ax.tick_params(labelsize=30)
 
     if save:
+        ax.text(
+            0.7,
+            0.4,
+            "This Thesis",
+            verticalalignment="center",
+            transform=ax.transAxes,
+            fontsize=40,
+        )
         figure.savefig(f"{folder}/ROC_OvR_{suffix_}.png", bbox_inches="tight")
         plt.close(figure)
     return figure
@@ -202,13 +213,13 @@ def plot_roc_ovo(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folde
                 )
         global_roc_auc = roc_auc_score(y_train, y_score, average="macro", multi_class="ovo")
         plt.plot([], [], " ", label=f"Unweighted average OvO ROC AUC: {global_roc_auc:.2f}")
-        ax.set_xlabel("First class efficiency", fontsize=30)
-        ax.set_ylabel("Second class efficiency", fontsize=30)
-        ax.set_title(f"ROC one vs. one {name}", fontsize=30)
-        ax.legend(loc="lower right", frameon=False, fontsize=25)
+        ax.set_xlabel("First class efficiency", fontsize=40)
+        ax.set_ylabel("Second class efficiency", fontsize=40)
+        ax.set_title(f"ROC one vs. one {name}", fontsize=40)
+        ax.legend(loc="lower right", frameon=False, fontsize=30)
         ax.set_xlim([-0.05, 1.05])
         ax.set_ylim([-0.05, 1.05])
-        ax.tick_params(labelsize=20)
+        ax.tick_params(labelsize=30)
     if save:
         figure.savefig(f"{folder}/ROC_OvO_{suffix_}.png", bbox_inches="tight")
         plt.close(figure)
@@ -232,7 +243,9 @@ def roc_train_test(
     binmin, binmax = binlims
     if roc_type not in ("OvR", "OvO"):
         raise ValueError("ROC type can be only OvR or OvO")
+    names_ = ["XGBoost"]
     roc_fun = plot_roc_ovr if roc_type == "OvR" else plot_roc_ovo
+    class_labels = ["class 1", "class 2"]
     fig_train = roc_fun(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folder, class_labels, save=False)
     fig_test = roc_fun(names_, classifiers_, suffix_, x_test, y_test, nkfolds, folder, class_labels, save=False)
 
@@ -254,20 +267,28 @@ def roc_train_test(
                         linestyle=ls,
                         label=f"{roc_t.get_label()}, {set_name} set",
                     )
-        ax.set_xlabel(ax_train.get_xlabel(), fontsize=30)
-        ax.set_ylabel(ax_train.get_ylabel(), fontsize=30)
+        ax.set_xlabel(ax_train.get_xlabel(), fontsize=40)
+        ax.set_ylabel(ax_train.get_ylabel(), fontsize=40)
         ax.legend(loc="lower right", frameon=False, fontsize=25)
         ax.set_xlim([-0.05, 1.05])
         ax.set_ylim([-0.05, 1.05])
-        ax.tick_params(labelsize=20)
+        ax.tick_params(labelsize=30)
 
+        #ax.text(
+        #    0.4,
+        #    0.20,
+        #    f" ${binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {binmax}$",
+        #    verticalalignment="center",
+        #    transform=ax.transAxes,
+        #    fontsize=30,
+        #)
         ax.text(
             0.7,
             0.8,
-            f" ${binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {binmax}$",
+            "This Thesis",
             verticalalignment="center",
             transform=ax.transAxes,
-            fontsize=30,
+            fontsize=40,
         )
 
     figure.savefig(f"{folder}/ROCtraintest_{roc_type}_{suffix_}.png", bbox_inches="tight")
@@ -327,9 +348,10 @@ def plot_model_pred(names, classifiers, suffix, x_train, y_train, x_test, y_test
                 err = np.sqrt(hist * scale) / scale
                 center = (bins[:-1] + bins[1:]) / 2
                 plt.errorbar(center, hist, yerr=err, fmt="o", c=color, label=f"{label}, test")
-            plt.xlabel(f"ML score for {label_hyp}", fontsize=15)
-            plt.ylabel("Counts (arb. units)", fontsize=15)
-            plt.legend(loc="best", frameon=False, fontsize=15)
+            plt.xlabel(f"ML score for {label_hyp}", fontsize=20)
+            plt.ylabel("Counts (arb. units)", fontsize=20)
+            plt.legend(loc="lower center", frameon=False, fontsize=20, ncols=2)
             plt.yscale("log")
+            figure.text(0.4, 0.8, "This Thesis", fontsize=30)
             figure.savefig(f"{folder}/ModelOutDistr_{label_hyp}_{name}_{suffix}.png", bbox_inches="tight")
             plt.close(figure)

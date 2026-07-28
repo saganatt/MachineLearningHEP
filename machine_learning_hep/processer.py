@@ -243,7 +243,7 @@ class Processer:  # pylint: disable=too-many-instance-attributes
                         self.lpt_probcutfin,
                         self.lpt_probcutpre,
                     )
-            elif probcutfin < probcutpre:
+            elif probcutfin > probcutpre:
                 self.logger.fatal(
                     "Probability cut final: %s must be tighter (smaller values) than presel %s!",
                     self.lpt_probcutfin,
