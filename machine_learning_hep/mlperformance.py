@@ -348,7 +348,7 @@ def plot_model_pred(names, classifiers, suffix, x_train, y_train, x_test, y_test
                 plt.errorbar(center, hist, yerr=err, fmt="o", c=color, label=f"{label}, test")
             plt.xlabel(f"ML score for {label_hyp}", fontsize=40)
             plt.ylabel("Counts (arb. units)", fontsize=40)
-            plt.legend(loc="lower center", frameon=False, fontsize=25, ncols=2)
+            plt.legend(loc="lower center", frameon=False, fontsize=20, ncols=2)
             plt.tick_params(labelsize=30)
             plt.yscale("log")
             figure.text(0.4, 0.8, "This Thesis", fontsize=40)
