@@ -231,13 +231,13 @@ def importanceplotall(mylistvariables_, names_, trainedmodels_, suffix_, folder)
         y_pos = np.arange(len(mylistvariables_))
         ax.barh(y_pos, feature_importances_, align="center", color="green")
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(mylistvariables_, fontsize=17)
+        ax.set_yticklabels(mylistvariables_, fontsize=25)
         ax.invert_yaxis()  # labels read top-to-bottom
-        ax.set_xlabel("Importance", fontsize=17)
-        ax.set_title(f"Importance features {name}", fontsize=17)
-        ax.xaxis.set_tick_params(labelsize=17)
+        ax.set_xlabel("Importance", fontsize=40)
+        ax.set_title(f"Importance features {name}", fontsize=40)
+        ax.xaxis.set_tick_params(labelsize=25)
         plt.xlim(0, 0.7)
-    figure.savefig(f"{folder}/importance_{suffix_}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/importance_{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close()
 
 
@@ -255,15 +255,16 @@ def shap_study(names_, trainedmodels_, suffix_, x_train_, folder, class_labels, 
         folder: str
             Where to be saved
     """
-    mpl.rcParams.update({"text.usetex": True})
+    class_labels = ["class 1", "class 2", "class 3"]
+    #mpl.rcParams.update({"text.usetex": True})
     plot_type_name = "prob_cut_scan"
     plot_options = plot_options_.get(plot_type_name, {}) if isinstance(plot_options_, dict) else {}
-    feature_names = []
-    for fn in x_train_.columns:
-        if fn in plot_options and "xlabel" in plot_options[fn]:
-            feature_names.append("$" + plot_options[fn]["xlabel"] + "$")
-        else:
-            feature_names.append(fn.replace("_", ":"))
+    feature_names = [f"feature {i}" for i in range(len(x_train_.columns))]
+    #for fn in x_train_.columns:
+    #    if fn in plot_options and "xlabel" in plot_options[fn]:
+    #        feature_names.append("$" + plot_options[fn]["xlabel"] + "$")
+    #    else:
+    #        feature_names.append(fn.replace("_", ":"))
 
     # Rely on name to exclude certain models at the moment
     names_models = [
@@ -285,16 +286,41 @@ def shap_study(names_, trainedmodels_, suffix_, x_train_, folder, class_labels, 
             class_names=class_labels,
             class_inds="original",
         )
+        ax = plt.gca()
+        legend = ax.get_legend()
+        texts = legend.get_texts()
+        for txt in texts:
+            txt.set_fontsize(25)
+        ax.tick_params("x", labelsize=20)
+        ax.tick_params("y", labelsize=25)
+        xlabel = ax.get_xlabel()
+        ax.set_xlabel(xlabel, fontsize=13)
+        ylabel = ax.get_ylabel()
+        ax.set_ylabel(ylabel, fontsize=40)
+        ax.text(0.63, 0.27, "This Thesis", transform=ax.transAxes, fontsize=30)
+
         if len(class_labels) > 2:
             for ind, label in enumerate(class_labels):
                 fig_class, _, _ = prepare_fig(1)
                 shap.summary_plot(
                     shap_values[ind], x_train_, show=False, feature_names=feature_names, class_names=class_labels
                 )
+                ax = plt.gca()
+                ax.tick_params("x", labelsize=15)
+                ax.tick_params("y", labelsize=20)
+                xlabel = ax.get_xlabel()
+                ax.set_xlabel(xlabel, fontsize=20)
+                ylabel = ax.get_ylabel()
+                ax.set_ylabel(ylabel, fontsize=40)
+                ax.text(0.0, 0.05, "This Thesis", transform=ax.transAxes, fontsize=25)
+                ax_cbar = fig_class.axes[-1]
+                ax_cbar.tick_params(labelsize=20)
+                ylabel = ax_cbar.get_ylabel()
+                ax_cbar.set_ylabel(ylabel, fontsize=30)
                 fig_class.savefig(f"{folder}/importance_shap_{name}_{label}_{suffix_}.png", bbox_inches="tight")
                 plt.close(fig_class)
-    figure.savefig(f"{folder}/importance_shap_{suffix_}.png", bbox_inches="tight")
-    mpl.rcParams.update({"text.usetex": False})
+    figure.savefig(f"{folder}/importance_shap_{suffix_}.png", bbox_inches="tight", dpi=600)
+    #mpl.rcParams.update({"text.usetex": False})
     plt.close(figure)
 
 
