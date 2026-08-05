@@ -234,10 +234,9 @@ def importanceplotall(mylistvariables_, names_, trainedmodels_, suffix_, folder)
         y_pos = np.arange(len(mylistvariables_))
         ax.barh(y_pos, feature_importances_, align="center", color="green")
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(feature_names, fontsize=25)
+        ax.set_yticklabels(feature_names, fontsize=40)
         ax.invert_yaxis()  # labels read top-to-bottom
         ax.set_xlabel("Importance", fontsize=40)
-        ax.set_title(f"Importance features", fontsize=40)
         ax.xaxis.set_tick_params(labelsize=25)
         plt.xlim(0, 0.2)
     figure.savefig(f"{folder}/importance_{suffix_}.png", bbox_inches="tight", dpi=600)
@@ -258,16 +257,19 @@ def shap_study(names_, trainedmodels_, suffix_, x_train_, folder, class_labels, 
         folder: str
             Where to be saved
     """
-    class_labels = ["class 1", "class 2", "class 3"]
-    #mpl.rcParams.update({"text.usetex": True})
+    mpl.rcParams.update({"text.usetex": True})
     plot_type_name = "prob_cut_scan"
     plot_options = plot_options_.get(plot_type_name, {}) if isinstance(plot_options_, dict) else {}
-    feature_names = [f"feature {i}" for i in range(len(x_train_.columns))]
-    #for fn in x_train_.columns:
-    #    if fn in plot_options and "xlabel" in plot_options[fn]:
-    #        feature_names.append("$" + plot_options[fn]["xlabel"] + "$")
-    #    else:
-    #        feature_names.append(fn.replace("_", ":"))
+    feature_names = []
+    logger = get_logger()
+    logger.debug("plot options:\n%s", plot_options)
+    for fn in x_train_.columns:
+        logger.debug("feature %s", fn)
+        if fn in plot_options and "xlabel" in plot_options[fn]:
+            logger.debug("feature in plot options %s", plot_options[fn]["xlabel"])
+            feature_names.append("$" + plot_options[fn]["xlabel"] + "$")
+        else:
+            feature_names.append(fn.replace("_", ":"))
 
     # Rely on name to exclude certain models at the moment
     names_models = [
@@ -323,7 +325,7 @@ def shap_study(names_, trainedmodels_, suffix_, x_train_, folder, class_labels, 
                 fig_class.savefig(f"{folder}/importance_shap_{name}_{label}_{suffix_}.png", bbox_inches="tight", dpi=600)
                 plt.close(fig_class)
     figure.savefig(f"{folder}/importance_shap_{suffix_}.png", bbox_inches="tight", dpi=600)
-    #mpl.rcParams.update({"text.usetex": False})
+    mpl.rcParams.update({"text.usetex": False})
     plt.close(figure)
 
 
