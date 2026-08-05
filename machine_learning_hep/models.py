@@ -317,7 +317,7 @@ def shap_study(names_, trainedmodels_, suffix_, x_train_, folder, class_labels, 
                 ax_cbar.tick_params(labelsize=20)
                 ylabel = ax_cbar.get_ylabel()
                 ax_cbar.set_ylabel(ylabel, fontsize=30)
-                fig_class.savefig(f"{folder}/importance_shap_{name}_{label}_{suffix_}.png", bbox_inches="tight")
+                fig_class.savefig(f"{folder}/importance_shap_{name}_{label}_{suffix_}.png", bbox_inches="tight", dpi=600)
                 plt.close(fig_class)
     figure.savefig(f"{folder}/importance_shap_{suffix_}.png", bbox_inches="tight", dpi=600)
     #mpl.rcParams.update({"text.usetex": False})
