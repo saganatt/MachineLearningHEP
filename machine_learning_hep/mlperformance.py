@@ -54,7 +54,7 @@ def plot_cross_validation_mse(names_, df_scores_, suffix_, folder):
         ax.set_xlabel("scores RMSE", fontsize=30)
         ax.set_ylabel("Entries", fontsize=30)
         ax.set_ylim(0, 5)
-    figure.savefig(f"{folder}/scoresRME{suffix_}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/scoresRME{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close(figure)
 
 
@@ -68,7 +68,7 @@ def plot_distribution_target(names_, testset, myvariablesy, suffix_, folder):
         ax.set_xlabel(myvariablesy, fontsize=30)
         ax.set_ylabel("Entries", fontsize=30)
     plt.legend(loc="center right")
-    figure.savefig(f"{folder}/distributionregression{suffix_}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/distributionregression{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close(figure)
 
 
@@ -81,7 +81,7 @@ def plot_scatter_target(names_, testset, myvariablesy, suffix_, folder):
         ax.set_xlabel(f"{myvariablesy} true", fontsize=30)
         ax.set_ylabel(f"{myvariablesy} predicted", fontsize=30)
         ax.tick_params(labelsize=20)
-    figure.savefig(f"{folder}/scatterplotregression{suffix_}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/scatterplotregression{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close(figure)
 
 
@@ -107,7 +107,7 @@ def confusion(names_, classifiers_, suffix_, x_train, y_train, cvgen, folder, do
         ax.xaxis.set_ticklabels(["signal", "background"])
         ax.yaxis.set_ticklabels(["signal", "background"])
     suffix_0 = "_Diag0" if do_diag0 else ""
-    figure.savefig(f"{folder}/confusion_matrix{suffix_}{suffix_0}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/confusion_matrix{suffix_}{suffix_0}.png", bbox_inches="tight", dpi=600)
     plt.close(figure)
 
 
@@ -146,7 +146,7 @@ def plot_precision_recall(
         ax.legend(loc="best", frameon=False, fontsize=25)
         ax.set_ylim([0, 1])
         ax.tick_params(labelsize=20)
-    figure.savefig(f"{folder}/precision_recall{suffix_}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/precision_recall{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close(figure)
 
 
@@ -167,7 +167,7 @@ def plot_roc_ovr(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folde
         ax.set_xlabel("False Positive Rate", fontsize=40)
         ax.set_ylabel("True Positive Rate", fontsize=40)
         #ax.set_title(f"ROC one vs. rest {name}", fontsize=40)
-        ax.legend(loc="lower right", frameon=False, fontsize=30)
+        ax.legend(loc="lower right", frameon=False, fontsize=25)
         ax.set_xlim([-0.05, 1.05])
         ax.set_ylim([-0.05, 1.05])
         ax.tick_params(labelsize=30)
@@ -181,7 +181,7 @@ def plot_roc_ovr(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folde
             transform=ax.transAxes,
             fontsize=40,
         )
-        figure.savefig(f"{folder}/ROC_OvR_{suffix_}.png", bbox_inches="tight")
+        figure.savefig(f"{folder}/ROC_OvR_{suffix_}.png", bbox_inches="tight", dpi=600)
         plt.close(figure)
     return figure
 
@@ -215,12 +215,12 @@ def plot_roc_ovo(names_, classifiers_, suffix_, x_train, y_train, nkfolds, folde
         ax.set_xlabel("First class efficiency", fontsize=40)
         ax.set_ylabel("Second class efficiency", fontsize=40)
         ax.set_title(f"ROC one vs. one {name}", fontsize=40)
-        ax.legend(loc="lower right", frameon=False, fontsize=30)
+        ax.legend(loc="lower right", frameon=False, fontsize=25)
         ax.set_xlim([-0.05, 1.05])
         ax.set_ylim([-0.05, 1.05])
         ax.tick_params(labelsize=30)
     if save:
-        figure.savefig(f"{folder}/ROC_OvO_{suffix_}.png", bbox_inches="tight")
+        figure.savefig(f"{folder}/ROC_OvO_{suffix_}.png", bbox_inches="tight", dpi=600)
         plt.close(figure)
     return figure
 
@@ -279,18 +279,17 @@ def roc_train_test(
         #    f" ${binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {binmax}$",
         #    verticalalignment="center",
         #    transform=ax.transAxes,
-        #    fontsize=30,
+        #    fontsize=40,
         #)
         ax.text(
             0.7,
             0.8,
             "This Thesis",
-            verticalalignment="center",
             transform=ax.transAxes,
             fontsize=40,
         )
 
-    figure.savefig(f"{folder}/ROCtraintest_{roc_type}_{suffix_}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/ROCtraintest_{roc_type}_{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close(figure)
     plt.close(fig_train)
     plt.close(fig_test)
@@ -320,7 +319,7 @@ def plot_learning_curves(names_, classifiers_, suffix_, folder, x_data, y_data, 
         ax.legend(loc="best", frameon=False, fontsize=25)
         ax.set_ylim([0, np.amax(np.sqrt(val_errors)) * 2])
         ax.tick_params(labelsize=20)
-    figure.savefig(f"{folder}/learning_curve{suffix_}.png", bbox_inches="tight")
+    figure.savefig(f"{folder}/learning_curve{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close(figure)
 
 
@@ -347,10 +346,11 @@ def plot_model_pred(names, classifiers, suffix, x_train, y_train, x_test, y_test
                 err = np.sqrt(hist * scale) / scale
                 center = (bins[:-1] + bins[1:]) / 2
                 plt.errorbar(center, hist, yerr=err, fmt="o", c=color, label=f"{label}, test")
-            plt.xlabel(f"ML score for {label_hyp}", fontsize=20)
-            plt.ylabel("Counts (arb. units)", fontsize=20)
-            plt.legend(loc="lower center", frameon=False, fontsize=20, ncols=2)
+            plt.xlabel(f"ML score for {label_hyp}", fontsize=40)
+            plt.ylabel("Counts (arb. units)", fontsize=40)
+            plt.legend(loc="lower center", frameon=False, fontsize=25, ncols=2)
+            plt.tick_params(labelsize=30)
             plt.yscale("log")
-            figure.text(0.4, 0.8, "This Thesis", fontsize=30)
-            figure.savefig(f"{folder}/ModelOutDistr_{label_hyp}_{name}_{suffix}.png", bbox_inches="tight")
+            figure.text(0.4, 0.8, "This Thesis", transform=ax.transAxes, fontsize=40)
+            figure.savefig(f"{folder}/ModelOutDistr_{label_hyp}_{name}_{suffix}.png", bbox_inches="tight", dpi=600)
             plt.close(figure)
