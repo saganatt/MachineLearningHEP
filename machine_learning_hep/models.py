@@ -224,19 +224,22 @@ def importanceplotall(mylistvariables_, names_, trainedmodels_, suffix_, folder)
         for name, model in zip(names_, trainedmodels_)
         if not any(mname in name for mname in ("SVC", "Logistic", "Keras"))
     ]
+    feature_names = [f"feature {i}" for i in range(len(mylistvariables_))]
     figure, nrows, ncols = prepare_fig(len(names_models))
+    logger = get_logger()
+    logger.debug("list variables %s", mylistvariables_)
     for ind, (name, model) in enumerate(names_models, start=1):
         ax = plt.subplot(nrows, ncols, ind)
         feature_importances_ = model.feature_importances_
         y_pos = np.arange(len(mylistvariables_))
         ax.barh(y_pos, feature_importances_, align="center", color="green")
         ax.set_yticks(y_pos)
-        ax.set_yticklabels(mylistvariables_, fontsize=25)
+        ax.set_yticklabels(feature_names, fontsize=25)
         ax.invert_yaxis()  # labels read top-to-bottom
         ax.set_xlabel("Importance", fontsize=40)
-        ax.set_title(f"Importance features {name}", fontsize=40)
+        ax.set_title(f"Importance features", fontsize=40)
         ax.xaxis.set_tick_params(labelsize=25)
-        plt.xlim(0, 0.7)
+        plt.xlim(0, 0.2)
     figure.savefig(f"{folder}/importance_{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close()
 
