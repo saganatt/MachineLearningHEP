@@ -351,6 +351,6 @@ def plot_model_pred(names, classifiers, suffix, x_train, y_train, x_test, y_test
             plt.legend(loc="lower center", frameon=False, fontsize=25, ncols=2)
             plt.tick_params(labelsize=30)
             plt.yscale("log")
-            figure.text(0.4, 0.8, "This Thesis", transform=ax.transAxes, fontsize=40)
+            figure.text(0.4, 0.8, "This Thesis", fontsize=40)
             figure.savefig(f"{folder}/ModelOutDistr_{label_hyp}_{name}_{suffix}.png", bbox_inches="tight", dpi=600)
             plt.close(figure)
