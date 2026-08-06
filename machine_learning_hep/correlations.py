@@ -37,10 +37,11 @@ def vardistplot(dfs_input_, mylistvariables_, output_, binmin, binmax, plot_opti
     plot_type_name = "prob_cut_scan"
     plot_options = plot_options_.get(plot_type_name, {}) if isinstance(plot_options_, dict) else {}
 
-    figure = plt.figure(figsize=(20, 15))
-    figure.suptitle(f"Separation plots for ${binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {binmax}$", fontsize=30)
+    figure = plt.figure(figsize=(15, 20))
+    #figure.suptitle(f"Separation plots for ${binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {binmax}$", fontsize=30)
+    offset = 1 if len(mylistvariables_) % 3 > 0 else 0
     for ind, var in enumerate(mylistvariables_, start=1):
-        ax = plt.subplot(3, int(len(mylistvariables_) / 3 + 1), ind)
+        ax = plt.subplot(3, int(len(mylistvariables_) / 3) + offset, ind)
         plt.yscale("log")
         kwargs = {"alpha": 0.3, "density": True, "bins": 100}
         po = plot_options.get(var, {})
@@ -55,11 +56,17 @@ def vardistplot(dfs_input_, mylistvariables_, output_, binmin, binmax, plot_opti
             plt.xlim(po["xlim"][0], po["xlim"][1])
         if "xlabel" in po:
             var_tex = "$" + po["xlabel"] + "$"
-        plt.xlabel(var_tex, fontsize=11)
-        plt.ylabel(po.get("ylabel", "entries"), fontsize=11)
-        ax.legend()
+        plt.xlabel(var_tex, fontsize=30)
+        if (ind - 1) % 4 == 0:
+            plt.ylabel(po.get("ylabel", "entries"), fontsize=20)
+        plt.tick_params("x", labelsize=30)
+        plt.tick_params("y", labelsize=25)
+        #ax.legend()
+    plt.subplots_adjust(wspace=0.35, hspace=0.3)
+    plt.legend(loc="best", frameon=False, fontsize=25)
+    figure.text(0.4, 0.9, "This Thesis", fontsize=40)
     plotname = f"{output_}/variablesDistribution_nVar{len(mylistvariables_)}_{binmin}{binmax}.png"
-    figure.savefig(plotname, bbox_inches="tight")
+    figure.savefig(plotname, bbox_inches="tight", dpi=600)
     mpl.rcParams.update({"text.usetex": False})
     plt.close(figure)
 
@@ -315,7 +322,7 @@ def correlationmatrix(dataframe, mylistvariables, label, output, binmin, binmax,
     corr = dataframe[mylistvariables].corr()
     # Generate a mask for the upper triangle
     mask = np.triu(np.ones_like(corr, dtype=bool))
-    _, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 8))
     # sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool),
     mpl.rcParams.update({"text.usetex": True})
     plot_type_name = "prob_cut_scan"
@@ -342,13 +349,30 @@ def correlationmatrix(dataframe, mylistvariables, label, output, binmin, binmax,
         yticklabels=labels,
     )
     ax.text(
-        0.7,
+        0.4,
         0.9,
         f"${binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {binmax}$\n{label}",
         verticalalignment="center",
         transform=ax.transAxes,
-        fontsize=13,
+        fontsize=30,
     )
-    plt.savefig(output, bbox_inches="tight")
+    ax.text(
+        0.4,
+        0.7,
+        "This Thesis",
+        verticalalignment="center",
+        transform=ax.transAxes,
+        fontsize=40,
+    )
+    xlabel = ax.get_xlabel()
+    ax.set_xlabel(xlabel, fontsize=40)
+    ylabel = ax.get_ylabel()
+    ax.set_ylabel(ylabel, fontsize=40)
+    ax.tick_params(labelsize=13)
+    ax_cbar = fig.axes[-1]
+    ax_cbar.tick_params(labelsize=20)
+    ylabel = ax_cbar.get_ylabel()
+    ax_cbar.set_ylabel(ylabel, fontsize=30)
+    plt.savefig(output, bbox_inches="tight", dpi=600)
     mpl.rcParams.update({"text.usetex": False})
     plt.close()
