@@ -237,7 +237,7 @@ def importanceplotall(mylistvariables_, names_, trainedmodels_, suffix_, folder)
         ax.set_yticklabels(feature_names, fontsize=40)
         ax.invert_yaxis()  # labels read top-to-bottom
         ax.set_xlabel("Importance", fontsize=40)
-        ax.xaxis.set_tick_params(labelsize=25)
+        ax.tick_params("x", labelsize=30)
         plt.xlim(0, 0.2)
     figure.savefig(f"{folder}/importance_{suffix_}.png", bbox_inches="tight", dpi=600)
     plt.close()
@@ -301,7 +301,7 @@ def shap_study(names_, trainedmodels_, suffix_, x_train_, folder, class_labels, 
         xlabel = ax.get_xlabel()
         ax.set_xlabel(xlabel, fontsize=13)
         ylabel = ax.get_ylabel()
-        ax.set_ylabel(ylabel, fontsize=40)
+        ax.set_ylabel(ylabel, fontsize=35)
         ax.text(0.63, 0.27, "This Thesis", transform=ax.transAxes, fontsize=30)
 
         if len(class_labels) > 2:
@@ -316,7 +316,7 @@ def shap_study(names_, trainedmodels_, suffix_, x_train_, folder, class_labels, 
                 xlabel = ax.get_xlabel()
                 ax.set_xlabel(xlabel, fontsize=20)
                 ylabel = ax.get_ylabel()
-                ax.set_ylabel(ylabel, fontsize=40)
+                ax.set_ylabel(ylabel, fontsize=35)
                 ax.text(0.0, 0.05, "This Thesis", transform=ax.transAxes, fontsize=25)
                 ax_cbar = fig_class.axes[-1]
                 ax_cbar.tick_params(labelsize=20)
