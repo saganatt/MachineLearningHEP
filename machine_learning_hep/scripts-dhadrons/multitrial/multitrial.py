@@ -109,6 +109,9 @@ def plot_yields_trials(yields, yields_err, trials, cfg, pt_string, plot_pt_strin
                     facecolor="orange", edgecolor="none", alpha=0.3)
     plot_trial_line(ax, central_trial_ind)
     plot_text_box(ax, plot_pt_string)
+    trial_file = f'{cfg["outdir"]}/{cfg["outfile"]}_yields_trials_{pt_string}.png'
+    print("trial file:")
+    print(trial_file)
     fig.savefig(f'{cfg["outdir"]}/{cfg["outfile"]}_yields_trials_{pt_string}.png',
                 bbox_inches="tight")
     plt.close()

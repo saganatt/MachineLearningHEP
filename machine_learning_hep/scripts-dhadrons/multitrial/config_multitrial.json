@@ -13,7 +13,7 @@
   "pt_bins_max": [2, 3, 4, 5, 6, 7, 8, 10, 12, 16, 24],
   "central_trial": "",
   "_central_trial": "suffix of the directory with the central trial",
-  "outdir": "/data8/majak/multitrial",
+  "outdir": "/data8/majak/multitrial-thesis",
   "_outdir": "output directory",
   "outfile": "result-prompt-chi5",
   "_outfile": "output file pattern"
