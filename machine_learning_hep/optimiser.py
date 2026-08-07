@@ -785,9 +785,12 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
             plt.figure(fig_signif.number)
             plt.errorbar(x_axis,  signif_array_ml, yerr=signif_err_array_ml,
                          c="b", label=name, elinewidth=2.5, linewidth=5.0)
-            plt.text(0.7, 0.95,
-                     f" ${self.p_binmin} < p_\\mathrm{{T}}/(\\mathrm{{GeV}}/c) < {self.p_binmax}$",
-                     verticalalignment="center", transform=fig_signif.gca().transAxes, fontsize=30)
+            plt.text(0.6, 0.95,
+                     f" ${self.p_binmin} < p_\\mathrm{{T}}(\\mathrm{{GeV}}/c) < {self.p_binmax}$",
+                     verticalalignment="center", transform=fig_signif.gca().transAxes, fontsize=40)
+            plt.text(0.6, 0.85,
+                     "This Thesis",
+                     verticalalignment="center", transform=fig_signif.gca().transAxes, fontsize=40)
             #signif_array_tot = [sig * sqrt(self.p_nevttot) for sig in signif_array]
             #signif_err_array_tot = [sig_err * sqrt(self.p_nevttot) for sig_err in signif_err_array]
             #plt.figure(fig_signif.number)
@@ -798,7 +801,7 @@ class Optimiser: # pylint: disable=too-many-public-methods, consider-using-f-str
         plt.savefig(f"{self.dirmlplot}/Significance_PerEvent_{self.s_suffix}.png", bbox_inches='tight')
         plt.figure(fig_signif.number)
         mpl.rcParams.update({"text.usetex": True})
-        plt.legend(loc="lower left", fontsize=25)
+        #plt.legend(loc="lower left", fontsize=25)
         plt.savefig(f"{self.dirmlplot}/Significance_{self.s_suffix}.png", bbox_inches='tight')
         mpl.rcParams.update({"text.usetex": False})
 

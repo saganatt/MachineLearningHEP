@@ -227,56 +227,68 @@ LcpKpi:
 
     plot_options:
       prob_cut_scan:
-        pt_prong0:
-          xlim:
-            - 0
-            - 8
-        pt_prong1:
-          xlim:
-            - 0
-            - 8
-        pt_prong2:
-          xlim:
-            - 0
-            - 8
         fDecayLength:
-          xlim:
-            - 0
-            - 0.08
+          xlim: [0, 0.1]
+          xlabel: "DL"
+        fDecayLengthXY:
+          xlim: [0, 0.1]
+          xlabel: "DL^{xy}"
+        fImpactParameter0:
+          xlim: [-0.5, 0.5]
+          xlabel: "d_{0}^{xy, 0}"
+        fImpactParameter1:
+          xlim: [-0.5, 0.5]
+          xlabel: "d_{0}^{xy, 1}"
+        fImpactParameter2:
+          xlim: [-0.5, 0.5]
+          xlabel: "d_{0}^{xy, 2}"
         fChi2PCA:
-          xlim:
-            - 0
-            - 20.
-        fNSigTofPr0:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TOF}(p)0"
-        fNSigTofPi0:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TOF}(\\pi)0"
-        fNSigTofKa1:
-          xlim: [-10, 10]
-          xlabel: "n\\sigma_\\mathrm{TOF}(K)1"
-        fNSigTofPr2:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TOF}(p)2"
-        fNSigTofPi2:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TOF}(\\pi)2"
+          xlim: [0, 20.]
+          xlabel: "\\chi_{\\mathrm{PCA}}^2"
+        fCpa:
+          xlim: [0.8, 1.0]
+          xlabel: "\\cos \\theta_{\\mathrm{P}}"
+        fNSigTpcTofPr0:
+          xlim: [0, 30]
+          xlabel: "n\\sigma_\\mathrm{comb}^{\\mathrm{p}, 0}"
+        fNSigTpcTofPi0:
+          xlim: [0, 200]
+          xlabel: "n\\sigma_\\mathrm{comb}^{\\pi^{+}, 0}"
+        fNSigTpcTofKa1:
+          xlim: [0, 3]
+          xlabel: "n\\sigma_\\mathrm{comb}^{\\mathrm{K}^{-}, 1}"
+        fNSigTpcTofPr2:
+          xlim: [0, 30]
+          xlabel: "n\\sigma_\\mathrm{comb}^{\\mathrm{p}, 2}"
+        fNSigTpcTofPi2:
+          xlim: [0, 200]
+          xlabel: "n\\sigma_\\mathrm{comb}^{\\pi^{+}, 2}"
+        fCpaXY:
+          xlabel: "\\cos \\theta_{\\mathrm{P}}^{xy}"
+        fM:
+          xlabel: "m"
+        fY:
+          xlabel: "y"
+        fEta:
+          xlabel: "\\eta"
+        fPt:
+          xlabel: "p_{\\mathrm{T}}"
+        fPtProng0:
+          xlabel: "p_{\\mathrm{T}}^{0}"
+        fPtProng1:
+          xlabel: "p_{\\mathrm{T}}^{1}"
+        fPtProng2:
+          xlabel: "p_{\\mathrm{T}}^{2}"
         fNSigTpcPr0:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TPC}(p)0"
+          xlabel: "n\\sigma_\\mathrm{TPC}^{\\mathrm{p}, 0}"
         fNSigTpcPi0:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TPC}(\\pi)0"
+          xlabel: "n\\sigma_\\mathrm{TPC}^{\\pi^{+}, 0}"
         fNSigTpcKa1:
-          xlim: [-10, 10]
-          xlabel: "n\\sigma_\\mathrm{TPC}(K)1"
+          xlabel: "n\\sigma_\\mathrm{TPC}^{\\mathrm{K}^{-}, 1}"
         fNSigTpcPr2:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TPC}(p)2"
+          xlabel: "n\\sigma_\\mathrm{TPC}^{\\mathrm{p}, 2}"
         fNSigTpcPi2:
-          xlim: [-50, 50]
-          xlabel: "n\\sigma_\\mathrm{TPC}(\\pi)2"
+          xlabel: "n\\sigma_\\mathrm{TPC}^{\\pi^{+}, 2}"
       eff_cut_scan:
         pt_prong0:
           xlim:
@@ -377,7 +389,7 @@ LcpKpi:
     binmax: [2,3,4,5,6,7,8,10,12,24] # must be equal to sel_skim_binmax (sel_skim_binmin bins)
     mltype: MultiClassification
     ncorescrossval: 10
-    prefix_dir_ml: /data8/majak/MLHEP/results-data-20012025/
+    prefix_dir_ml: /data8/majak/MLHEP/results-thesis-2026-models-20012025/
     mlplot: mlplot # to be removed
     mlout: mlout # to be removed
 

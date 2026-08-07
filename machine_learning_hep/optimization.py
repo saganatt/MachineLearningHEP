@@ -145,9 +145,9 @@ def prepare_eff_signif_figure(y_label, mltype):
     class_label = "Bkg" if mltype == "MultiClassification" else "Prompt"
     fig = plt.figure(figsize=(20, 15))
     ax = plt.subplot(1, 1, 1)
-    ax.set_xlabel(f"{class_label} threshold", fontsize=30)
-    ax.set_ylabel(y_label, fontsize=30)
+    ax.set_xlabel(f"{class_label} threshold", fontsize=40)
+    ax.set_ylabel(y_label, fontsize=40)
     ax.xaxis.set_major_locator(MultipleLocator(0.1))
     ax.set_xlim(0.0, 1.0)
-    ax.tick_params(labelsize=20)
+    ax.tick_params(labelsize=30)
     return fig
