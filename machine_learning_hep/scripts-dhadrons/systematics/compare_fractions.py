@@ -52,9 +52,9 @@ HIST_STYLES=[kFullCircle, kFullSquare, kFullTriangleUp, kOpenCircle, kOpenSquare
 
 
 def get_alice_text(alice_text_config):
-    alice_text = TPaveText(0.24, 0.68, 0.60, 0.90, "brNDC")
+    alice_text = TPaveText(0.18, 0.72, 0.64, 0.90, "brNDC")
     alice_text.SetTextFont(42)
-    alice_text.SetTextSize(0.045)
+    alice_text.SetTextSize(0.032)
     alice_text.SetBorderSize(0)
     alice_text.SetFillStyle(0)
     alice_text.SetTextAlign(11)
@@ -73,48 +73,27 @@ def get_legend(x_1, y_1, x_2, y_2, num_hists, header = None):
     if header:
         leg.SetHeader(header)
     leg.SetTextAlign(12) #13)
-    leg.SetTextSize(0.05)
+    leg.SetTextSize(0.035)
     leg.SetMargin(0.1)
     leg.SetBorderSize(0)
     leg.SetFillStyle(0)
     return leg
 
-def prepare_canvas(cname, logy):
-    canv = TCanvas(cname, "", 443, 100, 700, 700)
-    canv.Range(0, 0, 1, 1)
-    #canv.SetLeftMargin(0.15)
-    #canv.SetBottomMargin(0.15)
 
-    canv_top = TPad(f"{cname}_top", "", 0.01, 0.3, 0.99, 0.99)
-    if logy:
-        canv_top.SetLogy()
-    canv_top.SetTickx(1)
-    canv_top.SetTicky(1)
-    canv_top.SetLeftMargin(0.20)
-    canv_top.SetRightMargin(0.02)
-    canv_top.SetBottomMargin(0.0)
-    canv_top.SetTopMargin(0.05)
-
-    canv.Modified()
-    canv.cd()
-    canvr = TPad(f"{cname}_ratio", "", 0.01, 0.01, 0.99, 0.3)
-    canvr.SetBottomMargin(0.35)
-    canvr.SetLeftMargin(0.20)
-    canvr.SetRightMargin(0.02)
-    canvr.SetTopMargin(0.0)
-
-    for canvas in (canv, canv_top, canvr):
-        canvas.SetFillColor(0)
-        canvas.SetBorderMode(0)
-        canvas.SetBorderSize(2)
-        canvas.SetFrameBorderMode(0)
-        canvas.SetTickx(1)
-        canvas.SetTicky(1)
-    canvr.Draw()
-    canv_top.cd()
-    canv_top.Draw()
-
-    return canv, canv_top, canvr
+def prepare_canvas(cname):
+    canv = TCanvas(cname, "")
+    canv.SetCanvasSize(700, 700)
+    canv.SetTickx(1)
+    canv.SetTicky(1)
+    canv.SetLeftMargin(0.15)
+    canv.SetRightMargin(0.02)
+    canv.SetBottomMargin(0.12)
+    canv.SetTopMargin(0.05)
+    canv.SetFillColor(0)
+    canv.SetBorderMode(0)
+    canv.SetBorderSize(2)
+    canv.SetFrameBorderMode(0)
+    return canv
 
 
 def save_canvas(canv, cfg, filename):
@@ -169,19 +148,19 @@ def set_hist_style(hist, color, y_axis, style=None):
     hist.GetYaxis().SetTitleFont(42)
     hist.GetXaxis().SetTitleFont(42)
     hist.GetYaxis().SetTitleSize(0.06)
-    hist.GetYaxis().SetTitleOffset(1.4)
-    hist.GetYaxis().SetLabelSize(0.06)
-    hist.GetYaxis().SetLabelOffset(0.02)
+    hist.GetYaxis().SetTitleOffset(1.2)
+    hist.GetYaxis().SetLabelSize(0.04)
+    hist.GetYaxis().SetLabelOffset(0.01)
     hist.GetXaxis().SetTitleSize(0.05)
     hist.GetXaxis().SetTitleOffset(1.0)
-    hist.GetXaxis().SetLabelSize(0.07)
-    hist.GetXaxis().SetLabelOffset(0.02)
+    hist.GetXaxis().SetLabelSize(0.04)
+    hist.GetXaxis().SetLabelOffset(0.01)
     #hist.GetXaxis().SetNdivisions(808)
     hist.SetLineColor(color)
     hist.SetLineWidth(2)
     hist.GetXaxis().SetTitle("#it{p}_{T}(GeV/#it{c})")
     hist.GetYaxis().SetTitle(y_axis)
-    
+
     if style:
         hist.SetFillColor(color)
         hist.SetFillStyle(style)
@@ -240,15 +219,15 @@ def get_hist_model(label, color, style, cfg):
     return hist
 
 
-def plot_compare(cfg, canv_main, canv):
+def plot_compare(cfg, canv):
     maxy = 0.
     miny = 1000000.
 
     hists_models = []
     if cfg.get("models", None):
         leg_models = get_legend(*cfg["legend_models"], len(cfg["models"]))
-        leg_models.SetMargin(0.2)
-        leg_models.SetTextSize(0.05)
+        leg_models.SetMargin(0.4)
+        leg_models.SetTextSize(0.035)
         leg = get_legend(*cfg["legend"], len(cfg["hists"]))
         for ind, (label, color, style) in \
                 enumerate(zip(cfg["models"], MODELS_COLORS, MODELS_STYLES)):
@@ -321,11 +300,10 @@ def plot_compare(cfg, canv_main, canv):
     else:
         alice_text = None
 
-    canv_main.cd()
+    canv.cd()
     canv.Draw()
-    canv_main.Draw()
 
-    return canv_main, canv, hists, graphs_syst, hists_models, leg, leg_models, alice_text, central_graph
+    return canv, hists, graphs_syst, hists_models, leg, leg_models, alice_text, central_graph
 
 
 def get_average(hist, graph_syst):
@@ -511,11 +489,11 @@ def main():
     with TFile(os.path.join(cfg["output"]["outdir"],
                f'{cfg["output"]["file"]}.root'), "recreate") as output:
 
-        canv, canv_top, canvr = prepare_canvas(f'c_{cfg["histoname"]}', cfg.get("log_scale", False))
-        canv, canv_top, hists, graphs_syst, hists_models, leg, leg_models, alice_text, central_graph = plot_compare(cfg, canv, canv_top) # pylint: disable=unused-variable
+        canv  = prepare_canvas(f'c_{cfg["histoname"]}')
+        canv, hists, graphs_syst, hists_models, leg, leg_models, alice_text, central_graph = plot_compare(cfg, canv) # pylint: disable=unused-variable
         output.cd()
-        canv_top.Write()
-        save_canvas(canv_top, cfg, f'{cfg["output"]["file"]}_top')
+        canv.Write()
+        save_canvas(canv, cfg, f'{cfg["output"]["file"]}')
         for _, hist in hists.items():
             hist.Write()
         for graph in graphs_syst:
@@ -523,21 +501,21 @@ def main():
         for hist in hists_models:
             hist.Write()
 
-        canv, canvr, histr, graphr, legr, line = plot_ratio(cfg, hists, graphs_syst, central_graph, canv, canvr)
-        output.cd()
-        canv.Write()
-        save_canvas(canv, cfg, f'{cfg["output"]["file"]}')
-        canvr.Write()
-        save_canvas(canvr, cfg, f'{cfg["output"]["file"]}_ratio')
-        for hist in histr:
-            hist.Write()
-        for graph in graphr:
-            graph.Write()
+        #canv, canvr, histr, graphr, legr, line = plot_ratio(cfg, hists, graphs_syst, central_graph, canv, canvr)
+        #output.cd()
+        #canv.Write()
+        #save_canvas(canv, cfg, f'{cfg["output"]["file"]}')
+        #canvr.Write()
+        #save_canvas(canvr, cfg, f'{cfg["output"]["file"]}_ratio')
+        #for hist in histr:
+        #    hist.Write()
+        #for graph in graphr:
+        #    graph.Write()
 
-        calc_systematics(cfg, hists)
+        #calc_systematics(cfg, hists)
 
-        canv_top.Delete()
-        canvr.Delete()
+        #canv_top.Delete()
+        #canvr.Delete()
 
 
 if __name__ == "__main__":
