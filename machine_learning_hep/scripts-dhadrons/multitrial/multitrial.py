@@ -22,8 +22,7 @@ from ROOT import (  # pylint: disable=import-error,no-name-in-module
 def plot_text_box(ax, text):
     ax.text(0.98, 0.97, text,
             horizontalalignment="right", verticalalignment="top",
-            fontsize=40, va="top", transform=ax.transAxes,
-            bbox={"edgecolor": "black", "fill": False})
+            fontsize=40, transform=ax.transAxes)
 
 
 def get_yields(cfg):
@@ -68,10 +67,10 @@ def get_yields(cfg):
 def prepare_figure(y_label, ticks):
     fig = plt.figure(figsize=(20, 15))
     ax = plt.subplot(1, 1, 1)
-    ax.set_xlabel("Trial #", fontsize=20)
-    ax.set_ylabel(y_label, fontsize=20)
+    ax.set_xlabel("Trial #", fontsize=40)
+    ax.set_ylabel(y_label, fontsize=40)
     ax.tick_params(which="both", width=2.5, direction="in")
-    ax.tick_params(which="major", labelsize=20, length=15)
+    ax.tick_params(which="major", labelsize=30, length=15)
     ax.tick_params(which="minor", length=7)
     ax.xaxis.set_major_locator(MultipleLocator(ticks))
     ax.xaxis.set_minor_locator(AutoMinorLocator(5))
@@ -91,7 +90,7 @@ def set_ax_limits(ax, pt_string, values):
 def plot_trial_line(ax, central_trial_ind):
     axis_lim = ax.get_ylim()
     y_axis = np.linspace(*axis_lim, 100)
-    ax.plot([central_trial_ind] * len(y_axis), y_axis, c="m", ls="--", linewidth=4.0)
+    ax.plot([central_trial_ind] * len(y_axis), y_axis, c="m", ls="--", linewidth=4.0, label="central trial #")
     ax.set_ylim(*axis_lim)
 
 
@@ -100,18 +99,19 @@ def plot_yields_trials(yields, yields_err, trials, cfg, pt_string, plot_pt_strin
     fig, ax = prepare_figure("Raw yield", 100)
     x_axis = range(len(trials))
     ax.errorbar(x_axis, yields, yerr=yields_err,
-                fmt="o", c="b", elinewidth=2.5, linewidth=4.0)
+                fmt="o", c="b", elinewidth=2.5, linewidth=4.0, label="yields")
     set_ax_limits(ax, pt_string, yields)
     central_line = np.array([central_yield] * len(x_axis), dtype="float32")
-    ax.plot(x_axis, central_line, c="orange", ls="--", linewidth=4.0)
+    ax.plot(x_axis, central_line, c="orange", ls="--", linewidth=4.0, label="central trial yield")
     central_err = np.array([yields_err[central_trial_ind]] * len(x_axis), dtype="float32")
     ax.fill_between(x_axis, central_line - central_err, central_line + central_err,
-                    facecolor="orange", edgecolor="none", alpha=0.3)
+                    facecolor="orange", edgecolor="none", alpha=0.3, label="central yield error")
     plot_trial_line(ax, central_trial_ind)
     plot_text_box(ax, plot_pt_string)
-    trial_file = f'{cfg["outdir"]}/{cfg["outfile"]}_yields_trials_{pt_string}.png'
-    print("trial file:")
-    print(trial_file)
+    ax.text(0.02, 0.97, "This Thesis",
+            horizontalalignment="left", verticalalignment="top",
+            fontsize=50, transform=ax.transAxes)
+    ax.legend(loc="lower left", frameon=False, fontsize=25)
     fig.savefig(f'{cfg["outdir"]}/{cfg["outfile"]}_yields_trials_{pt_string}.png',
                 bbox_inches="tight")
     plt.close()
@@ -131,8 +131,9 @@ def plot_chis(chis, cfg, pt_string, plot_pt_string):
 def plot_yields_distr(yields, cfg, pt_string, plot_pt_string, central_trial_ind, central_yield):
     plt.figure(figsize=(20, 15))
     ax = plt.subplot(1, 1, 1)
-    ax.set_xlabel("Ratio", fontsize=20)
-    ax.tick_params(labelsize=20, length=7, width=2.5)
+    ax.set_xlabel("Ratio to the central value", fontsize=40)
+    ax.set_ylabel("Counts", fontsize=40)
+    ax.tick_params(labelsize=30, length=7, width=2.5)
     ratios = [yield_ / central_yield for ind, yield_ in enumerate(yields) \
               if ind != central_trial_ind]
     ax.hist(ratios, color="b", linewidth=4.0)
@@ -148,6 +149,9 @@ def plot_yields_distr(yields, cfg, pt_string, plot_pt_string, central_trial_ind,
                       f"std dev: {std_dev:.2f}\n"\
                       f"RMSE:    {rmse:.2f}\n"\
                       f"#trials: {len(yields)}")
+    ax.text(0.02, 0.97, "This Thesis",
+            horizontalalignment="left", verticalalignment="top",
+            fontsize=50, transform=ax.transAxes)
     plt.savefig(f'{cfg["outdir"]}/{cfg["outfile"]}_distr_{pt_string}.png', bbox_inches="tight")
     plt.close()
 
@@ -172,10 +176,13 @@ def main():
                 central_trial_ind = trials[pt_string].index(cfg["central_trial"])
                 central_yield = yields[pt_string][central_trial_ind]
 
+                print(f"Plotting yields pt {pt_bin_min}, {pt_bin_max}")
                 plot_yields_trials(yields[pt_string], yields_err[pt_string], trials[pt_string], cfg,
                                    pt_string, plot_pt_string, central_trial_ind, central_yield)
+                print(f"Plotting ratios pt {pt_bin_min}, {pt_bin_max}")
                 plot_yields_distr(yields[pt_string], cfg, pt_string, plot_pt_string,
                                   central_trial_ind, central_yield)
+                print(f"Plotting chis pt {pt_bin_min}, {pt_bin_max}")
                 plot_chis(chis[pt_string], cfg, pt_string, plot_pt_string)
             except: # pylint: disable=bare-except
                 pass
